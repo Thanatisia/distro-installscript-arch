@@ -1,0 +1,32 @@
+# Contributing
+
+- How to contribute?
+  - 1. (OPTIONAL) Star this original project to follow
+  - 2. Fork this project
+    - Click on the "Fork" button in the original project repository
+  - 3. Clone forked project into your local repository
+    - git clone "forked-remote-repository-url"
+  - 4. (OPTIONAL) add username & email into local git to allow push
+    - git config {--global} { user.name "username" | user.email "email" }
+  - 5. Make changes to your project
+  - 6. Change branch to an another testing branch
+    - This will make it easier for the maintainer to differentiate Pull Requests
+    - Command: git checkout -b {new-branch}
+  - 7. Add files/folders to changes
+    - git add { . | "path" | * }
+  - 8. Commit changes made
+    - git commit -m {message}
+  - 9. Push local repository to your forked remote repository
+    - git push -u {forked-remote-repository-url} {branch-name}
+  - 10. Create Pull Request
+    - To request for the maintainer to accept your contributions and merge to the main branch
+    - Steps
+      - 1. Go to your forked remote repository on GitHub | GitLab
+      - 2. You should now see a yellow button that says "Changes found"
+      - 3. Click on "Request Pull Request"
+      - 4. State and specify the changes you've made so that the maintainer knows what you did/changed
+      - 5. Once you confirm and am ready, press "Confirm Pull Request"
+      - 6. (OPTIONAL) Wait for maintainer
+      - 7. Pull changes to local repository
+        - git pull
+      - 8. Repeat Steps 5-10
