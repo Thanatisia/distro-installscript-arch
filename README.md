@@ -23,6 +23,9 @@ thank you!
 1. Contacts
 
 [Contacts]
+
 Twitter: [@phantasu](https://twitter.com/phantasu)
+
 [My Portfolio Website](https://thanatisia.github.io/my-portfolio-website)
+
 Fiverr: @fortissimasura
