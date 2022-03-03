@@ -663,7 +663,7 @@ postinstallation()
 	
 	# Combine into a string
 	cmd_str=""
-	for c in "${chroot_commands[@]}"; do
+	for c in "${postinstall_commands[@]}"; do
 		cmd_str+="\n$c;"
 	done
 	
