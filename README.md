@@ -1,6 +1,16 @@
 # distro-installscript-arch
 
-Welcome to my ArchLinux distro install script!
+Linux Distribution Portable, Modular Command Line/Terminal Installation Script - ArchLinux
+
+## Table of Contents
+
+1. Background
+2. Remarks
+3. Contents
+
+## Background
+
+Welcome to my **ArchLinux distro install script**!
 
 Designed to be
 
@@ -13,19 +23,32 @@ Afterwhich, when you want to install the build, you just need to open it, edit t
 
 On run, just several presses to confirm the details and it's done!
 
+## Remarks
+
 - Please do contact me in any of the platforms below if you have any ideas | bugs | comments | suggestions or if you just wanna talk!
 I am open for suggestions as well as talking to everyone
 
-thank you!
+- As of 2022-03-04 1349H : The current status of the scripts is primarily for brand new installations
+	> I am attempting to and in the midst of adding pre-existing installation features as well as testings surrounding pre-existing distributions
+	> Thus, please do update
 
-[Table of Contents]
+- I am thinking of making a discord group for my set of Linux Installation Script plans, do message me in any of the following contacts if you are interested.
 
-1. Contacts
+- Do message me with any comments or suggestions for improvements, all comments will be greatly appreciated!
 
-[Contacts]
+- Please star/follow this repository if you think this is useful!
 
-Twitter: [@phantasu](https://twitter.com/phantasu)
+thank you again for using!
 
-[My Portfolio Website](https://thanatisia.github.io/my-portfolio-website)
 
-Fiverr: @fortissimasura
+## Contents
+
+- Contacts
+
+	> Twitter: [@phantasu](https://twitter.com/phantasu)
+
+	> [My Portfolio Website](https://thanatisia.github.io/my-portfolio-website)
+
+	> Fiverr: @fortissimasura
+
+
