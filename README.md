@@ -45,8 +45,8 @@ thank you again for using!
 
 [base-installation](base-installation)
 
-    - [Manual](base-installation/installer-manual.sh)
-    - [Simple](base-installation/installer-ux.sh)
+* [Manual](base-installation/installer-manual.sh)
+* [Simple](base-installation/installer-ux.sh)
 
 	> Differences:
 		Manual : Variables are defined in arrays & associative arrays directly labelled with 'EDIT THIS'
@@ -63,25 +63,25 @@ thank you again for using!
 
 [post-installation](post-installation)
 
-	- [Install Core & Essential Packages](postinstallation-core-packages.sh)
-	- [Setup Root Settings](postinstallations-root.sh)
-	- [General PostInstallation Setup](postinstallations.sh)
+* [Install Core & Essential Packages](postinstallation-core-packages.sh)
+* [Setup Root Settings](postinstallations-root.sh)
+* [General PostInstallation Setup](postinstallations.sh)
 
 [references](references)
 
-	- [vbox-usboot-1](references/vbox-usboot-1)
+* [vbox-usboot-1](references/vbox-usboot-1)
 
-		- Reference example profile 
+	- Reference example profile 
 
-		- used to install in a USB MicroSD Card booted in a VirtualBox ArchLinux Instance
+	- used to install in a USB MicroSD Card booted in a VirtualBox ArchLinux Instance
 
 
 ## Contacts
 
-	> Twitter: [@phantasu](https://twitter.com/phantasu)
+* Twitter: [@phantasu](https://twitter.com/phantasu)
 
-	> [My Portfolio Website](https://thanatisia.github.io/my-portfolio-website)
+* [My Portfolio Website](https://thanatisia.github.io/my-portfolio-website)
 
-	> Fiverr: @fortissimasura
+* Fiverr: @fortissimasura
 
 
