@@ -49,7 +49,9 @@ thank you again for using!
 * [Simple](base-installation/installer-ux.sh)
 
 	> Differences:
+
 		- Manual : Variables are defined in arrays & associative arrays directly labelled with 'EDIT THIS'
+
 		- Simple : Arrays & Associative Arrays have all been predefined and "Symlinked" with variable containers at the top
 			- You (the user) just need to modify the variables labelled under 'EDIT THIS' at the top
 
