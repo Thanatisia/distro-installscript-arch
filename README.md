@@ -8,6 +8,7 @@ Linux Distribution Portable, Modular Command Line/Terminal Installation Script -
 2. Remarks
 3. Files
 4. Contacts
+5. FAQs
 
 ## Background
 
@@ -85,5 +86,7 @@ thank you again for using!
 * [My Portfolio Website](https://thanatisia.github.io/my-portfolio-website)
 
 * Fiverr: @fortissimasura
+
+## FAQs
 
 
