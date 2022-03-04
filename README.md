@@ -45,8 +45,8 @@ thank you again for using!
 
 [base-installation](base-installation)
 
-	- [Manual](base-installation/installer-manual.sh)
-	- [Simple](base-installation/installer-ux.sh)
+    - [Manual](base-installation/installer-manual.sh)
+    - [Simple](base-installation/installer-ux.sh)
 
 	> Differences:
 		Manual : Variables are defined in arrays & associative arrays directly labelled with 'EDIT THIS'
