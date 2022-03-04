@@ -21,7 +21,7 @@
 PROGRAM_SCRIPTNAME="installation-core-packages"
 PROGRAM_NAME="Postinstallation: Core Packages Installation"
 PROGRAM_TYPE="Main"
-MODE="DEBUG" # { DEBUG | RELEASE }
+MODE="${1:-DEBUG}" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 
 # [Folders]
