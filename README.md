@@ -6,7 +6,8 @@ Linux Distribution Portable, Modular Command Line/Terminal Installation Script -
 
 1. Background
 2. Remarks
-3. Contents
+3. Files
+4. Contacts
 
 ## Background
 
@@ -40,10 +41,42 @@ I am open for suggestions as well as talking to everyone
 
 thank you again for using!
 
+## Files
 
-## Contents
+[base-installation](base-installation)
 
-- Contacts
+	- [Manual](base-installation/installer-manual.sh)
+	- [Simple](base-installation/installer-ux.sh)
+
+	> Differences:
+		Manual : Variables are defined in arrays & associative arrays directly labelled with 'EDIT THIS'
+		Simple : Arrays & Associative Arrays have all been predefined and "Symlinked" with variable containers at the top
+			- You (the user) just need to modify the variables labelled under 'EDIT THIS' at the top
+
+	> Notes:
+		- The script is designed for portability and modularity in mind, thus:
+			> You do not need to change or modify any of the functions unless 
+				a. you know what you're adding or
+				
+				b. you're contributing to the project
+			> Just need to edit the variables labelled with 'EDIT THIS'
+
+[post-installation](post-installation)
+
+	- [Install Core & Essential Packages](postinstallation-core-packages.sh)
+	- [Setup Root Settings](postinstallations-root.sh)
+	- [General PostInstallation Setup](postinstallations.sh)
+
+[references](references)
+
+	- [vbox-usboot-1](references/vbox-usboot-1)
+
+		- Reference example profile 
+
+		- used to install in a USB MicroSD Card booted in a VirtualBox ArchLinux Instance
+
+
+## Contacts
 
 	> Twitter: [@phantasu](https://twitter.com/phantasu)
 
