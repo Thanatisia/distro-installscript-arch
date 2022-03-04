@@ -46,7 +46,7 @@ thank you again for using!
 [base-installation](base-installation)
 
 * [Manual](base-installation/installer-manual.sh)
-* [Simple](base-installation/installer-ux.sh)
+* [Simple](base-installation/installer-ux.min.sh)
 
 	> Differences:
 
