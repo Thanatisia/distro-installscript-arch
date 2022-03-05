@@ -19,6 +19,7 @@
 #	- 2021-07-12 0925H, Asura
 #	- 2021-07-12 1223H, Asura
 #	- 2021-07-13 0928H, Asura
+#	- 2022-03-05 1202H, Asura
 # Features: 
 #	- Full minimal user input install script
 # Background Information: 
@@ -70,6 +71,8 @@
 #			- Remove files after completion to clean up the account for use
 #	- 2021-08-01 1116H, Asura
 #		- Updated postinstall script to include option to copy script files to user
+#	- 2022-03-05 1202H, Asura
+#		- Added more documentation to [partition_Parameters]
 # TODO:
 #		- Seperate and create script 'postinstallation-utilities.sh' for PostInstallation processes (non-installation focus)
 #			such as 
@@ -191,11 +194,15 @@ declare -A partition_Configuration=(
 )
 
 declare -A partition_Parameters=(
+	# This is the default container for partition parameters
+	# - created to store partition parameter as global variable
+	# This will be used to dynamically store data
+	# You do not need to edit this
 	[part_ID]=1
 	[part_Name]="Boot"
 	[part_Type]="primary"
 	[part_file_Type]="ext4"
-	[part_start_Size]="1MiB"
+	[part_start_Size]="0%"
 	[part_end_Size]="1024MiB"
 	[part_Bootable]=True
 	[part_Others]=""
