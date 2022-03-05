@@ -20,6 +20,7 @@
 #	- 2021-07-12 1223H, Asura
 #	- 2021-07-13 0928H, Asura
 #	- 2022-03-05 1202H, Asura
+#	- 2022-03-05 1540H, Asura
 # Features: 
 #	- Full minimal user input install script
 # Background Information: 
@@ -73,6 +74,9 @@
 #		- Updated postinstall script to include option to copy script files to user
 #	- 2022-03-05 1202H, Asura
 #		- Added more documentation to [partition_Parameters]
+#	- 2022-03-05 1540H, Asura
+#		- Updated /etc/sudoers : (ALL) ALL => (ALL:ALL) ALL
+#			- Previously (ALL) ALL, however, it was changed sometime in 2021/2022 updates
 # TODO:
 #		- Seperate and create script 'postinstallation-utilities.sh' for PostInstallation processes (non-installation focus)
 #			such as 
@@ -923,7 +927,7 @@ postinstallation()
 	# =========== #
 	postinstall_commands+=(
 		"echo ======= Enable sudo ======="												# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'
-		"sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+ALL\)/\1/' /etc/sudoers"				# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'
+		"sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL:ALL)\s\+ALL\)/\1/' /etc/sudoers"				# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'
 	)
 
 	# =============== #
