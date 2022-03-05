@@ -3,12 +3,17 @@
 This page contains the Base Installation Scripts
 
 ## Table of Contents:
+- Notes
 - Obtaining
 - Syntax
 - Parameters/Options/Flags
 - Pre-Requisites
 - Usage
 - FAQs
+
+## Notes
+	1. Please note that as of 2022-03-05 1147H : The script only has support for MBR (MSDOS/BIOS) Bootloader style
+		- Implementation of UEFI (EFI) support is currently in the plans
 
 ## Obtaining
 	1. via cloning (Whole)

@@ -57,7 +57,7 @@ This page contains the Post Installation Scripts
 
 		Syntax: curl -L -O https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/post-installation/script_name.sh
 		Examples:
-			installer-ux.min.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/post-installation/postinstallations.sh
+			postinstallations.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/post-installation/postinstallations.sh
 
 ## Syntax
 

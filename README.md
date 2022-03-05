@@ -30,9 +30,14 @@ On run, just several presses to confirm the details and it's done!
 - Please do contact me in any of the platforms below if you have any ideas | bugs | comments | suggestions or if you just wanna talk!
 I am open for suggestions as well as talking to everyone
 
-- As of 2022-03-04 1349H : The current status of the scripts is primarily for brand new installations
-	> I am attempting to and in the midst of adding pre-existing installation features as well as testings surrounding pre-existing distributions
-	> Thus, please do update
+- Please note that 
+	- as of 2022-03-04 1349H : The current status of the scripts is tested primarily for brand new installations
+		> I am attempting to and in the midst of adding pre-existing installation features as well as testings surrounding pre-existing distributions
+
+		> Thus, please do becareful when attempting to multiboot with this script
+
+	- as of 2022-03-05 1147H : The script only has support for MBR (MSDOS/BIOS) Bootloader style
+		> Implementation of UEFI (EFI) support is currently in the plans
 
 - I am thinking of making a discord group for my set of Linux Installation Script plans, do message me in any of the following contacts if you are interested.
 
