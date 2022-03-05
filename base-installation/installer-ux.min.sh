@@ -94,6 +94,11 @@
 #				- If user is empty : while true and get user to create until user is created
 # NOTES:
 #	- Please modify all [EDIT: Modify this] and confirm before running this file
+#	- As of 2022-03-05 2306H:
+#		- Support for installation from existing linux distro is still a WIP
+#			- Please try to install from the ArchLinux ISO
+#			- If you would like to try to install from an existing linux distro
+#				- Please install the package [arch-install-scripts]
 # References:
 #	1. Multiline-scripting in Arch-chroot : https://www.reddit.com/r/archlinux/comments/bssbze/scripting_into_chroot/
 #

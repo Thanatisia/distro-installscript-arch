@@ -12,8 +12,13 @@ This page contains the Base Installation Scripts
 - FAQs
 
 ## Notes
-	1. Please note that as of 2022-03-05 1147H : The script only has support for MBR (MSDOS/BIOS) Bootloader style
-		- Implementation of UEFI (EFI) support is currently in the plans
+	1. Please note that as of 2022-03-05 1147H : 
+
+		- The script only has support for MBR (MSDOS/BIOS) Bootloader style
+			- Implementation of UEFI (EFI) support is currently in the plans
+
+		- Scripts only support installation from the ArchLinux Installer
+			- Installation from an existing distro is currently in the works
 
 ## Obtaining
 	1. via cloning (Whole)
