@@ -20,6 +20,7 @@
 #	- 2021-07-12 0925H, Asura
 #	- 2021-07-12 1223H, Asura
 #	- 2021-07-26 1727H, Asura
+#	- 2022-03-05 1134H, Asura
 # Features: 
 #	- Full minimal user input install script
 # Background Information: 
@@ -68,6 +69,8 @@
 #	- 2021-07-26 1727H, Asura
 #		- Transferred newest functions made in [installer-ux.min.sh]
 #			- Should now be working
+#	- 2022-03-05 1134H, Asura
+#		- Copied function body from [installer-ux.min.sh] to make it similar
 # TODO:
 #		- Seperate and create script 'postinstallation-utilities.sh' for PostInstallation processes (non-installation focus)
 #			such as 
@@ -253,6 +256,33 @@ debug_printAll()
 			;;
 	esac
 }
+seperate_by_Delim()
+{
+	#
+	# Seperate a string into an array by the delimiter
+	#
+
+	# --- Input
+	
+	# Command Line Argument
+	str="$1"			# String to be seperated
+	delim="${2:-';'}"	# Delimiter to split
+
+	# Local Variables
+
+	# Array
+	content=()			# Array container to store results
+	char=''				# Single character for splitting element of a string
+
+	# Associative Array
+
+	# --- Processing
+	# Split string into individual characters
+	IFS=$delim read -r -a content <<< "$str"
+	
+	# --- Output
+	echo "${content[@]}"
+}
 
 # Installation stages
 verify_network()
@@ -282,30 +312,19 @@ verify_boot_Mode()
 
 update_system_Clock()
 {
-	comms=(
-		# Sync NTP
-		"timedatectl set-ntp true"
-		# To check system clock
-		"timedatectl status"
-	)
-
-	for c in "${comms[@]}"; do
-		case "$MODE" in
-			"DEBUG")
-				echo $c
-				;;
-			*)
-				# Default: RELEASE
-				$c
-				;;
-		esac
-	done
-
 	# Sync NTP
-	#echo timedatectl set-ntp true
+	if [[ "$MODE" == "DEBUG" ]]; then
+		echo timedatectl set-ntp true
+	else
+		timedatectl set-ntp true
+	fi
 
 	# To check system clock
-	#echo timedatectl status
+	if [[ "$MODE" == "DEBUG" ]]; then
+		echo timedatectl status
+	else
+		timedatectl status
+	fi
 }
 
 device_partition_Manager()
@@ -317,9 +336,6 @@ device_partition_Manager()
 	echo "Get User Input - Device Information"
 	device_Name="${device_Parameters["device_Name"]}"
 	device_Label="${device_Parameters["device_Label"]}"
-
-	echo "Device Name : $device_Name"
-	echo "Device Label: $device_Label"
 
 	echo ""
 
@@ -447,7 +463,6 @@ mount_Disks()
 	else
 		mkdir -p $dir_Home
 	fi
-
 	# Boot Directory
 	if [[ "$MODE" == "DEBUG" ]]; then
 		echo mkdir -p $dir_Boot
@@ -458,13 +473,9 @@ mount_Disks()
 	# Mount remaining directories
 	if [[ "$MODE" == "DEBUG" ]]; then
 		echo mount "$device_Name"3 $dir_Home
-	else
-		mount "$device_Name"3 $dir_Home
-	fi
-
-	if [[ "$MODE" == "DEBUG" ]]; then
 		echo mount "$device_Name"1 $dir_Boot
 	else
+		mount "$device_Name"3 $dir_Home
 		mount "$device_Name"1 $dir_Boot
 	fi
 
@@ -489,17 +500,19 @@ pacstrap_Install()
 	# --- Input
 
 	# Arrays
-	# pkgs=()
-	pkg=${pkgs["pacstrap"]}
+	pacstrap_Pkgs=${pkgs["pacstrap"]}
 
 	# Local Variables
-	mount_Point="${mount_Group["2"]}"
+	mount_Point=${mount_Group["2"]}
+
 
 	# --- Processing
 	if [[ "$MODE" == "DEBUG" ]]; then
-		echo pacstrap $mount_Point ${pkg[@]}
+		# echo pacstrap ${mount_Group["2"]} "${pkgs[@]}"
+		echo pacstrap $mount_Point ${pacstrap_Pkgs[@]}
 	else
-		pacstrap $mount_Point ${pkg[@]}
+		# pacstrap ${mount_Group["2"]} "${pkgs[@]}"
+		pacstrap $mount_Point ${pacstrap_Pkgs[@]}
 	fi
 
 	# --- Output
@@ -551,14 +564,14 @@ arch_chroot_Exec()
 		"hwclock --systohc"																# Step 10: Time Zones; Generate /etc/adjtime via hwclock
 		"echo ======= Location ======"													# Step 11: Localization;
 		# "vim /etc/locale.gen"															# Step 11: Localization; Edit /etc/locale.gen and uncomment language (ie. en_US.UTF-8 UTF-8; en_SG.UTF-8 UTF-8;)
-		"sed -i '/$location/s/^#//g' /etc/locale.gen"									# Step 11: Localization; Uncomment the locale region language
+		"sed -i '/$language/s/^#//g' /etc/locale.gen" 									# Step 11: Localization; Uncomment locale using sed
 		"locale-gen"																	# Step 11: Localization; Generate the locales by running
 		"echo \"LANG=$language\" | tee -a /etc/locale.conf"								# Step 11: Localization; Set LANG variable according to your locale
 		"echo ======= Network Configuration ======"										# step 12: Network Configuration;
 		"echo \"$hostname\" | tee -a /etc/hostname"										# Step 12: Network Configuration; Set Network Hostname Configuration; Create hostname file
 		"echo \"127.0.0.1   localhost\" | tee -a /etc/hosts"							# Step 12: Network Configuration; Add matching entries to hosts file
 		"echo \"::1         localhost\" | tee -a /etc/hosts"							# Step 12: Network Configuration; Add matching entries to hosts file
-		"echo \"127.0.1.1   $hostname.localdomain   $hostname\" | tee -a /etc/hosts"	# Step 12: Network Configuration; Add matching entries to hosts file
+		"echo \"127.0.1.1   $hostname.localdomain	$hostname\" | tee -a /etc/hosts"	# Step 12: Network Configuration; Add matching entries to hosts file
 		"echo ======= Make Initial Ramdisk ======="										# Step 13: Initialize RAM file system;
 		"mkinitcpio -P linux"															# Step 13: Initialize RAM file system; Create initramfs image (linux kernel)
 		"mkinitcpio -P linux-lts"														# Step 13: Initialize RAM file system; Create initramfs image (linux-lts kernel)
@@ -627,18 +640,62 @@ arch_chroot_Exec()
 	for c in "${chroot_commands[@]}"; do
 		cmd_str+="\n$c;"
 	done
-	
+
 	# Cat commands into script file in mount root
 	mount_Root=$dir_Mount/root
 	script_to_exe=chroot-comms.sh
 	if [[ "$MODE" == "DEBUG" ]]; then
-		# echo "echo -e "$cmd_str" > $mount_Root/$script_to_exe"
 		echo -e "$cmd_str"
 	else
 		echo -e "$cmd_str" > $mount_Root/$script_to_exe
 	fi
 
 	# Execute in arch-chroot
+	# ====== RETAIN THIS PIECE OF CODE FOR LEGACY DEBUGGING, THX FUTURE ME ====== #
+	#for c in "${chroot_commands[@]}"; do
+	#	if [[ "$MODE" == "DEBUG" ]]; then
+	#		echo arch-chroot $dir_Mount $c
+	#	else
+	#		arch-chroot $dir_Mount $c
+	#	fi
+	#done
+	# ====== RETAIN THIS PIECE OF CODE FOR LEGACY DEBUGGING, THX FUTURE ME ====== #
+	#for c in "${chroot_commands[@]}"; do
+	#	if [[ "$MODE" == "DEBUG" ]]; then	
+	#		# echo arch-chroot $dir_Mount $c
+	#		echo "arch-chroot $dir_Mount <<-EOF\
+	#			$c\
+	#		EOF"
+	#	else
+	#		# arch-chroot $dir_Mount $c
+	#		arch-chroot $dir_Mount <<-EOF
+	#			$c
+	#		EOF
+	#	fi
+	#done
+	
+	#if [[ "$MODE" == "DEBUG" ]]; then
+	#	echo -e "arch-chroot $dir_Mount <<- EOF\
+	#		$cmd_str
+	#	EOF"
+	#else
+	#	arch-chroot $dir_Mount <<-EOF
+	#		$cmd_str
+	#	EOF
+	#fi
+
+	#for c in "${chroot_commands[@]}"; do
+	#	if [[ "$MODE" == "DEBUG" ]]; then
+	#		echo -e "arch-chroot $dir_Mount $c"
+	#	else
+	#		arch-chroot $dir_Mount $c
+	#	fi
+	#done
+	external_scripts+=(
+		### Append all external scripts used ###
+		$mount_Root/$script_to_exe
+	)
+
 	if [[ "$MODE" == "DEBUG" ]]; then
 		echo "chmod +x $mount_Root/$script_to_exe"
 		echo "arch-chroot $dir_Mount /bin/bash -c \"$PWD/$script_to_exe\""
@@ -649,22 +706,248 @@ arch_chroot_Exec()
 	# --- Output
 }
 
+
+# =========================== #
+# Post-Installation Functions #
+# =========================== #
+# User Management
+get_users_Home()
+{
+	#
+	# Get the home directory of a user
+	#
+	USER_NAME=$1
+	HOME_DIR=""
+	if [[ ! "$USER_NAME"  == "" ]]; then
+		# Not Empty
+		HOME_DIR=$(su - $USER_NAME -c "echo \$HOME")
+	fi
+	echo "$HOME_DIR"
+}
+check_user_Exists()
+{
+	#
+	# Check if user exists
+	#
+	user_name="$1"
+	exist_Token="0"
+	delimiter=":"
+	res_Existence="$(getent passwd $user_name)"
+
+	if [[ ! "$res_Existence" == "" ]]; then
+		# Something is found
+		# Check if is the user
+		res_is_User=$(echo "$res_Existence" | grep "^$user_name:" | cut -d ':' -f1)
+
+		if [[ "$res_is_User" == "$user_name" ]]; then
+			exist_Token="1"
+		fi
+	fi
+
+	echo "$exist_Token"
+}
+useradd_get_default_Params()
+{
+    #
+    # Useradd
+    #   - Get Default Parameters
+    #
+    declare -A params=(
+        [group]="$(useradd -D | grep GROUP | cut -d '=' -f2)"
+        [home]="$(useradd -D | grep HOME | cut -d '=' -f2)"
+        [inactive]="$(useradd -D | grep INACTIVE | cut -d '=' -f2)"
+        [expire]="$(useradd -D | grep EXPIRE | cut -d '=' -f2)"
+        [shell]="$(useradd -D | grep SHELL | cut -d '=' -f2)"
+        [skeleton-path]="$(useradd -D | grep SKEL | cut -d '=' -f2)"
+        [create-mail-spool]="$(useradd -D | grep CREATE_MAIL_SPOOL | cut -d '=' -f2)"
+    )
+    default_Params=()
+
+    keywords=(
+        "GROUP"
+        "HOME"
+        "INACTIVE"
+        "EXPIRE"
+        "SHELL"
+        "SKEL"
+        "CREATE_MAIL_SPOOL"
+    )
+    for k in "${keywords[@]}"; do
+        # Put all keywords with the default values
+        # default_Params[$k]="$(useradd -D | grep $k | cut -d '=' -f2)"
+        default_Params+=("$(useradd -D | grep $k | cut -d '=' -f2)")
+    done
+
+    echo "${default_Params[@]}"
+}
+get_all_users()
+{
+	#
+	# Check if user exists
+	#
+	exist_Token="0"
+	delimiter=":"
+	res_Existence="$(getent passwd)"
+    all_users=($(cut -d ':' -f1 /etc/group | tr '\n' ' '))
+
+	echo "${all_users[@]}"
+}
+get_user_primary_group()
+{
+    #
+    # Just retrieves the user's primary group (-g)
+    #
+    user_name="$1"
+    primary_group="$(id -gn $user_name)"
+    echo "$primary_group"
+}
+create_user()
+{
+    # =========================================
+    # :: Function to create user lol
+    #   1. Append all arguments into the command
+    #   2. Execute command and create
+    # =========================================
+
+    # --- Head
+    ### Parameters ###
+    u_name="$1"                 # User Name
+    # Get individual parameters
+    u_primary_Group="$2"        # Primary Group
+    u_secondary_Groups="$3"     # Secondary Groups
+    u_home_Dir="$4"             # Home Directory
+    u_other_Params="$5"         # Any other parameters after the first 3
+
+    # Local variables
+    u_create_Command="useradd"
+    create_Token="0"            # 0 : not Created; 1 : Created
+
+    # --- Processing
+    # Get Parameters
+    if [[ ! "$u_home_Dir" == "NIL" ]]; then
+        # If Home Directory is not Empty
+        u_create_Command+=" -m "
+        u_create_Command+=" -d $u_home_Dir "
+    fi
+
+    if [[ ! "$u_primary_Group" == "NIL" ]]; then
+        # If Primary Group is Not Empty
+        u_create_Command+=" -g $u_primary_Group "
+    fi
+
+    if [[ ! "$u_secondary_Groups" == "NIL" ]]; then
+        # If Primary Group is Not Empty
+        u_create_Command+=" -G $u_secondary_Groups "
+    fi
+
+    if [[ ! "$u_other_Params" == "NIL" ]]; then
+        # If there are any miscellenous parameters
+        u_create_Command+=" $u_other_Params "
+    fi
+
+    u_create_Command+="$u_name"
+
+    # --- Output
+    # Return Create Command
+	echo "$u_create_Command"
+}
+
+# Post-Installation Stages
 postinstallation()
 {
 	#
 	# Post-Installation Recommendations and TODOs 
 	# - To be seperated into its own individual scripts for running
 	# 
-	postinstall_commands=(
+
+	### Header ###
+
+	# Local Variable
+	postinstall_commands=()
+
+	### Body ###
+	# =========== #
+	# Enable Sudo #
+	# =========== #
+	postinstall_commands+=(
 		"echo ======= Enable sudo ======="												# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'
-		"sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+ALL\)/\1/' /etc/sudoers"				# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'		
+		"sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL)\s\+ALL\)/\1/' /etc/sudoers"				# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'
 	)
 
+	# =============== #
+	# User Management #
+	# =============== #
+	postinstall_commands+=(
+		"echo ======= User Management ======="
+	)
+    # Loop through all users in user_profiles and
+    # See if it exists, follow above documentation
+    for u_ID in "${!user_Info[@]}"; do
+		curr_user="${user_Info[$u_ID]}"
+		curr_user_Params=($(seperate_by_Delim $curr_user ','))
+    
+        # Get individual parameters
+		u_name="${curr_user_Params[0]}"					# User Name
+        u_primary_Group="${curr_user_Params[1]}"        # Primary Group
+        u_secondary_Groups="${curr_user_Params[2]}"     # Secondary Groups
+        u_home_Dir="${curr_user_Params[3]}"             # Home Directory
+        u_other_Params="${curr_user_Params[@]:4}"       # Any other parameters after the first 3
+
+		# Check if user exists
+        u_Exists="$(check_user_Exists $u_name)" # Check if user exists; 0 : Does not exist | 1 : Exists
+
+        if [[ ! "$u_Exists" == "1" ]]; then
+            # 0 : Does not exist
+            echo "User [$u_name] does not exist"
+
+            u_create_Command="useradd"
+            # Get Parameters
+            if [[ ! "$u_home_Dir" == "NIL" ]]; then
+                # If Home Directory is not Empty
+                u_create_Command+=" -m "
+                u_create_Command+=" -d $u_home_Dir "
+            fi
+
+            if [[ ! "$u_primary_Group" == "NIL" ]]; then
+                # If Primary Group is Not Empty
+                u_create_Command+=" -g $u_primary_Group "
+            fi
+
+            if [[ ! "$u_secondary_Groups" == "NIL" ]]; then
+                # If Primary Group is Not Empty
+                u_create_Command+=" -G $u_secondary_Groups "
+            fi
+
+            if [[ ! "$u_other_Params" == "NIL" ]]; then
+                # If there are any miscellenous parameters
+                u_create_Command+=" $u_other_Params "
+            fi
+
+            u_create_Command+="$u_name"
+
+			postinstall_commands+=(
+				"$u_create_Command"
+			    "echo ==========================="
+                "echo Password change for $u_name"
+                "echo ==========================="
+				"if [[ \"\$?\" == \"0\" ]]; then"
+                "	passwd $u_name"
+				"fi"
+			)
+        fi
+    done
 	
+	
+	### Footer ###
+
+	# =============== #
+	# Execute Command #
+	# =============== #
+
 	# Combine into a string
 	cmd_str=""
 	for c in "${postinstall_commands[@]}"; do
-		cmd_str+="\n$c;"
+		cmd_str+="\n$c"
 	done
 	
 	# Cat commands into script file in mount root
@@ -686,6 +969,13 @@ postinstallation()
 		arch-chroot $dir_Mount /bin/bash -c "$PWD/$script_to_exe"
 	fi
 	
+	external_scripts+=(
+		### Append all external scripts used ###
+		$mount_Root/$script_to_exe
+	)
+
+	read -p "Finished, press anything to quit." finish
+
 	echo "- Please proceed to follow the 'Post-Installation' series of guides"
 	echo "and/or"
 	echo "- Follow this list of recommendations:"
@@ -789,6 +1079,109 @@ postinstall_user_create()
 	echo "		iv. If part iii works : User has been created."
 }
 
+postinstall_sanitize()
+{
+	# ========================== #
+	#        Sanitize user       #
+	#   To sanitize the account  #
+	# from any unnecessary files #
+	# ========================== #
+	# Local Variables
+	dir_Mount="${mount_Group["2"]}"
+
+	number_of_external_scripts="${#external_scripts[@]}"
+	echo -e "External Scripts created:"
+	for ((i=0; i < $number_of_external_scripts; i++)); do
+		echo "[$i] : [${external_scripts[$i]}]"
+	done
+	read -p "What would you like to do to the root scripts? [(C)opy to user|(D)elete|<Leave empty to do nothing>]: " action
+	case "$action" in
+		"C" | "Copy")
+			read -p "Copy to which user? [(A)ll created users|(S)elect]: " users
+
+			# Copy to stated users
+			case "$users" in
+				"A" | "All")
+					# Loop through all users in user_profiles and
+					# See if it exists, follow above documentation
+					for u_ID in "${!user_Info[@]}"; do
+						curr_user="${user_Info[$u_ID]}"
+						curr_user_Params=($(seperate_by_Delim $curr_user ','))
+					
+						# Get individual parameters
+						u_name="${curr_user_Params[0]}"					# User Name
+						u_primary_Group="${curr_user_Params[1]}"        # Primary Group
+						u_secondary_Groups="${curr_user_Params[2]}"     # Secondary Groups
+						u_home_Dir="${curr_user_Params[3]}"             # Home Directory
+						u_other_Params="${curr_user_Params[@]:4}"       # Any other parameters after the first 3
+
+						echo "Copying from [$PWD] : curl_repositories.sh => /mnt/$u_home_Dir"
+						cp curl_repositories.sh /mnt/$u_home_Dir/curl_repositories.sh														# Copy script from root to user
+						arch-chroot $dir_Mount /bin/bash -c "chown -R $u_name:$u_primary_Group $u_home_Dir/curl_repositories.sh"		# Change ownership of file to user
+					done
+					;;
+				"S" | "Select")
+					# User Input
+					read -p "User name: " sel_uhome
+					sel_primary_group=$(arch-chroot $dir_Mount /bin/bash -c "su - $sel_uhome -c 'echo \$(id -gn $sel_uhome)'")
+					sel_uhome_dir=$(arch-chroot $dir_Mount /bin/bash -c "su - $sel_uhome -c 'echo \$HOME'")
+					echo "Copying from [$PWD] : curl_repositories.sh => /mnt/$sel_uhome_dir/curl_repositories.sh"
+					cp curl_repositories.sh /mnt/$sel_uhome_dir/curl_repositories.sh
+					arch-chroot $dir_Mount /bin/bash -c "chown -R $sel_uhome:$sel_primary_group $sel_uhome_dir/curl_repositories.sh"		# Change ownership of file to user
+					;;
+				*)
+					;;
+			esac
+
+			# Reset script to let user delete if they want to
+			postinstall_sanitize
+			;;
+		"D" | "Delete")
+			read -p "Delete the scripts? [(Y)es|(N)o|(S)elect]: " del_conf
+			# Yes - Delete
+			# No - Nothing
+			# Select - Allow user to choose
+			case "$del_conf" in
+				"Y" | "Yes") 
+					# Delete all
+					for ((i=0; i < $number_of_external_scripts; i++)); do
+						if [[ "$MODE" == "DEBUG" ]]; then
+							echo "rm -r ${external_scripts[$i]}"
+						else
+							rm -r ${external_scripts[$i]}
+						fi
+					done
+					;;
+				"S" | "Select")
+					# Let user choose
+					# Seperate all options with delimiter ','
+					echo -e "Please enter all files you wish to delete\n	(Seperate all options with delimiter ',')"
+					read -p "> : " del_selections
+					# Seperate selected options with ',' delimited
+					arr_Selected=($(seperate_by_Delim "$del_selections" ','))
+					# Delete selected files if not empty
+					if [[ ! "$del_selections" == "" ]]; then
+						for sel in "${arr_Selected[@]}"; do
+							# Delete selected files
+							if [[ "$MODE" == "DEBUG" ]]; then
+								echo "rm -r ${external_scripts[$sel]}"
+							else
+								rm -r ${external_scripts[$sel]}
+							fi
+						done
+					fi
+					;;
+				*)
+					;;
+			esac
+			;;
+		*)
+			echo "No action."
+			;;
+	esac
+	echo "Sanitization Completed."
+}
+
 installer()
 {
 	#
@@ -799,7 +1192,7 @@ installer()
 	echo "Stage 1: Prepare Network"
 	echo "========================"
 	echo "Testing Network..."
-	network_Enabled="$(verify_network)"
+	network_Enabed="$(verify_network)"
 	if [[ "$network_Enabled" == "False" ]]; then
 		sudo dhcpcd
 	fi
@@ -903,6 +1296,21 @@ installer()
 	echo "================="
 	postinstallation
 
+	if [[ "$MODE" == "DEBUG" ]]; then
+		read -p "Press anything to continue..." tmp
+	fi
+
+	echo ""
+
+	echo "========================"
+	echo "Sanitization and Cleanup"
+	echo "========================"
+	postinstall_sanitize
+
+	if [[ "$MODE" == "DEBUG" ]]; then
+		read -p "Press anything to continue..." tmp
+	fi
+
 	echo ""
 }
 
@@ -910,11 +1318,11 @@ init()
 {
 	#
 	# Initialization
-	#
-	echo "PROGRAM NAME: $PROGRAM_NAME"
-	echo "DISTRO      : $DISTRO"
+	# 
+	echo "Program Name: $PROGRAM_NAME"
+	echo "Program Type: $PROGRAM_TYPE"
+	echo "Distro: $DISTRO"
 }
-
 
 body()
 {
