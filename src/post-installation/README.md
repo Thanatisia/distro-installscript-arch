@@ -11,6 +11,19 @@ This page contains the Post Installation Scripts
 
 ## Information
 
+### Background Information
+
+This is my set of post-installation scripts designed to go alongside the base-installation script.
+
+- postinstallation-core-packages : contains functions to install and setup essential/core packages in 1 script.
+	- You can edit the packages you would like to use inside the script
+	- backup the modified script for portable/reusability
+
+- postinstallations-root : Contains functions for root setup (requires sudo). Currently Docs are being written, may be changed according to status of the base installation script
+
+- postinstallations : A general setup process which includes installing of packages that the user/I recommend or use. Automatically setting up of Graphical Environment (Desktop Environment/Window Managers) and the likes.
+
+
 ### Files
 
 - For Essential & Core Package (Installation + Setup) : postinstallation-core-packages.sh
@@ -109,10 +122,14 @@ postinstallation-core-packages.sh :
 
 	### Usage
 		1. Change Permission for use (Execute [+x])
+			```console
 			chmod +x script.sh
+			```
 
 		2. Run Program
+			```console
 			./script.sh {arguments}
+			```
 
 		3. Let Program run and just input your answers if there are any prompts
 
@@ -122,10 +139,14 @@ postinstallations-root.sh :
 
 	### Usage
 	1. Change Permission for use (Execute [+x])
+		```console
 		chmod +x script.sh
+		```
 
 	2. Run Program
+		```console
 		./script.sh {arguments}
+		```
 
 	3. Let Program run and just input your answers if there are any prompts
 
@@ -149,10 +170,14 @@ postinstallations.sh :
 
 	### Usage
 		1. Change Permission for use (Execute [+x])
+			```console
 			chmod +x script.sh
+			```
 
 		2. Run Program
+			```console
 			./script.sh {arguments}
+			```
 
 		3. Let Program run and just input your answers if there are any prompts
 

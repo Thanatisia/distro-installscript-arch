@@ -108,23 +108,29 @@ Generally they are the same function wise, however - the variable setup and arra
 
 	### Parameters/Options/Flags
 
-	MODE : The mode to run the program
+	MODE <options> : The mode to run the program
 		Default: DEBUG
 		
-	Options:
-		DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
-		RELEASE : Use this to set the program to release and actually make changes to the system
+		Options:
+			DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
+			RELEASE : Use this to set the program to release and actually make changes to the system
 	
 	### Usage
 
 	1. Change Permission for use (Execute [+x])
+		```console
 		chmod +x installer-ux.min.sh
+		```
 
 	2. (OPTIONAL) If you want to test before official use (RECOMMENDED)
+		```console
 		./installer-ux.min.sh
-	
+		```	
+
 	3. Run Program
+		```console
 		./installer-ux.min.sh RELEASE
+		```
 
 	4. Let Program run and just input your answers if there are any prompts
 
@@ -135,23 +141,29 @@ Generally they are the same function wise, however - the variable setup and arra
 
 	### Parameters/Options/Flags
 
-	MODE : The mode to run the program
+	MODE <options> : The mode to run the program
 		Default: DEBUG
 		
-	Options:
-		DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
-		RELEASE : Use this to set the program to release and actually make changes to the system
+		Options:
+			- DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
+			- RELEASE : Use this to set the program to release and actually make changes to the system
 	
 	### Usage
 
 	1. Change Permission for use (Execute [+x])
+		```console
 		chmod +x installer-manual.sh
+		```
 
 	2. (OPTIONAL) If you want to test before official use (RECOMMENDED)
+		```console
 		./installer-manual.sh
-	
+		```	
+
 	3. Run Program
+		```console
 		./installer-manual.sh RELEASE
+		```
 
 	4. Let Program run and just input your answers if there are any prompts
 
