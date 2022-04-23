@@ -168,6 +168,7 @@ Generally they are the same function wise, however - the variable setup and arra
 
 	4. Let Program run and just input your answers if there are any prompts
 
+
 ## References
 
 ### Notes
@@ -179,6 +180,16 @@ Generally they are the same function wise, however - the variable setup and arra
 
 	- Scripts only support installation from the ArchLinux Installer
 		- Installation from an existing distro is currently in the works
+
+- 2022-04-23 1617H : Asura
+
+	- $mount_Paths
+		- Please note that if you edit this variable, please append to mount_Group
+			```console
+			[mount_Paths_pos_index+1]="${mount_Paths[index]}"
+			```
+	- $mount_Group
+		- As of v0.4.0-alpha : The root directory (/mnt) will always be placed in index [2] of $mount_Group variable
 
 ## FAQs
 
