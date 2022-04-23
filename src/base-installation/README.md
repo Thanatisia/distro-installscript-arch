@@ -73,19 +73,20 @@ Generally they are the same function wise, however - the variable setup and arra
 
 	- This method allows you to download specifically the script to use
 
-	Syntax: 
-		```shellscript
+	- Syntax: 
+		```console
 		curl -L -O https://raw.githubusercontent.com/<author>/<repository_name>/<branch>/[folder/to/script_name.sh]
 		```
 
-	Examples:
-		installer-manual.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/installer-manual.sh
-		installer-ux.min.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/installer-ux.min.sh
+	- Examples:
+		- installer-manual.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/installer-manual.sh
+		- installer-ux.min.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/installer-ux.min.sh
 
 ### Preparation/Setup
 
 - Edit the script
-	```bash
+	```console
+	$EDITOR installer-manual.sh
 	$EDITOR installer-ux.min.sh
 	```
 

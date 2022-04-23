@@ -76,20 +76,20 @@ This is my set of post-installation scripts designed to go alongside the base-in
 
 	- This method allows you to download specifically the script to use
 
-	Syntax: 
+	- Syntax: 
 		```shellscript
 		curl -L -O https://raw.githubusercontent.com/<author>/<repository_name>/<branch>/[folder/to/script_name.sh]
 		```
 
-	Examples:
-		postinstallations.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/post-installation/postinstallations.sh
-		postinstallation-core-packages.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/post-installation/postinstallation-core-packages.sh
-		postinstallations-root.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/post-installation/postinstallations-root.sh
+	- Examples:
+		- postinstallations.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/post-installation/postinstallations.sh
+		- postinstallation-core-packages.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/post-installation/postinstallation-core-packages.sh
+		- postinstallations-root.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/post-installation/postinstallations-root.sh
 
 ### Preparation/Setup
 
 - Edit the script
-	```bash
+	```console
 	$EDITOR {script_name}
 	```
 
@@ -109,6 +109,7 @@ This is my set of post-installation scripts designed to go alongside the base-in
 ## Documentation
 
 postinstallation-core-packages.sh : 
+
 	### Syntax
 	./postinstallation-core-packages.sh {MODE}
 
@@ -134,6 +135,7 @@ postinstallation-core-packages.sh :
 		3. Let Program run and just input your answers if there are any prompts
 
 postinstallations-root.sh :
+
 	### Syntax
 	./postinstallations-root.sh
 
@@ -151,6 +153,7 @@ postinstallations-root.sh :
 	3. Let Program run and just input your answers if there are any prompts
 
 postinstallations.sh : 
+
 	### Syntax
 	./postinstallations.sh {base_Distro} {package_manager}
 
