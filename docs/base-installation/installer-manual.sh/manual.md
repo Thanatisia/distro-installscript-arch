@@ -1,6 +1,6 @@
-# Docs - Base Installation : installer-ux.min.sh
+# Docs - Base Installation : installer-manual.sh
 
-Documentations for Base Installation script [installer-ux.min.sh]
+Documentations for Base Installation script [installer-manual.sh]
 
 ## Table of Contents
 - [Setup](#setup)
@@ -84,7 +84,7 @@ Documentations for Base Installation script [installer-ux.min.sh]
 
 ### Synopsis/Syntax
 
-./installer-ux.min.sh {MODE}
+./installer-manual.sh {MODE}
 
 ### Parameters/Options/Flags
 
@@ -92,33 +92,28 @@ MODE <options> : The mode to run the program
 	Default: DEBUG
 		
 	Options:
-		DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
-		RELEASE : Use this to set the program to release and actually make changes to the system
+		- DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
+		- RELEASE : Use this to set the program to release and actually make changes to the system
 	
 ### Usage
 
 1. Change Permission for use (Execute [+x])
 	```console
-	chmod +x installer-ux.min.sh
+	chmod +x installer-manual.sh
 	```
 
 2. (OPTIONAL) If you want to test before official use (RECOMMENDED)
 	```console
-	./installer-ux.min.sh
+	./installer-manual.sh
 	```	
 
 3. Run Program
 	```console
-	./installer-ux.min.sh RELEASE
+	./installer-manual.sh RELEASE
 	```
 
 4. Let Program run and just input your answers if there are any prompts
 
+
 ### Configuration & Customization
 
-### To Note
-
-#### Variables: 
-
-
-## Tips and Tricks
