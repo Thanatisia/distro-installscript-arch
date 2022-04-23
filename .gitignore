@@ -1,0 +1,5 @@
+# Git Ignore File
+
+# Ignore all '.old' files
+*.old*
+
