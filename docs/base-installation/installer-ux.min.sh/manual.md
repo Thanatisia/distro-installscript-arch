@@ -29,28 +29,42 @@ Documentations for Base Installation script [installer-ux.min.sh]
 
 	- Syntax: 
 		1. Initialize Local Git
-			git init
-
+			```console
+            git init
+            ```
+            
 		2. Add path of remote repository
-			git remote add -f origin https://github.com/Thanatisia/distro-installscript-arch
-
+			```console
+            git remote add -f origin https://github.com/Thanatisia/distro-installscript-arch
+            ```
+            
 		3. (OPTIONAL) Add config
-			git config user.name {username}
+			```console
+            git config user.name {username}
 
 			git config user.email {email}
-
+            ```
+            
 		4. Initialize sparse-checkout git local repository folder
-			git sparse-checkout init
-
+			```console
+            git sparse-checkout init
+            ```
+            
 		5. Set path to tree
-			git sparse-checkout set "https://github.com/Thanatisia/distro-installscript-arch/tree/main/base-installation"
-
+			```console
+            git sparse-checkout set "https://github.com/Thanatisia/distro-installscript-arch/tree/main/base-installation"
+            ```
+            
 		6. Verify sparse-checkout
-			git sparse-checkout list
-
+			```console
+            git sparse-checkout list
+            ```
+            
 		7. Update new repository from sparse-checkout remote repository url
-			git pull origin {branch}
-
+			```console
+            git pull origin {branch}
+            ```
+            
 3. via curl
 
 	- This method allows you to download specifically the script to use
