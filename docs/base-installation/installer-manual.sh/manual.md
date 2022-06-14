@@ -11,8 +11,10 @@ Documentations for Base Installation script [installer-manual.sh]
 
 ### Pre-Requisites
 
-- git
-- wget/curl
++ git
++ wget/curl
+- If you are using an existing linux distro
+	+ arch-install-scripts
 
 ### Obtaining
 
@@ -116,4 +118,6 @@ MODE <options> : The mode to run the program
 
 
 ### Configuration & Customization
+
+#### Variables
 

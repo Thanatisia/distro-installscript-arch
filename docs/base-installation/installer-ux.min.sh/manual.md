@@ -13,19 +13,21 @@ Documentations for Base Installation script [installer-ux.min.sh]
 
 - git
 - wget/curl
+- If you are using an existing linux distro
+	+ arch-install-scripts
 
 ### Obtaining
 
 1. via cloning (Whole)
 	- This method will require you to download/clone the entire repository
 
-	Syntax: git clone https://github.com/Thanatisia/distro-installscript-arch
+	+ Syntax: git clone https://github.com/Thanatisia/distro-installscript-arch
 
 2. via cloning (Folder)
 	- This method will use the git 'sparse-checkout' to download a specific folder in the repository
 	- in this case : base-installation
 
-	Syntax: 
+	- Syntax: 
 		1. Initialize Local Git
 			git init
 
@@ -88,12 +90,12 @@ Documentations for Base Installation script [installer-ux.min.sh]
 
 ### Parameters/Options/Flags
 
-MODE <options> : The mode to run the program
-	Default: DEBUG
+- MODE <options> : The mode to run the program
+	+ Default: DEBUG
 		
-	Options:
-		DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
-		RELEASE : Use this to set the program to release and actually make changes to the system
+	- Options:
+		+ DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
+		+ RELEASE : Use this to set the program to release and actually make changes to the system
 	
 ### Usage
 
@@ -116,9 +118,12 @@ MODE <options> : The mode to run the program
 
 ### Configuration & Customization
 
-### To Note
+#### Variables
 
-#### Variables: 
+$
+
+
+### To Note
 
 
 ## Tips and Tricks

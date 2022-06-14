@@ -1,0 +1,24 @@
+: "
+Idea Snippet : Adding Input file support to ArchLinux Installation Script
+"
+
+### List of (default) Packages 
+# Defined by user to install into the system
+###
+declare -A pkgs=(
+	# Define Packages Here
+)
+
+# User Input (Command Line Argument)
+pkg_defn_file="$1"
+if [[! "$pkg_defn_file" == "" ]]; then
+	# items Found
+	# Overwrite pkgs set 
+	pkgs=(`cat $pkg_defn_file`)
+fi
+
+# Install all packages
+for pkg in "${pkgs[@]}"; do
+	sudo pacman -S $pkg
+done
+
