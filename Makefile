@@ -24,6 +24,7 @@
 # 	make download 			: To download the files only
 #	make help 				: Prints this help menu
 # 	make install			: Runs the script in the correct order and install the program; Please run this in sudo
+#	make prepare_all		: Does an automated downloaded and setting up of all files required (excluding backup) for use.
 #	make setup				: Prepare system for script use
 
 #============
@@ -90,10 +91,6 @@ dependencies = build-devel make git curl arch-install-scripts
 
 .DEFAULT_GOAL := help	# Run ':help' if no target/action is provided
 
-checksysinfo:
-	## Check System Information
-	echo -e "Distribution : $(OS_VERS)" 
-
 about:
 	## Displays the project information
 	echo -e "Program Name : arch-install-scripts \n"
@@ -132,11 +129,17 @@ backup:
 	# Done
 	echo -e "(D) Backup complete."
 
+checksysinfo:
+	## Check System Information
+	echo -e "Distribution : $(OS_VERS)"
+
 checkdependencies:
 	## Check if dependencies are installed
 	for pkg in $(dependencies); do
 		if [[ $(PKGLIST) $$pkg > /dev/null ]]; then
-			$(PKGLIST) $(dependencies)
+			echo -e "$$pkg is installed"
+		else
+			echo -e "$$pkg is not installed."
 		fi
 	done
 
@@ -144,14 +147,26 @@ setup:
 	## Prepare System for script use
 	
 	# - Install Dependencies
-	$(PKGINSTALL) $(dependencies)
+	for pkg in $(dependencies); do
+		if [[ ! $(PKGLIST) $$pkg > /dev/null ]]; then
+			echo -e "$$pkg is not installed."
+			$(PKGINSTALL) $$pkg && 
+				\ echo -e "Package has been installed." || 
+				\ echo -e "Error installing package."
+		fi
+	done
 
 	# - Create Temporary folders
-	@test -d $(BASE)/install/ || \
-		$(MKDIR) $(BASE)/backup/tmp
+	fldrs = $(PROJ_SCRIPTS) $(PROJ_TMP)
+	for fldr in $(fldrs); do
+		@test -d $$fldr || \
+			# Directory Not Found
+			$(MKDIR) $$fldr
+	done
 
 configure:
 	## Configures all configurable and customizable files
+	$(EDITOR) $(BASE_DISTRO_INSTALL_SCRIPT_PATH)/$(BASE_DISTRO_INSTALL_SCRIPT_FILE)
 
 download:
 	## Download the script/files
@@ -162,8 +177,7 @@ download:
 	
 	echo -e "(D) Download complete."
 
-build:
-	## Build current source code to make output object files (Unused)
+prepare_all: checksysinfo checkdependencies setup download configure ## Automate preparation and setup of all files required
 
 testinstall:
 	## Run the installation test process for the scripts (This will not run the commands, just to debug and view)

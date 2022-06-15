@@ -30,23 +30,80 @@ On run, just several presses to confirm the details and it's done!
 For further usage information, please refer to the Usage section in the relevant files found in [here](#files)
 
 ### Files
++ [Makefile](Makefile)
+    - Dependencies
+        + curl
+        + base-devel
+        + arch-install-scripts
+        + make
+        + git
+
+    - Usage
+        - Download Makefile
+            ```console
+            curl -L -O https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/Makefile
+            ```
+            
+        - Check system information
+            ```console
+            make checksysinfo
+            ```
+            
+        - Check your dependencies
+            ```console
+            make checkdependencies
+            ```
+            
+        - Run setup
+            ```console
+            make setup
+            ```
+            
+        - (OPTIONAL) Backup your system
+            ```
+            # Ensure you have space in your home directory
+            make backup
+            ```
+            
+        - Download file
+            ```console
+            make download
+            ```
+            
+        - Configure your install
+            ```console
+            make configure
+            ```
+            
+        - Test the install
+            ``` 
+            # Repeat this until you are satisfied with what you see before proceeding to the final step of the base install
+            make testinstall
+            ```
+            
+        - Perform the installation
+            ```console
+            # NOTE: Only do this if you are super sure you are willing to do this
+            #   - run this with sudo
+            sudo make install
+            ```
 
 - [base-installation/](src/base-installation)
-	- [Manual](src/base-installation/installer-manual.sh)
-	- [User Experience](src/base-installation/installer-ux.min.sh)
+	+ [Manual](src/base-installation/installer-manual.sh)
+	+ [User Experience](src/base-installation/installer-ux.min.sh)
 	
 	- Differences:
 		- Manual : Variables are defined in arrays & associative arrays directly labelled with 'EDIT THIS'
 
 		- Simple : Arrays & Associative Arrays have all been predefined and "Symlinked" with variable containers at the top
-			- You (the user) just need to modify the variables labelled under 'EDIT THIS' at the top
+			+ You (the user) just need to modify the variables labelled under 'EDIT THIS' at the top
 
 	- Notes:
 		- The script is designed for portability and modularity in mind, thus:
 			- You do not need to change or modify any of the functions unless 
 				a. you know what you're adding or
 				b. you're contributing to the project
-			- Just need to edit the variables labelled with 'EDIT THIS'
+			+ Just need to edit the variables labelled with 'EDIT THIS'
 
 - [post-installation/](src/post-installation)
 	- [Install Core & Essential Packages](src/post-installation/postinstallation-core-packages.sh)
@@ -54,7 +111,6 @@ For further usage information, please refer to the Usage section in the relevant
 	- [General PostInstallation Setup](src/post-installation/postinstallations.sh)
 
 - [references/](references)
-
 	- [vbox-usboot-1/](references/vbox-usboot-1)
 		- Reference example profile 
 		- used to install in a USB MicroSD Card booted in a VirtualBox ArchLinux Instance
