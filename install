@@ -28,7 +28,15 @@
 #	install help 				: Prints this help menu
 # 	install install			    : Runs the script in the correct order and install the program; Please run this in sudo
 #	install prepare_all		    : Does an automated downloaded and setting up of all files required (excluding backup) for use.
+#   install select_script       : To select a base install script that you would like to use to install
 #	install setup				: Prepare system for script use
+#
+# :: Customization and Configuration
+#   --- Folders
+#   $PWD/distro-installscript-arch/scripts : Store your custom install script here and set DISTRO_INSTALLSCRIPT_ARCH_FILENAME to the file name if you dont wish to use the select_script function
+#
+#   --- Environment Variables
+#   DISTRO_INSTALLSCRIPT_ARCH_FILENAME : Edit this to set the install script custom filename you wish to use (NOTE: Please ensure that this is found in )
 
 #============
 # Variables
@@ -42,27 +50,31 @@ PROJ_SCRIPTS="$BASE/scripts"
 PROJ_TMP="$BASE/tmp"
 DISTRO_BASE=$(egrep '^(VERSION|NAME)=' /etc/os-release)
 BASE_DISTRO_INSTALL_SCRIPT_PATH="https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation"
-
-# Get Base Distro File
-read -p "Select Script { (a) : installer-ux.min.sh | (b) : installer-manual.sh }: " BASE_DISTRO_INSTALL_SCRIPT_FILE 
-case "$BASE_DISTRO_INSTALL_SCRIPT_FILE" in
-	"a")
-		BASE_DISTRO_INSTALL_SCRIPT_FILE="installer-ux.min.sh"
-		;;
-	"b")
-		BASE_DISTRO_INSTALL_SCRIPT_FILE="installer-manual.sh"
-		;;
-	*)
-		BASE_DISTRO_INSTALL_SCRIPT_FILE="installer-ux.min.sh"
-		;;
-esac
-
+BASE_DISTRO_INSTALL_SCRIPT_FILE="$1"
 dependencies=(build-devel make git curl arch-install-scripts)
+
+# Constants
+declare -A help_opts=(
+    [about]="Displays the project information"
+    [backup]="Backup target system"
+    [build]="To download all files and run the full customization and configuration process"
+    [checkdependencies]="Check if dependences are installed"
+    [clean]="Clean and removes all temporary files"
+    [configure]="To configure your currently found files"
+    [download]="To download the files only"
+    [help]="Prints this help menu"
+    [install]="Runs the script in the correct order and install the program; Please run this in sudo"
+    [prepare_all]="Does an automated downloaded and setting up of all files required (excluding backup) for use"
+    [select_script]="To select a base install script that you would like to use to install"
+    [setup]="Prepare system for script use"
+)
+
 
 #==========
 # Command
 # Alias
 #==========
+CURL="curl --create-dirs"
 MKDIR="mkdir -p"
 LN="ln -vsf" 	# Symbolic Link Files
 LNDIR="ln -vs" 	# Symbolic Link Directory
@@ -169,6 +181,32 @@ checkdependencies()
 	done
 }
 
+select_script()
+{
+    : "
+    Specify script to use
+    "
+    # Get Base Distro File
+    read -p "Select Script { (a) : installer-ux.min.sh | (b) : installer-manual.sh | (Default) : Custom Filename }: " BASE_DISTRO_INSTALL_SCRIPT_FILE 
+    case "$BASE_DISTRO_INSTALL_SCRIPT_FILE" in
+        "a")
+            BASE_DISTRO_INSTALL_SCRIPT_FILE="installer-ux.min.sh"
+            ;;
+        "b")
+            BASE_DISTRO_INSTALL_SCRIPT_FILE="installer-manual.sh"
+            ;;
+        *)
+            # Custom file name
+            read -p "Indicate custom file name (NOTE: Ensure that this file is found in $BASE_DISTRO_INSTALL_SCRIPT_PATH): " BASE_DISTRO_INSTALL_SCRIPT_FILE
+            ;;
+    esac
+
+    # Write selected file into Environment Variable for later use
+    export DISTRO_INSTALLSCRIPT_ARCH_FILENAME=$BASE_DISTRO_INSTALL_SCRIPT_FILE
+
+    echo "$BASE_DISTRO_INSTALL_SCRIPT_FILE"
+}
+
 setup()
 {
 	## Prepare System for script use
@@ -203,11 +241,17 @@ configure()
 
 download()
 {
+    BASE_DISTRO_INSTALL_SCRIPT_FILE=$DISTRO_INSTALLSCRIPT_ARCH_FILENAME
+
+    if [[ "$BASE_DISTRO_INSTALL_SCRIPT_FILE" == "" ]]; then
+        BASE_DISTRO_INSTALL_SCRIPT_FILE=$(select_script)
+    fi
+
 	## Download the script/files
 	echo -e "(S) Downloading scripts/files"
 
 	echo -e "(+) Downloading Base Install Script : $BASE_DISTRO_INSTALL_SCRIPT_FILE"
-	curl -L $BASE_DISTRO_INSTALL_SCRIPT_PATH/$BASE_DISTRO_INSTALL_SCRIPT_FILE -o $PROJ_SCRIPTS/$BASE_DISTRO_INSTALL_SCRIPT_FILE
+	$CURL -L $BASE_DISTRO_INSTALL_SCRIPT_PATH/$BASE_DISTRO_INSTALL_SCRIPT_FILE -o $PROJ_SCRIPTS/$BASE_DISTRO_INSTALL_SCRIPT_FILE
 	
 	echo -e "(D) Download complete."
 }
@@ -256,7 +300,11 @@ testinstall()
 
     echo ""
 
-	./$PROJ_SCRIPTS/$BASE_DISTRO_INSTALL_SCRIPT_FILE
+    if [[ "$BASE_DISTRO_INSTALL_SCRIPT_FILE" == "" ]]; then
+        echo -e "Install Script file has not been decided yet, please run './install download' to select a script to use before proceeding"
+	else
+        ./$PROJ_SCRIPTS/$BASE_DISTRO_INSTALL_SCRIPT_FILE
+    fi
 
     echo ""
 
@@ -270,7 +318,11 @@ install()
 	
     echo ""
 
-    ./$PROJ_SCRIPTS/$BASE_DISTRO_INSTALL_SCRIPT_FILE RELEASE
+    if [[ "$BASE_DISTRO_INSTALL_SCRIPT_FILE" == "" ]]; then
+        echo -e "Install Script file has not been decided yet, please run './install download' to select a script to use before proceeding"
+    else
+        ./$PROJ_SCRIPTS/$BASE_DISTRO_INSTALL_SCRIPT_FILE RELEASE
+    fi
 
     echo ""
 
@@ -292,20 +344,6 @@ clean()
 help()
 {
 	## Prints this help menu
-    declare -A help_opts=(
-        [about]="Displays the project information"
-        [backup]="Backup target system"
-        [build]="To download all files and run the full customization and configuration process"
-        [checkdependencies]="Check if dependences are installed"
-        [clean]="Clean and removes all temporary files"
-        [configure]="To configure your currently found files"
-        [download]="To download the files only"
-        [help]="Prints this help menu"
-        [install]="Runs the script in the correct order and install the program; Please run this in sudo"
-        [prepare_all]="Does an automated downloaded and setting up of all files required (excluding backup) for use"
-        [setup]="Prepare system for script use"
-    )
-
     echo -e "Help:"
     for opt in "${!help_opts[@]}"; do
         opt_msg="${help_opts[$opt]}"
