@@ -43,40 +43,46 @@ For further usage information, please refer to the Usage section in the relevant
             ```console
             curl -L -O https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/Makefile
             ```
-            
-        - Check system information
-            ```console
-            make checksysinfo
-            ```
-            
-        - Check your dependencies
-            ```console
-            make checkdependencies
-            ```
-            
-        - Run setup
-            ```console
-            make setup
-            ```
-            
-        - (OPTIONAL) Backup your system
-            ```
-            # Ensure you have space in your home directory
-            make backup
-            ```
-            
-        - Download file
-            ```console
-            make download
-            ```
-            
+           
+        - Step-by-Step
+            - Check system information
+                ```console
+                make checksysinfo
+                ```
+                
+            - Check your dependencies
+                ```console
+                make checkdependencies
+                ```
+                
+            - Run setup
+                ```console
+                make setup
+                ```
+                
+            - (OPTIONAL) Backup your system
+                ```console
+                # Ensure you have space in your home directory
+                make backup
+                ```
+                
+            - Download file
+                ```console
+                make download
+                ```
+        - Automated 
+            - Use prepare_all
+                ```console
+                make prepare_all
+                ```
+                
         - Configure your install
             ```console
             make configure
             ```
             
         - Test the install
-            ``` 
+            ```console 
             # Repeat this until you are satisfied with what you see before proceeding to the final step of the base install
             make testinstall
             ```
