@@ -97,7 +97,7 @@ Format()
     : "
     Format the output message you wish to display
     "
-    FG="000000"
+    FG="\e[1;31m"
     echo -e "\t${FG}$1"
 }
 
@@ -317,9 +317,9 @@ help()
 main()
 {
     argv=($@)
-    argc="${argv[@]}"
+    argc="${#argv[@]}"
 
-    if [[ "$argc" == "1" ]]; then
+    if [[ "$argc" == "0" ]]; then
         help
     else
         for arg in "${argv[@]}"; do
