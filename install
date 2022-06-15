@@ -41,7 +41,7 @@ BASE="$PROJ_FLDR"
 PROJ_SCRIPTS="$BASE/scripts"
 PROJ_TMP="$BASE/tmp"
 DISTRO_BASE=$(egrep '^(VERSION|NAME)=' /etc/os-release)
-BASE_DISTRO_INSTALL_SCRIPT_PATH=https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation
+BASE_DISTRO_INSTALL_SCRIPT_PATH="https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation"
 
 # Get Base Distro File
 read -p "Select Script { (a) : installer-ux.min.sh | (b) : installer-manual.sh }: " BASE_DISTRO_INSTALL_SCRIPT_FILE 
@@ -81,6 +81,7 @@ case "$DISTRO_BASE" in
 		# TBC
 		PKGBACKUP="$PKGMGR list"
 		PKGLIST="$PKGMGR list"
+        ;;
 	*)
 		;;
 esac
@@ -145,7 +146,13 @@ checkdependencies()
 {
 	## Check if dependencies are installed
 	for pkg in ${dependencies[@]}; do
-		if [[ $PKGLIST $pkg > /dev/null ]]; then
+        # Output package specs to check if available and dump the data
+        $PKGLIST $pkg > /dev/null 
+
+        # Check if successful
+        # 0 : Success
+        # 1 : Error
+		if [[ "$?" == "0"  ]]; then
 			echo -e "$pkg is installed"
 		else
 			echo -e "$pkg is not installed."
@@ -159,7 +166,9 @@ setup()
 	
 	# - Install Dependencies
 	for pkg in ${dependencies[@]}; do
-		if [[ ! $PKGLIST $pkg > /dev/null ]]; then
+        $PKGLIST $pkg > /dev/null
+
+		if [[ ! "$?" == "0" ]]; then
 			echo -e "$pkg is not installed."
 			$PKGINSTALL $pkg && 
 				\ echo -e "Package has been installed." || 
