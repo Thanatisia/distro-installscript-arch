@@ -1,174 +1,199 @@
-#======================================#
-# Linux Distro Install Makefile Script #
-#======================================#
+# ArchLinux Install Script Makefile
+# 
+# A all-in-one setup wrapper script initially created for my (Arch)Linux install scripts 
+# that streamlines the download, configuration and customization and installation process without requiring you to
+# manually download the scripts.
+#
+# Now it is designed to be modular, portable and customizable Out-of-the-Box (OOTB).
+# You can reuse this as a template for other makefile usage
+#
+# -- DISCLAIMER : This is still a design and a W.I.P, please do a testrun in a virtual machine before running in your production
+#  At the moment, the makefile is optimized only to be used by an ArchLinux system due to the package manager.
+#  Cross-Package manager support is in the works.
+#
+# :: TODO
+# 	- Add/Test support for apt and emerge into the switch case 
+#
+# :: Usage
+#	make about 				: Displays the project information
+#	make backup				: Backup target system
+# 	make build 				: To download all files and run the full customization and configuration process
+#	make checkdependencies 	: Check if dependencies are installed
+#	make clean	 			: Clean and removes all temporary files
+# 	make configure 			: To configure your currently found files
+# 	make download 			: To download the files only
+#	make help 				: Prints this help menu
+# 	make install			: Runs the script in the correct order and install the program; Please run this in sudo
+#	make setup				: Prepare system for script use
 
-#================================================================
-# for ArchLinux Base & Post Installation + Setup Script
-# Program Info:
-# 	Author(s): 
-#		1. Asura
-#	Created: 2022-03-22 2258H, Asura
-#	Modified:
-#		[1] 2022-03-22 2258H, Asura
-# Features:
-#	- Easy Debug
-#	- 1 Step installation
-#	- Easy Seperation & Modification
-#	- Similar to the Install Script
-#		- You can use either according to your preferences
-#	- Updates made to the bash install script will be made here too
-# Remarks:
-#	- 2022-03-22 : Created Script, still a WIP to translate from the Bash script
-#================================================================
+#============
+# Variables
+#============
+PROJ_NAME = distro-installscript-arch 	# Project Name
+PROJ_FLDR = $(PWD)/$(PROJ_NAME) 		# Project Folder
+BASE  = $(PROJ_FLDR)
+PROJ_SCRIPTS = $(BASE)/scripts
+PROJ_TMP = $(BASE)/tmp
+OS_VERS := $(shell lsb_release -a 2>/dev/null | grep Description | awk '{ print $$2 "-" $$3 }')
+BASE_DISTRO_INSTALL_SCRIPT_PATH = https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation
 
-# Table of Contents
-#	- Ingredients
-#	- Recipes
+# Get Base Distro File
+@read -p "Select Script {(a) : installer-ux.min.sh | (b) : installer-manual.sh}: " BASE_DISTRO_INSTALL_SCRIPT_FILE 
+@case "$(BASE_DISTRO_INSTALL_SCRIPT_FILE)" in
+	"a")
+		BASE_DISTRO_INSTALL_SCRIPT_FILE = "installer-ux.min.sh"
+		;;
+	"b")
+		BASE_DISTRO_INSTALL_SCRIPT_FILE = "installer-manual.sh"
+		;;
+	*)
+		BASE_DISTRO_INSTALL_SCRIPT_FILE = "installer-ux.min.sh"
+		;;
+esac
 
-#[Variables]
+#==========
+# Commands
+#==========
+MKDIR = mkdir -p
+LN = ln -vsf 	# Symbolic Link Files
+LNDIR = ln -vs 	# Symbolic Link Directory
+case "$(OS_VERS)" in
+	"Arch")
+		PKGMGR = sudo pacman
+		PKGINSTALL = $(PKGRMGR) --needed -S
+		PKGUPDATE = $(PKGMGR) -Syu
+		PKGBACKUP = $(PKGMGR) -Qnq
+		PKGLIST = $(PKGMGR) -Qi
+		;;
+	"Debian")
+		PKGMGR = sudo apt
+		PKGINSTALL = $(PKGRMGR) install
+		PKGUPDATE = $(PKGMGR) update && $(PKGMGR) upgrade
+		# TBC
+		PKGBACKUP = $(PKGMGR) list
+		PKGLIST = $(PKGMGR) list
+	*)
+		;;
+esac
+TAR_COMPRESS = sudo tar -cvzf
+TAR_EXTRACT = sudo tar -xvzf
 
-# Command Line Arguments
-# Reference: https://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make
-# Pass an argument: make <action> [arg-name]=[arg-value] 
-# Get an argument: $(arg-name)
-action=$@
-
-# Global Variables
-PKG_MGR=pacman
-PKG_INSTALL=sudo $(PKG_MGR) -S
-CC=cc
-
-# File System Table (Fstab) Design
-DISK_LABEL=msdos
-DISK_NAME=/dev/sdX
-DISK_SIZE=50.0GiB
-declare -A PARTITION_SCHEME=(
-	#======================================EDIT THIS==========================================================================#
-	# ROW_ID, partition_name, mount_directory, partition_type, partition_filesystem_type, start_size, end_size, other_options #
-	#=========================================================================================================================#
-	[1]="Boot, /mnt/boot, primary, ext4, 0%,       1024MiB, Bootable"
-	[2]="Root, /,         primary, ext4, 1024MiB,  32768MiB"
-	[3]="Home, /home,     primary, ext4, 32768MiB, 100%"
-)
-
-
-# [Ingredients]
-
-base-pkgs: ## Essential Base-Installation Packages
-	## Can be modified
-	linux linux-lts linux-firmware linux-lts-headers vim base-devel 
-
-
-postinstall-pkgs: ## All other Packages to install
-	xorg xorg-xinit git 
-
-# [Recipes]
-
-#========#
-# Helper #
-#========#
-
-Changelogs: ## Print Changelogs
-    echo "[1] 2022-03-02 1630H : Asura"
-    echo "	- Created Script File"
-
-targets: ## List all targets
-    @grep '^[^#[:space:]].*:' Makefile
-
-verify-network: ## Check if Host network is available
-
-setup-disk: ## Setup Disk for use
-	# Format Disk (Setup Disk Label)
-	parted $(DISK_NAME) mklabel $(DISK_LABEL)
-
-	# Create Partitions
-	for partition_id in ${!PARTITION_SCHEME[@]}; do
-		part_id=$partition_id
-		part_scheme=(`echo ${PARTITION_SCHEME[$part_id]} | tr "," "\n"`)	# Split Partition Scheme string into array
-		number_of_col=${#part_scheme[@]}
-		part_name=${part_scheme[0]}
-		part_mnt_dir=${part_scheme[1]}
-		part_type=${part_scheme[2]}
-		part_filesystem_type=${part_scheme[3]}
-		part_start_size=${part_scheme[4]}
-		part_end_size=${part_scheme[5]}
-		part_label="$(DISK_NAME)$(part_id)"
-
-		# Get Bootable
-		if [[ $number_of_col -gt 6 ]]; then
-			# Additional Options
-			part_others=${part_scheme[@:6]}
-		fi
+#=============
+# Ingredients
+#=============
+dependencies = build-devel make git curl arch-install-scripts
 		
-		# Make Partition
-		parted $(DISK_NAME) mkpart $(part_type) $(part_filesystem_type) $(part_start_size) $(part_end_size)
+#=========
+# Recipes
+#=========
+.PHONY: about backup checkdependencies setup configure download build testinstall install clean help
 
-		# Format Partition
-		case "$(part_filesystem_type)" in
-			"fat16")
-				mkfs.fat -F16 $(part_label)
-				;;
-			"fat32")
-				mkfs.fat -f32 $(part_label)
-				;;
-			"ext3")
-				mkfs.ext4 $(part_label)
-				;;
-			"ext4")
-				mkfs.ext4 $(part_label)
-				;;
-			"linux-swap")
-				# Swap Partition
-				mkswap $(part_label)
-				;;
-			*)
-				# Default
-				;;
-		esac
+.DEFAULT_GOAL := help	# Run ':help' if no target/action is provided
 
-		# - Check if string contains substring
-		if [[ "$part_others" == *"Bootable"* ]]; then
-			# Make Bootable			
-			parted $(DISK_NAME) set $(part_id) boot on
+checksysinfo:
+	## Check System Information
+	echo -e "Distribution : $(OS_VERS)" 
+
+about:
+	## Displays the project information
+	echo -e "Program Name : arch-install-scripts \n"
+		\ "Author : Thanatisia \n"
+		\ "Repository URL : https://github.com/Thanatisia/arch-install-scripts \n"
+
+backup:
+	## Backup target system before install (OPTIONAL)
+	echo -e "(S) Backup Start"
+
+	# Test if directory exists
+	# else - create
+	@test -d $(BASE)/backup || \ 
+		echo -e "(+) Backup Directory doesnt exist, making Backup Directory..." && \ 
+			$(MKDIR) $(BASE)/backup
+
+	# Backup Packages in package manager
+	echo -e "(+) Backup Packages in Package Manager"
+	$(PKGBACKUP) > $(BASE)/backup/pkglist
+
+	# Backup Root excluding home folder to store into home folder
+	echo -e "(+) Backup Root directory excluding home folder"
+	$(TAR_COMPRESS) $(BASE)/backup/files/system-backup.tar.gz
+		\ / --exclude /home  
+
+	# Backup Home directory into general /home
+	# and move into backup directory after creation
+	echo -e "(+) Backup Home directory to /home for temporary storage"
+	$(TAR_COMPRESS) /home/home-backup.tar.gz 
+		\ $(HOME)
+
+	echo -e "(+) Moving Home backup to Backup directory"
+	echo -e "(1) Moving"
+	mv /home/home-backup.tar.gz $(BASE)/backup/files/system-backup.tar.gz	
+
+	# Done
+	echo -e "(D) Backup complete."
+
+checkdependencies:
+	## Check if dependencies are installed
+	for pkg in $(dependencies); do
+		if [[ $(PKGLIST) $$pkg > /dev/null ]]; then
+			$(PKGLIST) $(dependencies)
 		fi
 	done
 
-enable-sudo: ## Enable sudo permission in /etc/sudoers
-	sudo sed -i '' /etc/sudoers
+setup:
+	## Prepare System for script use
+	
+	# - Install Dependencies
+	$(PKGINSTALL) $(dependencies)
 
-#======#
-# Main #
-#======#
-default: ## Set Default Recipe 
-	## What to do if no instructions
-	make -c help
+	# - Create Temporary folders
+	@test -d $(BASE)/install/ || \
+		$(MKDIR) $(BASE)/backup/tmp
 
-help: ## List all options
-	install : install packages
-	start : Start Base Installation
-	setup : 
-	clean : 
-	help : 
-	default : 
+configure:
+	## Configures all configurable and customizable files
 
-start: ## Start Linux Distro Installation
-	baseinstall
-	setup
-	postinstall
-	clean
+download:
+	## Download the script/files
+	echo -e "(S) Downloading scripts/files"
 
-baseinstall: ## Base-Installation Proccess
-	# 1. Check Network
-	verify-network
-	# 2. Setup Disk
-	setup-disk
+	echo -e "(+) Downloading Base Install Script : $(BASE_DISTRO_INSTALL_SCRIPT)"
+	curl -L $(BASE_DISTRO_INSTALL_SCRIPT_PATH)/$(BASE_DISTRO_INSTALL_SCRIPT_FILE) -o $(PROJ_SCRIPTS)/$(BASE_DISTRO_INSTALL_SCRIPT_FILE)
+	
+	echo -e "(D) Download complete."
 
-setup: ## Generate and Setup Configs of programs
+build:
+	## Build current source code to make output object files (Unused)
+
+testinstall:
+	## Run the installation test process for the scripts (This will not run the commands, just to debug and view)
+	echo -e "(S) Starting test install..."
+	./$(PROJ_SCRIPTS)/$(BASE_DISTRO_INSTALL_SCRIPT)
+	echo -e "(D) Test install end."
+
+install:
+	## Start the installation process for the scripts
+	echo -e "(S) Starting installation script..."
+	./$(PROJ_SCRIPTS)/$(BASE_DISTRO_INSTALL_SCRIPT) RELEASE
+	echo -e "(D) Installation script end."
+
+clean:
+	## Removes all temporary files
+	echo -e "(S) Starting cleaning"
+
+	echo -e "(-) Deleting $(PROJ_FLDR)"
+	rm -r $(PROJ_FLDR) && \
+		echo -e "(+) $(PROJ_FLDR) deleted." || \
+		echo -e "(+) Error deleting $(PROJ_FLDR)"
+	echo -e "(D) Delete end."
+
+help:
+	## Prints this help menu
+	# Will search for all '##' in each recipe and
+	# Write that out in the help menu
+	# Reference: Gavin Freeborn | How to manage your dotfiles with make | https://www.youtube.com/watch?v=aP8eggU2CaU
+	@grep -E '^[a-ZA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
+		| sort \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 
-postinstall: ## Post-Installation Setup 'Must Dos'
-	enable-sudo
-
-
-clean: ## Clean-up and remove all unnecessary files
-	rm -f *.o

@@ -13,8 +13,8 @@ This page contains the Base Installation Scripts
 
 ### Program Information
 
-Program Name: Base Install Script (ArchLinux Edition)
-Program Version: v0.4.0-alpha
++ Program Name: Base Install Script (ArchLinux Edition)
++ Program Version: v0.4.0-alpha
 
 ### Background Information
 
@@ -39,36 +39,50 @@ Generally they are the same function wise, however - the variable setup and arra
 1. via cloning (Whole)
 	- This method will require you to download/clone the entire repository
 
-	Syntax: git clone https://github.com/Thanatisia/distro-installscript-arch
+	+ Syntax: git clone https://github.com/Thanatisia/distro-installscript-arch
 
 2. via cloning (Folder)
 	- This method will use the git 'sparse-checkout' to download a specific folder in the repository
 	- in this case : base-installation
 
-	Syntax: 
+	- Syntax: 
 		1. Initialize Local Git
-			git init
+			```console
+            git init
+            ```
 
 		2. Add path of remote repository
-			git remote add -f origin https://github.com/Thanatisia/distro-installscript-arch
-
+			```console
+            git remote add -f origin https://github.com/Thanatisia/distro-installscript-arch
+            ```
+            
 		3. (OPTIONAL) Add config
-			git config user.name {username}
+			```console
+            git config user.name {username}
 
 			git config user.email {email}
-
+            ```
+            
 		4. Initialize sparse-checkout git local repository folder
-			git sparse-checkout init
-
+			```console
+            git sparse-checkout init
+            ```
+            
 		5. Set path to tree
+            ```console
 			git sparse-checkout set "https://github.com/Thanatisia/distro-installscript-arch/tree/main/base-installation"
-
+            ```
+            
 		6. Verify sparse-checkout
-			git sparse-checkout list
-
+			```console
+            git sparse-checkout list
+            ```
+            
 		7. Update new repository from sparse-checkout remote repository url
-			git pull origin {branch}
-
+			```console
+            git pull origin {branch}
+            ```
+            
 3. via curl
 
 	- This method allows you to download specifically the script to use
@@ -135,7 +149,7 @@ Generally they are the same function wise, however - the variable setup and arra
 
 	4. Let Program run and just input your answers if there are any prompts
 
-- installer-ux.min.sh
+- installer-manual.sh
 	### Synopsis/Syntax
 
 	./installer-manual.sh {MODE}

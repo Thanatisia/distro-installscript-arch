@@ -27,7 +27,7 @@ Documentations for Base Installation script [installer-manual.sh]
 	- This method will use the git 'sparse-checkout' to download a specific folder in the repository
 	- in this case : base-installation
 
-	Syntax: 
+	- Syntax: 
 		1. Initialize Local Git
 			```console
             git init
