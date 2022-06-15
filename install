@@ -92,6 +92,15 @@ TAR_EXTRACT="sudo tar -xvzf"
 # Functions
 #===========
 
+Format()
+{
+    : "
+    Format the output message you wish to display
+    "
+    FG="000000"
+    echo -e "\t${FG}$1"
+}
+
 about()
 {
 	## Displays the project information
@@ -283,12 +292,26 @@ clean()
 help()
 {
 	## Prints this help menu
-	# Will search for all '##' in each recipe and
-	# Write that out in the help menu
-	# Reference: Gavin Freeborn | How to manage your dotfiles with make | https://www.youtube.com/watch?v=aP8eggU2CaU
-	@grep -E '^[a-ZA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
-		| sort \
-		| awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+    declare -A help_opts=(
+        [about]="Displays the project information"
+        [backup]="Backup target system"
+        [build]="To download all files and run the full customization and configuration process"
+        [checkdependencies]="Check if dependences are installed"
+        [clean]="Clean and removes all temporary files"
+        [configure]="To configure your currently found files"
+        [download]="To download the files only"
+        [help]="Prints this help menu"
+        [install]="Runs the script in the correct order and install the program; Please run this in sudo"
+        [prepare_all]="Does an automated downloaded and setting up of all files required (excluding backup) for use"
+        [setup]="Prepare system for script use"
+    )
+
+    echo -e "Help:"
+    for opt in "${!help_opts[@]}"; do
+        opt_msg="${help_opts[$opt]}"
+
+        Format "$opt : $opt_msg"
+    done
 }
 
 main()
@@ -296,9 +319,13 @@ main()
     argv=($@)
     argc="${argv[@]}"
 
-    for arg in "${argv[@]}"; do
-        "$arg"
-    done
+    if [[ "$argc" == "1" ]]; then
+        help
+    else
+        for arg in "${argv[@]}"; do
+            "$arg"
+        done
+    fi
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
