@@ -202,7 +202,8 @@ select_script()
     esac
 
     # Write selected file into Environment Variable for later use
-    export DISTRO_INSTALLSCRIPT_ARCH_FILENAME=$BASE_DISTRO_INSTALL_SCRIPT_FILE
+    echo "export DISTRO_INSTALLSCRIPT_ARCH_FILENAME=$BASE_DISTRO_INSTALL_SCRIPT_FILE" >> $PROJ_TMP/.env
+    source $PROJ_TMP/.env
 
     echo "$BASE_DISTRO_INSTALL_SCRIPT_FILE"
 }
