@@ -39,9 +39,9 @@ PROJ_REPO="https://github.com/$PROJ_AUTHOR/$PROJ_NAME"
 PROJ_FLDR="$PWD/$PROJ_NAME"      		# Project Folder
 BASE="$PROJ_FLDR"
 PROJ_SCRIPTS="$BASE/scripts"
-PROJ_TMP"=$BASE/tmp"
+PROJ_TMP="$BASE/tmp"
 DISTRO_BASE=$(egrep '^(VERSION|NAME)=' /etc/os-release)
-BASE_DISTRO_INSTALL_SCRIPT_PATH = https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation
+BASE_DISTRO_INSTALL_SCRIPT_PATH=https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation
 
 # Get Base Distro File
 read -p "Select Script { (a) : installer-ux.min.sh | (b) : installer-manual.sh }: " BASE_DISTRO_INSTALL_SCRIPT_FILE 
