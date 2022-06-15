@@ -46,11 +46,12 @@ PROJ_AUTHOR="Thanatisia"
 PROJ_REPO="https://github.com/$PROJ_AUTHOR/$PROJ_NAME"
 PROJ_FLDR="$PWD/$PROJ_NAME"      		# Project Folder
 BASE="$PROJ_FLDR"
+PROJ_DATA="$BASE/data"
 PROJ_SCRIPTS="$BASE/scripts"
 PROJ_TMP="$BASE/tmp"
 DISTRO_BASE=$(egrep '^(VERSION|NAME)=' /etc/os-release)
 BASE_DISTRO_INSTALL_SCRIPT_PATH="https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation"
-BASE_DISTRO_INSTALL_SCRIPT_FILE="$1"
+BASE_DISTRO_INSTALL_SCRIPT_FILE="$DISTRO_INSTALLSCRIPT_ARCH_FILENAME"
 dependencies=(build-devel make git curl arch-install-scripts)
 
 # Constants
@@ -202,8 +203,8 @@ select_script()
     esac
 
     # Write selected file into Environment Variable for later use
-    echo "export DISTRO_INSTALLSCRIPT_ARCH_FILENAME=$BASE_DISTRO_INSTALL_SCRIPT_FILE" >> $PROJ_TMP/.env
-    source $PROJ_TMP/.env
+    echo "export DISTRO_INSTALLSCRIPT_ARCH_FILENAME=$BASE_DISTRO_INSTALL_SCRIPT_FILE" > $PROJ_DATA/.env
+    . $PROJ_DATA/.env
 
     echo "$BASE_DISTRO_INSTALL_SCRIPT_FILE"
 }
@@ -211,6 +212,9 @@ select_script()
 setup()
 {
 	## Prepare System for script use
+
+    # - Source Environment Variable
+    . $PROJ_DATA/.env
 	
 	# - Install Dependencies
 	for pkg in ${dependencies[@]}; do
