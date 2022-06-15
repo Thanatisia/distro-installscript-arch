@@ -52,7 +52,7 @@ PROJ_TMP="$BASE/tmp"
 DISTRO_BASE=$(egrep '^(VERSION|NAME)=' /etc/os-release)
 BASE_DISTRO_INSTALL_SCRIPT_PATH="https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation"
 BASE_DISTRO_INSTALL_SCRIPT_FILE="$DISTRO_INSTALLSCRIPT_ARCH_FILENAME"
-dependencies=(build-devel make git curl arch-install-scripts)
+dependencies=("base-devel" "make" "git" "curl" "arch-install-scripts")
 
 # Constants
 declare -A help_opts=(
@@ -86,6 +86,7 @@ case "$DISTRO_BASE" in
 		PKGUPDATE="$PKGMGR -Syu"
 		PKGBACKUP="$PKGMGR -Qnq"
 		PKGLIST="$PKGMGR -Qi"
+        PKGLIST_GROUP="$PKGMGR -Qg"
 		;;
 	"Debian GNU/Linux")
 		PKGMGR="sudo apt"
@@ -94,6 +95,7 @@ case "$DISTRO_BASE" in
 		# TBC
 		PKGBACKUP="$PKGMGR list"
 		PKGLIST="$PKGMGR list"
+        PKGLIST_GROUP="$PKGMGR group"
         ;;
 	*)
 		;;
@@ -214,14 +216,18 @@ setup()
 	## Prepare System for script use
 
 	# - Install Dependencies
-	for pkg in ${dependencies[@]}; do
+	for pkg in "${dependencies[@]}"; do
         $PKGLIST "$pkg" > /dev/null
 
 		if [[ ! "$?" == "0" ]]; then
-			echo -e "$pkg is not installed."
-			$PKGINSTALL "$pkg" && \ 
-                echo -e "Package has been installed." || \ 
-                    echo -e "Error installing package."
+            $PKGLIST_GROUP $pkg" > /dev/null
+
+            if [[ ! "$?" == "0" ]]; then
+                echo -e "$pkg is not installed."
+                $PKGINSTALL "$pkg" && \ 
+                    echo -e "Package has been installed." || \ 
+                        echo -e "Error installing package."
+            fi
 		fi
 	done
 
@@ -376,5 +382,6 @@ main()
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    setup
     main $@
 fi
