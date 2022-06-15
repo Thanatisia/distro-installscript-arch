@@ -116,10 +116,10 @@ backup()
 
 	# Test if directory exists
 	# else - create
-    if [[ ! -d $(BASE)/backup ]]; then 
+    if [[ ! -d $BASE/backup ]]; then 
 	    # If directory doesnt exist
         echo -e "(+) Backup Directory doesnt exist, making Backup Directory..." 
-		$(MKDIR) $(BASE)/backup
+		$MKDIR $BASE/backup
     fi
 
 	# Backup Packages in package manager
@@ -206,7 +206,7 @@ download()
 	## Download the script/files
 	echo -e "(S) Downloading scripts/files"
 
-	echo -e "(+) Downloading Base Install Script : $(BASE_DISTRO_INSTALL_SCRIPT_FILE)"
+	echo -e "(+) Downloading Base Install Script : $BASE_DISTRO_INSTALL_SCRIPT_FILE"
 	curl -L $BASE_DISTRO_INSTALL_SCRIPT_PATH/$BASE_DISTRO_INSTALL_SCRIPT_FILE -o $PROJ_SCRIPTS/$BASE_DISTRO_INSTALL_SCRIPT_FILE
 	
 	echo -e "(D) Download complete."
