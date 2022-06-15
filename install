@@ -89,7 +89,7 @@ case "$DISTRO_BASE" in
 		;;
 	"Debian GNU/Linux")
 		PKGMGR="sudo apt"
-		PKGINSTALL="$PKGRMGR install"
+		PKGINSTALL="$PKGMGR install"
 		PKGUPDATE="$PKGMGR update && $PKGMGR upgrade"
 		# TBC
 		PKGBACKUP="$PKGMGR list"
@@ -213,29 +213,33 @@ setup()
 {
 	## Prepare System for script use
 
-    # - Source Environment Variable
-    . $PROJ_DATA/.env
-	
 	# - Install Dependencies
 	for pkg in ${dependencies[@]}; do
-        $PKGLIST $pkg > /dev/null
+        $PKGLIST "$pkg" > /dev/null
 
 		if [[ ! "$?" == "0" ]]; then
 			echo -e "$pkg is not installed."
-			$PKGINSTALL $pkg && 
-				\ echo -e "Package has been installed." || 
-				\ echo -e "Error installing package."
+			$PKGINSTALL "$pkg" && \ 
+                echo -e "Package has been installed." || \ 
+                    echo -e "Error installing package."
 		fi
 	done
 
 	# - Create Temporary folders
-	fldrs=($PROJ_SCRIPTS $PROJ_TMP)
+	fldrs=($PROJ_DATA $PROJ_SCRIPTS $PROJ_TMP)
 	for fldr in ${fldrs[@]}; do
 		if [[ ! -d $fldr ]]; then
 			# Directory Not Found
 			$MKDIR $fldr
         fi
 	done
+
+    # - Source Environment Variable
+    if [[ -f $PROJ_DATA/.env ]]; then
+        # File exists
+        # Source
+        . $PROJ_DATA/.env
+	fi
 }
 
 configure()
