@@ -15,11 +15,12 @@ Version Naming Convension : major.minor.patches-status
 ```
 release_date | version_number | release_author
 ```
-2021-06-15 0104H | v0.1.0 | Asura
-2021-10-15 1335H | v0.2.0 | Asura
-2022-03-04 1406H | v0.2.1 | Asura
-2022-04-23 1120H | v0.3.0 | Asura
-2022-04-23 1450H | v0.4.0-alpha | Asura
++ 2021-06-15 0104H | v0.1.0 | Asura
++ 2021-10-15 1335H | v0.2.0 | Asura
++ 2022-03-04 1406H | v0.2.1 | Asura
++ 2022-04-23 1120H | v0.3.0 | Asura
++ 2022-04-23 1450H | v0.4.0-alpha | Asura
++ 2022-06-19 0133H | v0.5.0-alpha | Asura
 
 ### CHANGELOGS
 ```
@@ -53,4 +54,21 @@ release_date | version_number:
 	- Files Changed
 		- base-installation/
 		- post-installation/
+
+2022-06-19 0133H | v0.5.0-alpha
+    - Created folders
+        - dev/ : For Development Builds (similar to Development Branch)
+            + src/ : Source Files in the Development Folder
+        - docs/configs/ : To contain all templates and config files
+        - references/ : To store all references and resources 
+            - deprecated/ : Temporary storage to store all deprecated files for deletion and/or archival
+            - Samples/ : Contains all sample scripts with a pre-specified values that meets a specific criteria. Users can go into this directory, select a preset script and just download the file to install
+
+2022-06-20 1637H | v0.6.0-alpha
+    - Edited README to include latest specifications and Information
+    - Updated CONTRIBUTING.md
+    - Base Installer
+        + installer-manual.sh (v0.4.0-alpha) has been Deprecated
+        + installer-ux.min.sh (v0.4.0-alpha) updated
+        + installer.remake.sh (v0.8.0-alpha) updated
 

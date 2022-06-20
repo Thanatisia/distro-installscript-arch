@@ -14,112 +14,55 @@ Linux Distribution Portable, Modular CLI/Terminal Base-Installation + Essential 
 
 ### Background
 
-Welcome to my **ArchLinux distro install script**!
+Welcome to my (semi)automatic Linux distribution (trying-to-be-generic) installation script!
 
-Designed to be
+This project revolves primarily around the base installation area, but this project will also contain various scripts for Post-Installation support as well!
 
+- The Project was first planned as I had to reinstall my ArchLinux (as do many Arch users) but had to do it manually. Thus, the concept bloomed when I considered 
+how to automatically install a consistent ArchLinux build with similar if not the same packages and users etc without having to re-type them.
+
+- The project (specifically the Base Installation Linux Install script ) is designed to be
   1. Modular
   2. Portable,
+  3. Customizable
+  4. Configurable
 
-you just need to open up the script, edit it with your basic information such as packages; distro user profile information (that you want to create) etc. and you can backup the file!
+- As you will see in [Usage](#usage), the end result will be that you *should* get the same build everytime consistently. The only time it might not may be if the installation process itself completely change 
+and/or the tools required by the target distribution changed, thus, leading to the next point
 
-Afterwhich, when you want to install the build, you just need to open it, edit the disk name (i.e. /dev/sd{a|b|c...} and run it. (Plans to add Disk Name input via CLI is a WIP)
+- The script has been formatted and structured in a way that if you want to create a Linux install script for another distro, you just need to 
+    + enter the functions that is specifically for that distro (according to the steps for installation)
+    + change that line of code and that should do it, as some of the general steps are universal across the distro CLI-based installation steps
+    + Thus, with the modular, containerized method, the modification of codes will be easier and customizable
 
-On run, just several presses to confirm the details and it's done!
+- I recommend starting with the [Base Installation](src/base-installation) directory as this is the stable build Base Installation Scripts 
 
-For further usage information, please refer to the Usage section in the relevant files found in [here](#files)
+```
+NOTE:
+- I apologise for the messy structure at the moment (installer.remake.sh - 2022-06-20 1608H)
+    + Currently I am testing out 2 formats (explained in #Remarks)
+    + Do do tell me which you consider to be aligned with 
+        - the core concept of
+            + Modular, Portable, Customizable, Configurable
+        - and just better to use in general
+    + once I have decided, I will rework the project filestructure and tidy up the repository.
+```
 
-### Files
-+ [Makefile](Makefile)
-    - Dependencies
-        + curl
-        + base-devel
-        + arch-install-scripts
-        + make
-        + git
+### Dependencies (General)
 
-    - Usage
-        - Download Makefile
-            ```console
-            curl -L -O https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/Makefile
-            ```
-           
-        - Step-by-Step
-            - Check system information
-                ```console
-                make checksysinfo
-                ```
-                
-            - Check your dependencies
-                ```console
-                make checkdependencies
-                ```
-                
-            - Run setup
-                ```console
-                make setup
-                ```
-                
-            - (OPTIONAL) Backup your system
-                ```console
-                # Ensure you have space in your home directory
-                make backup
-                ```
-                
-            - Download file
-                ```console
-                make download
-                ```
-        - Automated 
-            - Use prepare_all
-                ```console
-                make prepare_all
-                ```
-                
-        - Configure your install
-            ```console
-            make configure
-            ```
-            
-        - Test the install
-            ```console 
-            # Repeat this until you are satisfied with what you see before proceeding to the final step of the base install
-            make testinstall
-            ```
-            
-        - Perform the installation
-            ```console
-            # NOTE: Only do this if you are super sure you are willing to do this
-            #   - run this with sudo
-            sudo make install
-            ```
++ curl
++ base-devel
++ arch-install-scripts
++ make
++ git
 
-- [base-installation/](src/base-installation)
-	+ [Manual](src/base-installation/installer-manual.sh)
-	+ [User Experience](src/base-installation/installer-ux.min.sh)
-	
-	- Differences:
-		- Manual : Variables are defined in arrays & associative arrays directly labelled with 'EDIT THIS'
+### Files and Folders
 
-		- Simple : Arrays & Associative Arrays have all been predefined and "Symlinked" with variable containers at the top
-			+ You (the user) just need to modify the variables labelled under 'EDIT THIS' at the top
-
-	- Notes:
-		- The script is designed for portability and modularity in mind, thus:
-			- You do not need to change or modify any of the functions unless 
-				a. you know what you're adding or
-				b. you're contributing to the project
-			+ Just need to edit the variables labelled with 'EDIT THIS'
-
-- [post-installation/](src/post-installation)
-	- [Install Core & Essential Packages](src/post-installation/postinstallation-core-packages.sh)
-	- [Setup Root Settings](src/post-installation/postinstallations-root.sh)
-	- [General PostInstallation Setup](src/post-installation/postinstallations.sh)
-
-- [references/](references)
-	- [vbox-usboot-1/](references/vbox-usboot-1)
-		- Reference example profile 
-		- used to install in a USB MicroSD Card booted in a VirtualBox ArchLinux Instance
+- [base-installation/](src/base-installation) : This is the Base Installation script. All files placed here have been tested from those found in dev (Development Folder). This is probably where you want to go first.
+- [post-installation/](src/post-installation) : This is the Post-Installation related scripts. All files placed here have been tested from those found in dev
+- [references/](references) : This references directory contains various useful files such as Sample configurations, Sample templates and Sample usage scripts.
+- [development](dev) : This is the development directory. This directory is essentially the Nightly Build branch and to be considered as Testing or unsafe, just to be safe, please test the files found here in a Virtual Machine.
+- [documentations](docs) : This contains all documentations and guides for references.
 
 ## FAQs
 
@@ -129,13 +72,21 @@ For further usage information, please refer to the Usage section in the relevant
 I am open for suggestions as well as talking to everyone
 
 - Please note that 
-	- as of 2022-03-04 1349H : The current status of the scripts is tested primarily for brand new installations
-		> I am attempting to and in the midst of adding pre-existing installation features as well as testings surrounding pre-existing distributions
+	- 2022-03-04 1349H | The current status of the scripts is tested primarily for brand new installations
+		+ I am attempting to and in the midst of adding pre-existing installation features as well as testings surrounding pre-existing distributions
+		+ Thus, please do becareful when attempting to multiboot with this script
 
-		> Thus, please do becareful when attempting to multiboot with this script
-
-	- as of 2022-03-05 1147H : The script only has support for MBR (MSDOS/BIOS) Bootloader style
-		> Implementation of UEFI (EFI) support is currently in the plans
+	- 2022-03-05 1147H | The script only has support for MBR (MSDOS/BIOS) Bootloader
+		+ Implementation of UEFI (EFI) support is currently in the plans
+        
+    - 2022-06-20 1603H | Script has 2 types
+        + This is a brief summary of the differences between type-1 and type-2, for more info, please check out the [Base Installation README.md](src/base-installation/README.md)
+        - As of installer.remake.sh v1.0.5 and v1.0.8, I have created 2 types, known as [type-1] and [type-2]
+            + They are functionally the same, but the differences is in the configuration format
+            + type-1 is operating in an all-in-one file environment that has the variables within the script
+            + type-2 is operating as a source-config environment, theres a template config generated inside the script itself though, you can also just curl/download th template i have in my docs directory that I will push to githube
+        + I am still considering which format is more configurable, once I have decided, I will rework the project filestructure and tidy up the repository.
+        + I apologise for the messy structure at the moment.
 
 - I am thinking of making a discord group for my set of Linux Installation Script plans, do message me in any of the following contacts if you are interested.
 
@@ -147,10 +98,10 @@ thank you again for using!
 
 
 ## Contacts
-- [Twitter @phantasu](https://twitter.com/phantasu)
-- [GitHub @thanatisia](https://github.com/Thanatisia)
-- [My Portfolio Website](https://thanatisia.github.io/my-portfolio-website)
-- [Fiverr @fortissimasura](https://fiverr.com/fortissimasura)
-
++ [Twitter: @phantasu](https://twitter.com/phantasu)
++ [GitHub: @thanatisia](https://github.com/Thanatisia)
++ [My Portfolio Website](https://thanatisia.github.io/my-portfolio-website)
++ [Fiverr: @fortissimasura](https://fiverr.com/fortissimasura)
++ [Email: AsuraTechna@gmail.com](mailto:AsuraTechna@gmail.com)
 
 
