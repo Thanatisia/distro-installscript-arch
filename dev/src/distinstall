@@ -35,7 +35,7 @@ Modular, Portable, Customizable and Configurable script that can be modified int
 
 ### Synopsis/Syntax
 
-+ TARGET_DISK_NAME='your-disk-label (/dev/sdX)' (./)installer.remake.sh {MODE}
++ TARGET_DISK_NAME='your-disk-label (/dev/sdX)' (./)distinstall {MODE}
 
 ### Parameters
 
@@ -47,8 +47,8 @@ Modular, Portable, Customizable and Configurable script that can be modified int
 
 ### Usage
 
-+ TARGET_DISK_NAME='/dev/sdX' (./)installer.remake.sh           : Run in DEBUG mode
-+ TARGET_DISK_NAME='/dev/sdX' (./)installer.remake.sh RELEASE   : Run installation
++ TARGET_DISK_NAME='/dev/sdX' (./)distinstall           : Run in DEBUG mode
++ TARGET_DISK_NAME='/dev/sdX' (./)distinstall RELEASE   : Run installation
 
 ## Configuration and Customization
     ## Environment Variables

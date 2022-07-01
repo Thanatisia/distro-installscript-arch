@@ -1,4 +1,4 @@
-[#](#) Development Folder
+# Development Folder
 
 <h2>
     This is the Development folder (probably should make a dev branch instead...).

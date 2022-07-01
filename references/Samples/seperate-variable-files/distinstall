@@ -1,104 +1,63 @@
-#
-# Profile Build Installer
-# Author: Asura
-# Created: 2021-06-15 0104H, Asura
-# Modified: 
-#	- 2021-06-15 0104H, Asura
-#	- 2021-06-15 0154H, Asura
-#	- 2021-06-15 1836H, Asura
-#	- 2021-06-17 0123H, Asura
-#	- 2021-06-17 0141H, Asura
-#	- 2021-06-17 0232H, Asura
-#	- 2021-06-18 1228H, Asura
-#	- 2021-06-18 1739H, Asura
-#	- 2021-06-18 2256H, Asura
-#	- 2021-06-20 1136H, Asura
-#	- 2021-06-23 1529H, Asura
-#	- 2021-06-23 2103H, Asura
-#	- 2021-06-23 2125H, Asura
-#	- 2021-06-23 2233H, Asura
-#	- 2021-07-12 0925H, Asura
-#	- 2021-07-12 1223H, Asura
-#	- 2021-07-26 1727H, Asura
-#	- 2022-03-05 1134H, Asura
-#	- 2022-03-05 1540H, Asura
-# Features: 
-#	- Full minimal user input install script
-# Background Information: 
-#	A full minimal user-input, modular install script that allows user to
-#	change just afew variables and be able to effectively customize their system according to what they need
-#	with just afew changes
-# Changelog:
-#	- 2021-06-15 0104H, Asura
-#		- Created script file
-#	- 2021-06-15 0154H, Asura
-#		- Added other features
-#	- 2021-06-15 1836H, Asura
-#		- Completed main install structure
-#		- Now focusing on postinstallation recommendations
-#	- 2021-06-17 0123H, Asura
-#		- Fixed some bugs: { mounting partitions boot, home and root didnt include the device name }
-#	- 2021-06-17 0141H, Asura
-#		- Added read -p if MODE == DEBUG
-#	- 2021-06-17 0232H, Asura
-#		- Added DEBUG features
-#	- 2021-06-18 1228H, Asura
-#		- Modified arch-chroot /mnt <commands> install scripts
-#		- Added a [Reference] section for reference sites
-#	- 2021-06-18 1739H, Asura
-#		- Added 'check network'
-#	- 2021-06-18 2256H, Asura
-#		- Modified arch-chroot method to create a file inside root partition to execute for the time being
-#	- 2021-06-20 1137H, Asura
-#		- Added Comments
-#	- 2021-06-23 1529H, Asura
-#		- Added test use-case for auto-uncommenting /etc/locale.gen using sed
-#	- 2021-06-23 2103H, Asura
-#		- Added package 'base' into arraylist of packages to install
-#	- 2021-06-23 2125H, Asura
-#		- Moved local variable 'pkgs' from pacstrap_Install() -> Global Array variable 'pacstrap_Pkgs'
-#		- Added syslinux bootloader install
-#		- Created new associative array 'pkg' to store all packages
-#		- Appended 'pacstrap_Pkgs' to 'pkg' associative array
-#	- 2021-06-23 2233H, Asura
-#		- Added syslinux install - To be tested
-#	- 2021-07-12 0925H, Asura
-#		- Added line to uncomment sudoers using sed in arch-chroot
-#	- 2021-07-12 1223H, Asura
-#		- Added simple postinstallation basic commands such as enabling sudo and user management
-#		- no installation (to do in postinstallation setup script)
-#	- 2021-07-26 1727H, Asura
-#		- Transferred newest functions made in [installer-ux.min.sh]
-#			- Should now be working
-#	- 2022-03-05 1134H, Asura
-#		- Copied function body from [installer-ux.min.sh] to make it similar
-#		- Added more documentation to [partition_Parameters] to make it clearer
-#	- 2022-03-05 1540H, Asura
-#		- Updated /etc/sudoers : (ALL) ALL => (ALL:ALL) ALL
-#			- Previously (ALL) ALL, however, it was changed sometime in 2021/2022 updates
-# TODO:
-#		- Seperate and create script 'postinstallation-utilities.sh' for PostInstallation processes (non-installation focus)
-#			such as 
-#				'Repository' :
-#					Enable multilib repository
-#				'Sudo' :
-#					Set sudo priviledges
-#				'Administrative' : 
-#					Create User Account
-#				'System Maintenance' : 
-#					Swap File
-#		- Post installation: 
-#			> Get user to create a user
-# NOTES:
-#	- Please modify all [EDIT: Modify this] and confirm before running this file
-#	- As of 2022-03-05 2306H:
-#		- Support for installation from existing linux distro is still a WIP
-#			- Please try to install from the ArchLinux ISO
-#			- If you would like to try to install from an existing linux distro
-#				- Please install the package [arch-install-scripts]
-# References:
-#	1. Multiline-scripting in Arch-chroot : https://www.reddit.com/r/archlinux/comments/bssbze/scripting_into_chroot/
-#
+: "
+Distro Install Script
+Modular, Portable, Customizable and Configurable script that can be modified into other distro installers
+=====================================
+## Information
++ Author: Asura
+- Features: 
+    + Full minimal user input install script
+- Dependencies
+    + arch-install-scripts
+    + build-devel
+- Recommendation
+    + Download the Makefile in the same directory as the script
+### Background Information: 
++ A full minimal user-input, modular install script that allows user to
+    change just afew variables and be able to effectively customize their system according to what they need
+    with just afew changes
+### Security Design
++ If user is empty : while true and get user to create until user is created
+### NOTES
+- Please modify all [EDIT: Modify this] and confirm before running this file
+- As of 2022-06-16 2326H:
+    - Support for installation from existing linux distro is still a WIP
+        + Testing using ArchLinux (Base) completed, status  Success
+   - Suggestions
+        + Please try to install from the ArchLinux ISO
+        - If you would like to try to install from an existing linux distro
+            + Please install the package [arch-install-scripts]
+- As of 2022-06-17 2356H:
+    - Support for installation from existing linux distro success [ArchLinux].
+        + Testing using ArchISO completed, status : Success
+        + Testing using Existing Linux Distribution (Base Arch) completed, status: Success
+
+## Documentation
+
+### Synopsis/Syntax
+
++ TARGET_DISK_NAME='your-disk-label (/dev/sdX)' (./)distinstall {MODE}
+
+### Parameters
+
+- Positional Arguments
+    1. MODE
+        - Options
+            + DEBUG     : Display only the commands
+            + RELEASE   : Run the installation
+
+### Usage
+
++ TARGET_DISK_NAME='/dev/sdX' (./)distinstall           : Run in DEBUG mode
++ TARGET_DISK_NAME='/dev/sdX' (./)distinstall RELEASE   : Run installation
+
+## Configuration and Customization
+    ## Environment Variables
+    + TARGET_DISK_NAME : To set the disk/device label you wish to use (/dev/sdX)
+
+References:
+    1. Multiline-scripting in Arch-chroot : https://www.reddit.com/r/archlinux/comments/bssbze/scripting_into_chroot/
+=====================================
+"
 
 # --- Variables
 
@@ -109,136 +68,127 @@ PROGRAM_TYPE="Main"
 MODE="${1:-DEBUG}" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 
-# [Array]
+cfg_name="config.sh"
+# Import Variables
+if [[ -f "$PWD/$cfg_name" ]]; then
+    source "$PWD/$cfg_name"
+else
+    : "
+    Generate a template env config file
+    that will contain the variables to be used 
+    in the install script
+    "
+    cfg=$(cat <<EOF
+#==============================#
+# Distro Installer Config File #
+#==============================#
+: '
+Variables to be imported into the installer file
 
-### Pacstrap
-pacstrap_Pkgs=(
-	# EDIT: MODIFY THIS
-	# Place your pacstrap packages here
-	# - Ensure 'base' is inside
-	# - Otherwise, there will be issues loading after installation
-	# - Error examples:
-	#	1. 'root mounted, but /sbin/init not found, have fun'
-	# Add the packages you want to strap in here
-	"base"
-	"linux"
-	"linux-firmware"
-	"linux-lts"
-	"linux-lts-headers"
-	"base-devel"
-	"nano"
-	"vim"
-	"networkmanager"
-	"os-prober"
+:: Usage
+    # Enable executable
+    chmod +x $cfg_name
+
+    # Import Library
+    if [[ -f "$cfg_name" ]]; then
+        # Config Exists
+        . $cfg_name
+    fi
+'
+deviceParams_devType="<hdd|ssd|flashdrive|microSD>"
+deviceParams_Name="\$TARGET_DISK_NAME"
+deviceParams_Size="<x {GB | GiB | MB | MiB}>"
+deviceParams_Boot="<mbr|uefi>"
+deviceParams_Label="<msdos|gpt>"
+boot_Partition=(
+    # Append this and append a [n]="\${boot_Partition[<n-1>]}" in
+    #	partition_Configuration
+    # <partition_Number>;<partition_Name>;<partition_Type>;<partition_file_Type><partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
+    "1;Boot;primary;ext4;0%;1024MiB;True;NIL"
+    "2;Root;primary;ext4;1024MiB;<x1MiB>;False;NIL"
+    "3;Home;primary;ext4;<x1MiB>;100%;False;NIL"
 )
+mount_Paths=(
+    # Append this and append a [n]="\${mount_Paths[<n-1>]}" in
+    "/mnt/boot"	# Boot
+    "/mnt"		# Root
+    "/mnt/home"	# Home
+)
+pacstrap_pkgs=(
+        # EDIT: MODIFY THIS
+        # Add the packages you want to strap in here
+        "base"
+        "linux"
+        "linux-firmware"
+        "linux-lts"
+        "linux-lts-headers"
+        "base-devel"
+        "nano"
+        "vim"
+        "networkmanager"
+        "os-prober"
+)
+location_Region="<your-region (Asia|US etc)>" # Refer to /usr/share/zoneinfo for your region
+location_City="<your-city (Singapore etc)>" # Refer to /usr/share/zoneinfo/<your-region> for your City
+location_Language="<language-code (en_US.UTF-8|en_SG.TF-8 etc)>" # Your Language code - refer to /etc/locale.gen for a list of all language codes
+location_KeyboardMapping="en_UTF-8" # Your Keyboard Mapping - change this if you use this (TODO: 2022-06-17 2314H : At the moment this is not used)
+user_ProfileInfo=(
+    # Append this and append a [n]="\${user_ProfileInfo[<n-1>]}" in
+    # 	user_Info
+    # Note:
+    #	- Please seperate all parameters with delimiter ','
+    #	- Please seperate all subvalues with delimiter ';'
+    # Syntax:
+    # 
+    #	<username>,
+    #	<primary_group>,
+    #	<secondary_group (put NIL if none),
+    #	<custom_directory_path (put NIL if none)>,
+    #	<any_other_Parameters>
+    # 
+    "username,wheel,NIL,/home/profiles/username,NIL"
+)
+networkConfig_hostname="<your-network-hostname>" # Similar to workspace group name, used in /etc/hostname
+bootloader="<your-bootloader>" # Your bootloader, at the moment - supported bootloaders are [grub, syslinux], tested: [grub] (TODO: 2022-06-17 2317H : Add more bootloaders (if available))
+bootloader_Params="" # Your Bootloader Parameters - fill this if you have any, leave empty if NIL
+default_kernel="<linux-kernel>" # Your Default Linux Kernel
+platform_Arch="<platform-architecture>" # Your Platform Architecture i.e. [ i386-pc | x86_64 ]   
+EOF
+    )
+    echo -e "$cfg" > $cfg_name && chmod +x $cfg_name
+    echo -e "Config file template generated, please modify the variables and rerun the program again, thank you!"
+    exit 1
+fi
 
-# [Associative Array]
+: "Empty Data Storage
+- Please do not edit these
+- (If Required) Edit the associative array values specified in [setup()]
+"
+## Lists
+
+### Stores all external scripts created
+external_scripts=()
+
+## Associative Array
 
 ### Device and Partitions
-declare -A device_Parameters=(
-	# EDIT: Modify this
-	[device_Type]="<hdd|ssd|flashdrive|microSD>"
-	[device_Name]="</dev/sdX>"
-	[device_Size]="<x {GB | GiB | MB | MiB}>"
-	[device_Boot]="<mbr|uefi>"
-	[device_Label]="<msdos|gpt>"
-)
-
-declare -A partition_Configuration=(
-	# EDIT: Modify this
-	# [Background Information]
-	# Compilation of all partitions
-	# Please append according to your needs
-	# [Syntax]
-	# ROW_ID="<partition_ID>;<partition_Name>;<partition_file_Type>;<partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
-	[1]="1;Boot;primary;ext4;0%;1024MiB;True;NIL"
-	[2]="2;Root;primary;ext4;1024MiB;<x1MiB>;False;NIL"
-	[3]="3;Home;primary;ext4;<x1MiB>;100%;False;NIL"
-)
-
-declare -A partition_Parameters=(
-	# This is the default container for partition parameters
-	# - created to store partition parameter as global variable
-	# This will be used to dynamically store data
-	# You do not need to edit this
-	[part_ID]=1
-	[part_Name]="Boot"
-	[part_Type]="primary"
-	[part_file_Type]="ext4"
-	[part_start_Size]="0%"
-	[part_end_Size]="1024MiB"
-	[part_Bootable]=True
-	[part_Others]=""
-)
-
+declare -A device_Parameters=()
+declare -A partition_Configuration=()
+declare -A partition_Parameters=()
 ### Mounts
-declare -A mount_Group=(
-	# Place all your partition path
-	#	corresponding to the partition number
-	# [Syntax]
-	# [partition-n]="/partition/mount/path"
-	[1]="/mnt/boot"	# Boot
-	[2]="/mnt"		# Root
-	[3]="/mnt/home"	# Home
-)
-
-### Packages
-declare -A pkgs=(
-	# EDIT: Modify this 
-	# All Packages
-	#	- pacstrap packages etc.
-	# Please append all new categories below in the key while
-	#	the array for the category in the values
-	[pacstrap]="${pacstrap_Pkgs[@]}"
-)
-
+declare -A mount_Group=()
 ### Region & Location
-declare -A location=(
-	# Regional & Location
-	# Your Region, Your City etc.
-	# EDIT: Modify this
-	[region]="<Your Region>"
-	[city]="<Your City>"
-	[language]="en_SG.UTF-8"
-	[keymap]="en_UTF-8"
-)
-
+declare -A location=()
+### Packages
+declare -A pkgs=()
 ### User Control
-declare -A user_Info=(
-	# EDIT: Modify this
-	# User Profile Information
-	# [Delimiters]
-	# , : For Parameter seperation
-	# ; : For Subparameter seperation (seperation within a parameter itself)
-	# [Syntax]
-	# ROW_ID="
-	#	<username>,
-	#	<primary_group>,
-	#	<secondary_group (put NIL if none),
-	#	<custom_directory_path (if custom_directory is True)>
-	#	<any other parameters>
-	# "
-	# [Examples]
-	# [1]="username,wheel,NIL,True,/home/profiles/username"
-	[1]="asura,wheel,NIL,/home/profiles/asura,NIL"
-)
-
+declare -A user_Info=()
 ### Network Configurations
-declare -A network_config=(
-	# EDIT: Modify this
-	# Network Configuration info
-	[hostname]="ArchLinux"
-)
-
+declare -A network_config=()
 ### Operating System Definitions
-declare -A osdef=(
-	# EDIT: Modify this
-	# Operating System Definitions
-	# - Bootloader, Kernels (to be added) etc.
-	[bootloader]="grub"				# Your Bootloader
-	[optional-parameters]=""		# Your Bootloader's additional parameters outside of the main important ones
-	[target_device_Type]="i386-pc"	# Your Target Device Type
-)
+declare -A osdef=()
+### Linux Definitions
+declare -A linux=()
 
 # --- Functions
 
@@ -347,20 +297,18 @@ device_partition_Manager()
 	# Device & Partition Manager
 	#
 
-	echo "Get User Input - Device Information"
+    echo "(+) Get User Input - Device Information"
 	device_Name="${device_Parameters["device_Name"]}"
 	device_Label="${device_Parameters["device_Label"]}"
 
 	echo ""
 
-	echo "Get User Input - Partition Information"
+    echo "(+) Get User Input - Partition Information"
 
 	# Format & Create Label
 	read -p "Would you like to format? [Y|N]: " format_conf
 	if [[ "$format_conf" == "Y" ]] || [[ "$format_conf" == "" ]]; then
-		echo "=============================================="
-		echo " Formatting [$device_Name] to [$device_Label] "
-		echo "=============================================="
+        echo "(+) Formatting [$device_Name] to [$device_Label]..."
 		
 		if [[ "$MODE" == "DEBUG" ]]; then
 			echo parted $device_Name mklabel $device_Label
@@ -397,9 +345,7 @@ device_partition_Manager()
 
 			echo ""
 
-			echo "==============================="
-			echo "Creating Partition [ $part_ID ]"
-			echo "==============================="
+            echo "(+) Creating Partition [ $part_ID ]"
 
 			# Create Partition
 			if [[ "$MODE" == "DEBUG" ]]; then
@@ -425,7 +371,7 @@ device_partition_Manager()
 					fi
 					;;
 				*)
-					echo "Unknown File System: [$part_file_Type]"
+                    echo "(-) Unknown File System: [$part_file_Type]"
 					;;
 			esac
 			## Check bootable
@@ -441,9 +387,7 @@ device_partition_Manager()
 
 	echo ""
 
-	echo "======================"
-	echo " Partition Completed. "
-	echo "======================"
+    echo "(D) Partition Completed. "
 }
 
 mount_Disks()
@@ -494,9 +438,6 @@ mount_Disks()
 	fi
 
 	# --- Output
-	echo "==============="
-	echo " Disks Mounted "
-	echo "==============="
 }
 
 pacstrap_Install()
@@ -565,6 +506,7 @@ arch_chroot_Exec()
 	city="${location["city"]}"
 	language="${location["language"]}"
 	hostname="${network_config["hostname"]}"
+    default_Kernel="${linux["kernel"]}"
 	bootloader="${osdef["bootloader"]}"
 	bootloader_optional_Params="${osdef["optional-parameters"]}"
 	bootloader_target_device_Type="${osdef["target_device_Type"]}"
@@ -573,24 +515,27 @@ arch_chroot_Exec()
 
 	# Associative Array
 	chroot_commands=(
-		"echo ======= Time Zones ======"												# Step 10: Time Zones
-		"ln -sf /usr/share/zoneinfo/$region/$city /etc/localtime"						# Step 10: Time Zones; Set time zone
+		# "echo ======= Time Zones ======"												# Step 10: Time Zones
+        "echo \(+\) Time Zones"
+        "ln -sf /usr/share/zoneinfo/$region/$city /etc/localtime"						# Step 10: Time Zones; Set time zone
 		"hwclock --systohc"																# Step 10: Time Zones; Generate /etc/adjtime via hwclock
-		"echo ======= Location ======"													# Step 11: Localization;
-		# "vim /etc/locale.gen"															# Step 11: Localization; Edit /etc/locale.gen and uncomment language (ie. en_US.UTF-8 UTF-8; en_SG.UTF-8 UTF-8;)
-		"sed -i '/$language/s/^#//g' /etc/locale.gen" 									# Step 11: Localization; Uncomment locale using sed
+		# "echo ======= Location ======"													# Step 11: Localization;
+        "echo \(+\) Location"
+        "sed -i '/$language/s/^#//g' /etc/locale.gen" 									# Step 11: Localization; Uncomment locale using sed
 		"locale-gen"																	# Step 11: Localization; Generate the locales by running
 		"echo \"LANG=$language\" | tee -a /etc/locale.conf"								# Step 11: Localization; Set LANG variable according to your locale
-		"echo ======= Network Configuration ======"										# step 12: Network Configuration;
-		"echo \"$hostname\" | tee -a /etc/hostname"										# Step 12: Network Configuration; Set Network Hostname Configuration; Create hostname file
+		# "echo ======= Network Configuration ======"										# step 12: Network Configuration;
+        "echo \(+\) Network Configuration"
+        "echo \"$hostname\" | tee -a /etc/hostname"										# Step 12: Network Configuration; Set Network Hostname Configuration; Create hostname file
 		"echo \"127.0.0.1   localhost\" | tee -a /etc/hosts"							# Step 12: Network Configuration; Add matching entries to hosts file
 		"echo \"::1         localhost\" | tee -a /etc/hosts"							# Step 12: Network Configuration; Add matching entries to hosts file
 		"echo \"127.0.1.1   $hostname.localdomain	$hostname\" | tee -a /etc/hosts"	# Step 12: Network Configuration; Add matching entries to hosts file
-		"echo ======= Make Initial Ramdisk ======="										# Step 13: Initialize RAM file system;
-		"mkinitcpio -P linux"															# Step 13: Initialize RAM file system; Create initramfs image (linux kernel)
-		"mkinitcpio -P linux-lts"														# Step 13: Initialize RAM file system; Create initramfs image (linux-lts kernel)
-		"echo ======= Change Root Password ======="										# Step 14: User Information; Set Root Password
-		"passwd"																		# Step 14: User Information; Set Root Password
+		# "echo ======= Make Initial Ramdisk ======="										# Step 13: Initialize RAM file system;
+        "echo \(+\) Making Initial Ramdisk"
+        "mkinitcpio -P $default_Kernel"													# Step 13: Initialize RAM file system; Create initramfs image (linux-lts kernel)
+		# "echo ======= Change Root Password ======="										# Step 14: User Information; Set Root Password
+        "echo \(+\) Change Root Password"
+        "passwd || passwd"																		# Step 14: User Information; Set Root Password
 	)
 
 	# --- Extra Information
@@ -602,16 +547,17 @@ arch_chroot_Exec()
 	# Default Bootloader
 	if [[ "$bootloader" == "" ]]; then
 		# Empty : Reset to 'Grub'
-		echo "Sorry, $bootloader is not supported at the moment, we will default to Grub(2.0)"
+        echo "(-) Sorry, $bootloader is not supported at the moment, we will default to Grub(2.0)"
 		bootloader="grub"
 	fi
 
 	# Switch Case bootloader between grub and syslinux
 	case "$bootloader" in
+		# Step 15: Bootloader
 		"grub")
 			chroot_commands+=(
-				"echo ======= Bootloader : Grub ======"											# Step 15: Bootloader
-				"sudo pacman -S grub"																# Install Grub Package
+                "echo \(+\) Installing Bootloader : Grub"
+                "sudo pacman -S grub"																# Install Grub Package
 				"grub-install --target=$bootloader_target_device_Type --debug $bootloader_optional_Params $device_Name"	# Install Grub Bootloader
 				"mkdir -p /boot/grub"																# Create grub folder
 				"grub-mkconfig -o /boot/grub/grub.cfg"												# Create grub config
@@ -619,7 +565,7 @@ arch_chroot_Exec()
 			;;
 		"syslinux")
 			chroot_commands+=(
-				"echo ======= Bootloader : Syslinux ======"											# Step 15: Bootloader
+                "echo \(+\) Installing Bootloader : Syslinux"
 				"sudo pacman -S syslinux"
 				"mkdir -p /boot/syslinux"
 				"cp -r /usr/lib/syslinux/bios/*.c32 /boot/syslinux"
@@ -665,46 +611,8 @@ arch_chroot_Exec()
 	fi
 
 	# Execute in arch-chroot
-	# ====== RETAIN THIS PIECE OF CODE FOR LEGACY DEBUGGING, THX FUTURE ME ====== #
-	#for c in "${chroot_commands[@]}"; do
-	#	if [[ "$MODE" == "DEBUG" ]]; then
-	#		echo arch-chroot $dir_Mount $c
-	#	else
-	#		arch-chroot $dir_Mount $c
-	#	fi
-	#done
-	# ====== RETAIN THIS PIECE OF CODE FOR LEGACY DEBUGGING, THX FUTURE ME ====== #
-	#for c in "${chroot_commands[@]}"; do
-	#	if [[ "$MODE" == "DEBUG" ]]; then	
-	#		# echo arch-chroot $dir_Mount $c
-	#		echo "arch-chroot $dir_Mount <<-EOF\
-	#			$c\
-	#		EOF"
-	#	else
-	#		# arch-chroot $dir_Mount $c
-	#		arch-chroot $dir_Mount <<-EOF
-	#			$c
-	#		EOF
-	#	fi
-	#done
-	
-	#if [[ "$MODE" == "DEBUG" ]]; then
-	#	echo -e "arch-chroot $dir_Mount <<- EOF\
-	#		$cmd_str
-	#	EOF"
-	#else
-	#	arch-chroot $dir_Mount <<-EOF
-	#		$cmd_str
-	#	EOF
-	#fi
-
-	#for c in "${chroot_commands[@]}"; do
-	#	if [[ "$MODE" == "DEBUG" ]]; then
-	#		echo -e "arch-chroot $dir_Mount $c"
-	#	else
-	#		arch-chroot $dir_Mount $c
-	#	fi
-	#done
+    # Future Codes deemed stable *enough*, thanks Past self for retaining legacy codes
+    # for debugging
 	external_scripts+=(
 		### Append all external scripts used ###
 		$mount_Root/$script_to_exe
@@ -712,10 +620,10 @@ arch_chroot_Exec()
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		echo "chmod +x $mount_Root/$script_to_exe"
-		echo "arch-chroot $dir_Mount /bin/bash -c \"$PWD/$script_to_exe\""
+		echo "arch-chroot $dir_Mount /bin/bash -c "/root/$script_to_exe""
 	else
 		chmod +x $mount_Root/$script_to_exe
-		arch-chroot $dir_Mount /bin/bash -c "$PWD/$script_to_exe"
+		arch-chroot $dir_Mount /bin/bash -c "/root/$script_to_exe"
 	fi
 	# --- Output
 }
@@ -884,16 +792,16 @@ postinstallation()
 	# Enable Sudo #
 	# =========== #
 	postinstall_commands+=(
-		"echo ======= Enable sudo ======="												# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'
-		"sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL:ALL)\s\+ALL\)/\1/' /etc/sudoers"				# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'
+        "echo \(+\) Enable sudo"
+        "sed -i 's/^#\s*\(%wheel\s\+ALL=(ALL:ALL)\s\+ALL\)/\1/' /etc/sudoers"				# PostInstall Must Do | Step 1: Enable sudo for group 'wheel'
 	)
 
 	# =============== #
 	# User Management #
 	# =============== #
 	postinstall_commands+=(
-		"echo ======= User Management ======="
-	)
+	    "echo \(+\) User Management"
+    )
     # Loop through all users in user_profiles and
     # See if it exists, follow above documentation
     for u_ID in "${!user_Info[@]}"; do
@@ -908,11 +816,12 @@ postinstallation()
         u_other_Params="${curr_user_Params[@]:4}"       # Any other parameters after the first 3
 
 		# Check if user exists
-        u_Exists="$(check_user_Exists $u_name)" # Check if user exists; 0 : Does not exist | 1 : Exists
+        echo -e "(+) Checking for user $u_name..."
+        u_Exists=`arch-chroot $dir_Mount /bin/bash -c "getent passwd $u_name"` #  Check if user exists | Empty if Not Found
 
-        if [[ ! "$u_Exists" == "1" ]]; then
+        if [[ "$u_Exists" == "" ]]; then
             # 0 : Does not exist
-            echo "User [$u_name] does not exist"
+            echo "(-) User [$u_name] does not exist"
 
             u_create_Command="useradd"
             # Get Parameters
@@ -941,9 +850,7 @@ postinstallation()
 
 			postinstall_commands+=(
 				"$u_create_Command"
-			    "echo ==========================="
-                "echo Password change for $u_name"
-                "echo ==========================="
+                "echo \"\t(+) Password change for $u_name\""
 				"if [[ \"\$?\" == \"0\" ]]; then"
                 "	passwd $u_name"
 				"fi"
@@ -977,20 +884,21 @@ postinstallation()
 	# Change Permission and Execute command
 	if [[ "$MODE" == "DEBUG" ]]; then
 		echo "chmod +x $mount_Root/$script_to_exe"
-		echo "arch-chroot $dir_Mount /bin/bash -c \"$PWD/$script_to_exe\""
+		echo "arch-chroot $dir_Mount /bin/bash -c "/root/$script_to_exe""
 	else
 		chmod +x $mount_Root/$script_to_exe
-		arch-chroot $dir_Mount /bin/bash -c "$PWD/$script_to_exe"
+		arch-chroot $dir_Mount /bin/bash -c "/root/$script_to_exe"
 	fi
 	
 	external_scripts+=(
 		### Append all external scripts used ###
 		$mount_Root/$script_to_exe
 	)
+}
 
-	read -p "Finished, press anything to quit." finish
-
-	echo "- Please proceed to follow the 'Post-Installation' series of guides"
+postinstall_todo()
+{
+    echo "- Please proceed to follow the 'Post-Installation' series of guides"
 	echo "and/or"
 	echo "- Follow this list of recommendations:"
 	echo "	[Post-Installation TODO]"
@@ -1064,33 +972,6 @@ postinstallation()
 	echo "		vii. Verify swap file allocation"
 	echo "			free -h"
 	echo "		viii. If part vii works : Swap file has been created."
-}
-
-postinstall_user_create()
-{
-	#
-	# PostInstallation Function: Create user account
-	# TODO:
-	#	- To be made into a proper function (useradd)
-	#	- Place inside another script (postinstallation-utilities.sh)
-	#
-	echo " 3. Create user account"
-	echo "		Summary:"
-	echo "			Create user account"
-	echo "		i. Add user using the 'useradd' command"
-	echo "			useradd -m -g <primary group (default: <username>) -G <secondary/supplementary groups (default: wheel)> -d <custom-profile-directory-path> <username>"
-	echo "			i.e."
-	echo "				useradd -m -g wheel -d /home/profiles/admin admin"
-	echo "				useradd -m -g users -G wheel -d /home/profiles/admin admin"
-	echo "		ii. Set password to username"
-	echo "			passwd <username>"
-	echo "			i.e."
-	echo "				let <username> be 'admin':"
-	echo "					passswd admin"
-	echo "		iii. Test user"
-	echo "			su - <username>"
-	echo "			sudo whoami"
-	echo "		iv. If part iii works : User has been created."
 }
 
 postinstall_sanitize()
@@ -1201,14 +1082,24 @@ installer()
 	#
 	# Main setup installer
 	#
+    echo -e "(S) Starting Base Installation..."
 
 	echo "========================"
 	echo "Stage 1: Prepare Network"
 	echo "========================"
-	echo "Testing Network..."
-	network_Enabed="$(verify_network)"
+    echo "(S) 1. Testing Network..."
+	network_Enabled="$(verify_network)"
 	if [[ "$network_Enabled" == "False" ]]; then
-		sudo dhcpcd
+		sudo dhcpcd && \
+            echo -e "(+) Network is activated" || \
+            echo -e "(+) Error starting Network"
+    else
+        echo -e "(+) Network is active"
+	fi
+    echo "(D) Network testing completed."
+
+    if [[ "$MODE" == "DEBUG" ]]; then
+		read -p "Press anything to continue..." tmp
 	fi
 
 	echo ""
@@ -1216,15 +1107,23 @@ installer()
 	echo "=========================================="
 	echo "Stage 2: Verify Boot Mode (i.e. UEFI/BIOS)"
 	echo "=========================================="
+    echo -e "(S) Verifying Boot Mode..."
 	boot_Mode="$(verify_boot_Mode)"
-	echo "Boot Mode: $boot_Mode"
+    echo -e "(+) Boot Mode: $boot_Mode"
+    echo -e "(D) Boot Mode verification completed."
+
+    if [[ "$MODE" == "DEBUG" ]]; then
+		read -p "Press anything to continue..." tmp
+	fi
 
 	echo ""
 
 	echo "============================"
 	echo "Stage 3: Update System Clock"
 	echo "============================"
-	update_system_Clock
+    echo -e "(S) Updating System Clock..."
+    update_system_Clock
+    echo -e "(D) System clock updated."
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1235,7 +1134,9 @@ installer()
 	echo "============================"
 	echo "Stage 4: Partition the Disks"
 	echo "============================"
-	device_partition_Manager
+    echo -e "(S) Starting Disk Management..."
+    device_partition_Manager
+    echo -e "(D) Disk Management completed."
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1246,7 +1147,9 @@ installer()
 	echo "===================="
 	echo "Stage 5: Mount Disks"
 	echo "===================="
+    echo -e "(S) Mounting disks..."
 	mount_Disks
+    echo -e "(D) Disks mounted."
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1257,7 +1160,9 @@ installer()
 	echo "======================="
 	echo "Stage 6: Select Mirrors"
 	echo "======================="
+    echo -e "(S) Selecting mirrors..."
 	echo $EDITOR /etc/pacman.d/mirrorlist
+    echo -e "(D) Mirror selected."
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1268,7 +1173,9 @@ installer()
 	echo "==================================="
 	echo "Stage 7: Install essential packages"
 	echo "==================================="
+    echo -e "(S) Strapping packages to mount point..."
 	pacstrap_Install
+    echo -e "(D) Packages strapped."
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1279,7 +1186,9 @@ installer()
 	echo "==========================================="
 	echo "Stage 8: Generate fstab (File System Table)"
 	echo "==========================================="
+    echo -e "(S) Generating Filesystems Table in /etc/fstab"
 	fstab_Generate
+    echo -e "(D) Filesystems Table generated."
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1290,7 +1199,9 @@ installer()
 	echo "==========================="
 	echo "Stage 9: Chroot and execute"
 	echo "==========================="
+    echo -e "(S) Executing chroot commands"
 	arch_chroot_Exec # Execute commands in arch-chroot
+    echo -e "(D) Commands executed"
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1301,14 +1212,17 @@ installer()
 	echo "======================="
 	echo "Installation Completed."
 	echo "======================="
-	echo "Base ArchLinux installation completed."
 
 	echo ""
 
 	echo "================="
 	echo "Post-Installation"
 	echo "================="
+    echo -e "(S) Starting Basic Post-Installation"
+
+    echo -e "(+) Running post-installation..."
 	postinstallation
+    echo -e "(+) Post-Installation execution completed"
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1319,13 +1233,142 @@ installer()
 	echo "========================"
 	echo "Sanitization and Cleanup"
 	echo "========================"
+    echo -e "(+) Running finalization and sanitization..."
 	postinstall_sanitize
+    echo -e "(+) Sanitization completed"
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
 	fi
 
 	echo ""
+
+    echo -e "(D) Basic Post-Installation processes completed."
+
+
+    read -p "(D) Finished, press anything to quit." finish	
+}
+
+setup()
+{
+    : "
+    Setup all associative arrays and variables that are not expected to be touched
+    and to be reinitialized if changes are made on a settings level
+    "
+    # [Associative Array]
+
+    ### Device and Partitions
+    device_Parameters=(
+        # EDIT: Modify this
+        [device_Type]="$deviceParams_devType"
+        [device_Name]="$deviceParams_Name"
+        [device_Size]="$deviceParams_Size"
+        [device_Boot]="$deviceParams_Boot"
+        [device_Label]="$deviceParams_Label"
+    )
+
+    partition_Configuration=(
+        # EDIT: Modify this
+        # [Background Information]
+        # Compilation of all partitions
+        # Please append according to your needs
+        # [Syntax]
+        # ROW_ID="<partition_ID>;<partition_Name>;<partition_file_Type>;<partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
+        [1]="${boot_Partition[0]}"
+        [2]="${boot_Partition[1]}"
+        [3]="${boot_Partition[2]}"
+    )
+
+    partition_Parameters=(
+        # This is the default container for partition parameters
+        # - created to store partition parameter as global variable
+        # This will be used to dynamically store data
+        # You do not need to edit this
+        [part_ID]=1
+        [part_Name]="Boot"
+        [part_Type]="primary"
+        [part_file_Type]="ext4"
+        [part_start_Size]="0%"
+        [part_end_Size]="1024MiB"
+        [part_Bootable]=True
+        [part_Others]=""
+    )
+
+    ### Mounts
+    mount_Group=(
+        # EDIT: Modify this
+        # Place all your partition path 
+        #	corresponding to the partition number
+        # [Syntax]
+        #   [partition-n]="/partition/mount/path"
+        [1]="${mount_Paths[0]}"	# Boot
+        [2]="${mount_Paths[1]}"	# Root
+        [3]="${mount_Paths[2]}"	# Home
+    )
+
+    ### Region & Location
+    location=(
+        # Regional & Location
+        # Your Region, Your City etc.
+        # EDIT: Modify this
+        [region]="$location_Region"
+        [city]="$location_City"
+        [language]="$location_Language"
+        [keymap]="$location_KeyboardMapping"
+    )
+
+    ### Packages
+    pkgs=(
+        # All Packages
+        #	- pacstrap packages etc.
+        # Please append all new categories below in the key while
+        #	the array for the category in the values
+        [pacstrap]="${pacstrap_pkgs[@]}"
+    )
+
+    ### User Control
+    user_Info=(
+        # EDIT: Modify this
+        # User Profile Information
+        # [Delimiters]
+        # , : For Parameter seperation
+        # ; : For Subparameter seperation (seperation within a parameter itself)
+        # [Notes]
+        # Please put 'NIL' for empty space
+        # [Syntax]
+        # ROW_ID="
+        #	<username>,
+        #	<primary_group>,
+        #	<secondary_group (put NIL if none),
+        #	<custom_directory_path (if custom_directory is True)>
+        #	<any other parameters>
+        # "
+        # [Examples]
+        # [1]="username,wheel,NIL,/home/profiles/username"
+        [1]="${user_ProfileInfo[0]}"
+    )
+
+    ### Network Configurations
+    network_config=(
+        # EDIT: Modify this
+        # Network Configuration info
+        [hostname]="$networkConfig_hostname"
+    )
+
+    ### Operating System Definitions
+    osdef=(
+        # EDIT: Modify this
+        # Operating System Definitions 
+        # - Bootloader, Kernels (to be added) etc.
+        [bootloader]="$bootloader"					# Your Bootloader
+        [optional-parameters]="$bootloader_Params"	# Your Bootloader's additional parameters outside of the main important ones
+        [target_device_Type]="$platform_Arch"		# Your Target Device Type
+    )
+
+    ### Linux Definitions
+    linux=(
+        ["kernel"]="$default_kernel" # Default Kernel
+    )
 }
 
 init()
@@ -1333,9 +1376,22 @@ init()
 	#
 	# Initialization
 	# 
+    echo -e "(S) Starting Initialization..."
 	echo "Program Name: $PROGRAM_NAME"
 	echo "Program Type: $PROGRAM_TYPE"
 	echo "Distro: $DISTRO"
+    echo -e "(+) Verifying Environment Variables..."
+    setup
+    if [[ "$TARGET_DISK_NAME" == "" ]]; then
+        while [[ "$deviceParams_Name" == "" ]]; do
+            echo -e "(-) TARGET_DISK_NAME not set"
+            read -p "Please indicate target disk (i.e. /dev/sdX): " deviceParams_Name
+        done
+        echo -e "(+) Target disk set to $deviceParams_Name"
+
+        device_Parameters["device_Name"]=$deviceParams_Name
+    fi
+    echo -e "(D) Initialization completed"
 }
 
 body()

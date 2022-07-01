@@ -9,7 +9,7 @@ MOUNT_PATHS = "/mnt/boot" "/mnt" "/mnt/home"
 
 # Program Variables
 ENV = TARGET_DISK_NAME="$(TARGET_DISK)"	# Environment Variables
-SCRIPT = "installer.remake.sh"			# Script Filename
+SCRIPT = "distinstall"					# Script Filename
 CFLAGS = "RELEASE"						# Compilation Flags
 
 # [Commands]

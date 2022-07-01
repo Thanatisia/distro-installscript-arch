@@ -72,3 +72,10 @@ release_date | version_number:
         + installer-ux.min.sh (v0.4.0-alpha) updated
         + installer.remake.sh (v0.8.0-alpha) updated
 
+2022-07-02 0025H | v1.0.0
+    - Initial major stable release v1.0.0
+    - Deprecated
+        + installer-manual.sh line
+        + installer-ux.min.sh line
+    - Renamed 'installer.remake-{version}.sh' to distinstall
+

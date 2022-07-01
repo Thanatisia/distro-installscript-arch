@@ -1,4 +1,4 @@
-#Base Installation Script (ArchLinux Edition)
+# Base Installation Script (ArchLinux Edition)
 
 Linux Distribution Portable, Modular CLI/Terminal Base-Installation + Essential Scripts for ArchLinux
 
@@ -35,19 +35,6 @@ and/or the tools required by the target distribution changed, thus, leading to t
     + change that line of code and that should do it, as some of the general steps are universal across the distro CLI-based installation steps
     + Thus, with the modular, containerized method, the modification of codes will be easier and customizable
 
-- I recommend starting with the [Base Installation](src/base-installation) directory as this is the stable build Base Installation Scripts 
-
-```
-NOTE:
-- I apologise for the messy structure at the moment (installer.remake.sh - 2022-06-20 1608H)
-    + Currently I am testing out 2 formats (explained in #Remarks)
-    + Do do tell me which you consider to be aligned with 
-        - the core concept of
-            + Modular, Portable, Customizable, Configurable
-        - and just better to use in general
-    + once I have decided, I will rework the project filestructure and tidy up the repository.
-```
-
 ### Dependencies (General)
 
 + curl
@@ -71,7 +58,7 @@ NOTE:
 - Please do contact me in any of the platforms below if you have any ideas | bugs | comments | suggestions or if you just wanna talk!
 I am open for suggestions as well as talking to everyone
 
-- Please note that 
+- Immediate Newsletter
 	- 2022-03-04 1349H | The current status of the scripts is tested primarily for brand new installations
 		+ I am attempting to and in the midst of adding pre-existing installation features as well as testings surrounding pre-existing distributions
 		+ Thus, please do becareful when attempting to multiboot with this script
@@ -87,6 +74,14 @@ I am open for suggestions as well as talking to everyone
             + type-2 is operating as a source-config environment, theres a template config generated inside the script itself though, you can also just curl/download th template i have in my docs directory that I will push to githube
         + I am still considering which format is more configurable, once I have decided, I will rework the project filestructure and tidy up the repository.
         + I apologise for the messy structure at the moment.
+
+    - 2022-07-02 0019H | Stable release v1.0.0
+        + First of all, thank you to everyone whom have provided feedback as to which type you prefer.
+        - After careful consideration and testing, the application will follow a "seperate config" structure on top of the initial portable design paradigm
+            + With this change, essentially all updates and patches made will NOT affect your configurations unless the patch is a major patch that removes/deprecated variables.
+            + Thus, this makes the program more portable, configurable and customizable.
+        + This means that this is what I would consider the first stable release
+        + Other changes can be found in [Changelog](CHANGELOG.md)
 
 - I am thinking of making a discord group for my set of Linux Installation Script plans, do message me in any of the following contacts if you are interested.
 

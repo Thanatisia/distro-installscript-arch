@@ -14,36 +14,20 @@ This page contains the Base Installation Scripts
 ### Program Information
 
 + Program Name: Base Install Script (ArchLinux Edition)
-+ Program Version: v0.5.0-alpha
++ Program Version: v1.0.0
 
 ### Background Information
 
-The general differences between the 2 files are as follows
-
-- Manual : Variables are defined in arrays & associative arrays directly labelled with 'EDIT THIS' (#DEPRECATED)
-- Simple : Arrays & Associative Arrays have all been predefined and "Symlinked" with variable containers at the top (#DEPRECATED)
-	+ You (the user) just need to modify the variables labelled under 'EDIT THIS' at the top
-- Remake : Using Simple (aka installer-ux.min.sh) as a base, designed to be more UI/UX conscious and improved on functionality. To take over [installer-manual.sh]
-
-Generally they are the same function wise, however - the variable setup and arrangement is different to fit your preference. Thus, they are considered the same version history.
-Remake - on the other hand - is based off 'Simple' but has been remodelled to work as a single file and will be distributed with intentions of this script being the main base installer
-(unlike a multi-variant script)
++ Initially started in 2 forms, 'installer-manual.sh' and 'installer-ux.min.sh' that basically has 2 styles of configs but they do the same function - to perform a linux distro's base installation
++ Thus, I combined them to make installer.remake.sh where it too had 2 forms.
++ Eventually narrowed down and got a external-config sourcing style configuration script and renamed to 'distinstall' (for now)
 
 ## Files
 
 + README.md     : README for the Base Installation-related scripts
 + CHANGELOG.md  : The Changelogs
 + Makefile      : A makefile for automate compilation/installation using the installer
-- installer.remake.sh : A remake using installer-ux.min.sh as a base
-    + Currently version v0.8.0-alpha (2022-06-20 1633H)
-- installer-ux.min.sh : A variant of the linux distro base install script (ArchLinux edition), the other being installer-manual.sh
-    + Currently version v0.4.0-alpha
-    - Considering to deprecate after installer-manual.sh in consideration for installer.remake.sh to be the primary script
-        + Explanation is in [notes](#notes)
-- installer-manual.sh : A variant of the linux distro base install script (ArchLinux edition), the other being installer-ux.min.sh
-    + Currently version v0.4.0-alpha 
-    - Will be deprecated by end of this week (2022-06-19 Sunday)
-        + Explanation is in [notes](#notes)
++ distinstall   : The Distribution install script
 
 ## Setup
 
@@ -115,21 +99,28 @@ Remake - on the other hand - is based off 'Simple' but has been remodelled to wo
 		```
 
 	- Examples:
-		- installer-manual.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/installer-manual.sh
-		- installer-ux.min.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/installer-ux.min.sh
-		- installer.remake.sh : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/installer.remake.sh
+		- distinstall : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/distinstall
         
 ### Preparation/Setup
 
-- Edit the script
-	```console
-	$EDITOR installer-manual.sh
-	$EDITOR installer-ux.min.sh
-	```
+- Change permission to enable running
+    ```sh
+    chmod u+x distinstall
+    ```
 
-- Modify file info according to your requirements
-	```
-	NOTE: You can just edit those labelled with "# EDIT: MODIFY THIS" if you do not know where to start
+- Configuration File 
+    + Download the sample configuration file 
+        ```sh
+        curl -L -O https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/docs/configs/config.sh
+        ```
+    + Generate the template configuration file in initial run
+        ```sh
+        ./distinstall
+        ```
+        
+- Edit the configuration file and set variables according to requirements
+	```console
+    $EDITOR distinstall
 	```
 
 - (OPTIONAL) Backup the file for re-usage
@@ -139,108 +130,43 @@ Remake - on the other hand - is based off 'Simple' but has been remodelled to wo
 
 ## Documentation
 
-- installer-ux.min.sh
-	### Synopsis/Syntax
+### Synopsis/Syntax
 
-	+ ./installer-ux.min.sh {MODE}
++ TARGET_DISK_NAME='your-disk-label (/dev/sdX)' (./)installer.remake.sh {MODE}
 
-	### Parameters/Options/Flags
+### Parameters/Options/Flags
 
-	- MODE <options> : The mode to run the program
-		- Default: DEBUG
-		- Options:
-		    + DEBUG   : Use this to run the program and see the commands being used 				(DEFAULT)
-			+ RELEASE : Use this to set the program to release and actually make changes to the system
-	
-	### Usage
+- Positional Arguments
+    1. MODE <options> : The mode to run the program
+        + Default: DEBUG
+        - Options
+            + DEBUG     : Use this to run the program and see the commands being used 				(DEFAULT) 
+            + RELEASE   : Use this to set the program to release and actually make changes to the system 
 
-	1. Change Permission for use (Execute [+x])
-		```console
-		chmod +x installer-ux.min.sh
-		```
+### Usage
 
-	2. (OPTIONAL) If you want to test before official use (RECOMMENDED)
-		```console
-		./installer-ux.min.sh
-		```	
+1. Change Permission for use (Execute [+x])
+    ```console
+    chmod +x installer.remake.sh
+    ```
 
-	3. Run Program
-		```console
-		./installer-ux.min.sh RELEASE
-		```
+2. (OPTIONAL) If you want to test before official use (RECOMMENDED)
+    ```console
+    TARGET_DISK_NAME="/dev/sdX" (./)installer.remake.sh
+    ```	
 
-	4. Let Program run and just input your answers if there are any prompts
+3. Run Program
+    ```console
+    TARGET_DISK_NAME="/dev/sdX" (./)installer.remake.sh RELEASE
+    ```
 
-- installer-manual.sh
-	### Synopsis/Syntax
+4. Let Program run and just input your answers if there are any prompts
 
-	+ ./installer-manual.sh {MODE}
+### Configuration and Customization
 
-	### Parameters/Options/Flags
+- Environment Variables
+    + TARGET_DISK_NAME : To set the disk/device label you wish to use (/dev/sdX)
 
-	- MODE <options> : The mode to run the program
-		+ Default: DEBUG
-		- Options:
-			+ DEBUG	: Use this to run the program and see the commands being used 				(DEFAULT)
-			+ RELEASE : Use this to set the program to release and actually make changes to the system
-	
-	### Usage
-
-	1. Change Permission for use (Execute [+x])
-		```console
-		chmod +x installer-manual.sh
-		```
-
-	2. (OPTIONAL) If you want to test before official use (RECOMMENDED)
-		```console
-		./installer-manual.sh
-		```	
-
-	3. Run Program
-		```console
-		./installer-manual.sh RELEASE
-		```
-
-	4. Let Program run and just input your answers if there are any prompts
-
-- installer.remake.sh
-    ### Synopsis/Syntax
-
-    + TARGET_DISK_NAME='your-disk-label (/dev/sdX)' (./)installer.remake.sh {MODE}
-
-    ### Parameters/Options/Flags
-
-    - Positional Arguments
-        1. MODE <options> : The mode to run the program
-            + Default: DEBUG
-            - Options
-                + DEBUG     : Use this to run the program and see the commands being used 				(DEFAULT) 
-                + RELEASE   : Use this to set the program to release and actually make changes to the system 
-
-    ### Usage
-
-	1. Change Permission for use (Execute [+x])
-		```console
-		chmod +x installer.remake.sh
-		```
-
-	2. (OPTIONAL) If you want to test before official use (RECOMMENDED)
-		```console
-		TARGET_DISK_NAME="/dev/sdX" (./)installer.remake.sh
-		```	
-
-	3. Run Program
-		```console
-		TARGET_DISK_NAME="/dev/sdX" (./)installer.remake.sh RELEASE
-		```
-
-	4. Let Program run and just input your answers if there are any prompts
-    
-    ### Configuration and Customization
-    
-    - Environment Variables
-        + TARGET_DISK_NAME : To set the disk/device label you wish to use (/dev/sdX)
-	
 ## References
 
 ### Notes
@@ -273,7 +199,15 @@ Remake - on the other hand - is based off 'Simple' but has been remodelled to wo
     - Application has only been officially tested to work with MBR/MSDOS support
         + UEFI support to be implemented (in TODO)
     - Please becareful and test it in a Virtual Environment before deploying to production/live environment
-     
+    
+- 2022-07-02 0030H : Asura
+    - Initial Stable Release v1.0.0 (Finally)
+        + Please refer to [CHANGELOGS](CHANGELOG.md) for more info on changes
+    - installer-ux.min.sh has been officially deprecated
+    - installer.remake.sh is renamed to 'distinstall' for the time being
+    - Documentations have been modified and deleted accordingly
+    - Old files can currently (as of release) be found in the Archives references folder for a short period of time
+    
 ## FAQs
 
 ## TODO

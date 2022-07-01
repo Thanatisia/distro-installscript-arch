@@ -11,13 +11,11 @@
 ## Information
 
 ### Files 
-+ I.1. installer.remake.sh
-+ I.2. installer-manual.sh
-+ I.3. installer-ux.min.sh
++ I.1. distinstall
  
 ## Changelog
 
-### I.1. installer.remake.sh
+### distinstall
 
 #### I.1. Information 
 + Created: 2022-06-16 2321H, Asura
@@ -27,6 +25,7 @@
     - 2022-06-18 2323H, v0.6.0, Asura
     - 2022-06-19 0113H, v0.7.0, Asura
     - 2022-06-19 2351H, v0.8.0, Asura
+    - 2022-07-02 0025H, v1.0.0, Asura
     
 #### I.1. Changelog
 - v0.4.0
@@ -99,6 +98,15 @@
     - The types will be merged once decided on a software design 
 - v0.8.0
     - Applied Heredoc for the template config file multiline strings to 'type-2'
+- v1.0.0
+    - Initial major stable release v1.0.0
+    - Deprecated
+        + installer-manual.sh line
+        + installer-ux.min.sh line
+    - Renamed 'installer.remake-{version}.sh' to distinstall
+    - After careful consideration and testing, the application will follow a "seperate config" structure on top of the initial portable design paradigm
+        + With this change, essentially all updates and patches made will NOT affect your configurations unless the patch is a major patch that removes/deprecated variables.
+        + Thus, this makes the program more portable, configurable and customizable.
     
 ### I.2. installer-manual.sh
 
