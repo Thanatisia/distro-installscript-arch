@@ -1,0 +1,31 @@
+=====================================
+## Information
++ Author: Asura
+- Features: 
+    + Full minimal user input install script
+- Dependencies
+    + arch-install-scripts
+    + build-devel
+- Recommendation
+    + Download the Makefile in the same directory as the script
+### Background Information: 
++ A full minimal user-input, modular install script that allows user to
+    change just afew variables and be able to effectively customize their system according to what they need
+    with just afew changes
+### Security Design
++ If user is empty : while true and get user to create until user is created
+### NOTES
+- Please modify all [EDIT: Modify this] and confirm before running this file
+- As of 2022-06-16 2326H:
+    - Support for installation from existing linux distro is still a WIP
+        + Testing using ArchLinux (Base) completed, status  Success
+   - Suggestions
+        + Please try to install from the ArchLinux ISO
+        - If you would like to try to install from an existing linux distro
+            + Please install the package [arch-install-scripts]
+- As of 2022-06-17 2356H:
+    - Support for installation from existing linux distro success [ArchLinux].
+        + Testing using ArchISO completed, status : Success
+        + Testing using Existing Linux Distribution (Base Arch) completed, status: Success
+
+

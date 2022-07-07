@@ -1,0 +1,243 @@
+#!/bin/env bash
+: "
+Distro Install Script
+Modular, Portable, Customizable and Configurable script that can be modified into other distro installers
+
+## Documentation
+
+### Synopsis/Syntax
+
++ TARGET_DISK_NAME='your-disk-label (/dev/sdX)' (./)distinstall {MODE}
+
+### Parameters
+
+- Positional Arguments
+    1. MODE
+        - Options
+            + DEBUG     : Display only the commands
+            + RELEASE   : Run the installation
+
+- Optional Arguments
+	+ -c [config file-name] | --config [config-filename] : Set your default config file to use
+	+ -r | --release : Set 'MODE' to RELEASE and set install flag to True; Start installation; Do not use this alongside '-t | --test'
+	+ -t | --test : Set 'MODE' to DEBUG and set test flag to True; Start Test installation and debug messages; Do not use this alongside '-r | --release'
+	+ -h | --help : Display this help message
+	+ -v | --version : Display current system version information
+
+### Usage
+
++ TARGET_DISK_NAME='/dev/sdX' (./)distinstall           : Run in DEBUG mode
++ TARGET_DISK_NAME='/dev/sdX' (./)distinstall RELEASE   : Run installation
+
+## Configuration and Customization
+    ## Environment Variables
+    + TARGET_DISK_NAME : To set the disk/device label you wish to use (/dev/sdX)
+
+References:
+    1. Multiline-scripting in Arch-chroot : https://www.reddit.com/r/archlinux/comments/bssbze/scripting_into_chroot/
+=====================================
+"
+
+# --- Variables
+
+# [Program]
+PROGRAM_SCRIPTNAME="installer"
+PROGRAM_NAME="ArchLinux Profile Setup Installer"
+PROGRAM_TYPE="Main"
+# MODE="${1:-DEBUG}" # { DEBUG | RELEASE }
+# DISTRO="${2:-ArchLinux}"
+MODE="DEBUG" # {DEBUG | RELEASE}
+DISTRO="ArchLinux" # {ArchLinux|Debian|Gentoo}
+
+<<EOF
+Get Configuration Files
+EOF
+cfg_name="config.sh"
+# Import Variables
+if [[ -f "$PWD/$cfg_name" ]]; then
+    source "$PWD/$cfg_name"
+else
+    : "
+    Generate a template env config file
+    that will contain the variables to be used 
+    in the install script
+    "
+    cfg=$(cat <<EOF
+#==============================#
+# Distro Installer Config File #
+#==============================#
+: '
+Variables to be imported into the installer file
+
+:: Usage
+    # Enable executable
+    chmod +x $cfg_name
+
+    # Import Library
+    if [[ -f "$cfg_name" ]]; then
+        # Config Exists
+        . $cfg_name
+    fi
+'
+deviceParams_devType="<hdd|ssd|flashdrive|microSD>"
+deviceParams_Name="\$TARGET_DISK_NAME"
+deviceParams_Size="<x {GB | GiB | MB | MiB}>"
+deviceParams_Boot="<mbr|uefi>"
+deviceParams_Label="<msdos|gpt>"
+boot_Partition=(
+    # Append this and append a [n]="\${boot_Partition[<n-1>]}" in
+    #	partition_Configuration
+    # <partition_Number>;<partition_Name>;<partition_Type>;<partition_file_Type><partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
+    "1;Boot;primary;ext4;0%;1024MiB;True;NIL"
+    "2;Root;primary;ext4;1024MiB;<x1MiB>;False;NIL"
+    "3;Home;primary;ext4;<x1MiB>;100%;False;NIL"
+)
+mount_Paths=(
+    # Append this and append a [n]="\${mount_Paths[<n-1>]}" in
+    "/mnt/boot"	# Boot
+    "/mnt"		# Root
+    "/mnt/home"	# Home
+)
+pacstrap_pkgs=(
+        # EDIT: MODIFY THIS
+        # Add the packages you want to strap in here
+        "base"
+        "linux"
+        "linux-firmware"
+        "linux-lts"
+        "linux-lts-headers"
+        "base-devel"
+        "nano"
+        "vim"
+        "networkmanager"
+        "os-prober"
+)
+location_Region="<your-region (Asia|US etc)>" # Refer to /usr/share/zoneinfo for your region
+location_City="<your-city (Singapore etc)>" # Refer to /usr/share/zoneinfo/<your-region> for your City
+location_Language="<language-code (en_US.UTF-8|en_SG.TF-8 etc)>" # Your Language code - refer to /etc/locale.gen for a list of all language codes
+location_KeyboardMapping="en_UTF-8" # Your Keyboard Mapping - change this if you use this (TODO: 2022-06-17 2314H : At the moment this is not used)
+user_ProfileInfo=(
+    # Append this and append a [n]="\${user_ProfileInfo[<n-1>]}" in
+    # 	user_Info
+    # Note:
+    #	- Please seperate all parameters with delimiter ','
+    #	- Please seperate all subvalues with delimiter ';'
+    # Syntax:
+    # 
+    #	<username>,
+    #	<primary_group>,
+    #	<secondary_group (put NIL if none),
+    #	<custom_directory_path (put NIL if none)>,
+    #	<any_other_Parameters>
+    # 
+    "username,wheel,NIL,/home/profiles/username,NIL"
+)
+networkConfig_hostname="<your-network-hostname>" # Similar to workspace group name, used in /etc/hostname
+bootloader="<your-bootloader>" # Your bootloader, at the moment - supported bootloaders are [grub, syslinux], tested: [grub] (TODO: 2022-06-17 2317H : Add more bootloaders (if available))
+bootloader_Params="" # Your Bootloader Parameters - fill this if you have any, leave empty if NIL
+default_kernel="<linux-kernel>" # Your Default Linux Kernel
+platform_Arch="<platform-architecture>" # Your Platform Architecture i.e. [ i386-pc | x86_64 ]   
+EOF
+    )
+    echo -e "$cfg" > $cfg_name && chmod +x $cfg_name
+    echo -e "Config file template generated, please modify the variables and rerun the program again, thank you!"
+    exit 1
+fi
+
+# --- Functions
+body()
+{
+	#
+	# Main function to run
+	#
+	argv=("$@")
+	argc="${#argv[@]}"
+
+	installer
+}
+
+function END()
+{
+    line=""
+    read -p "Pause" line
+}
+
+function main()
+{
+	#
+	# Main Function 
+	#  - You may not edit this if you want to leave it as default
+	#
+
+	: "
+	Get Command Line Options/Arguments
+	"
+	argv=("$@")
+	argc="${#argv[@]}"
+	if [[ "$argc" -gt 0 ]]; then
+		# If at least 1 or more options parsed
+		while [[ "$1" != "" ]]; do
+			# While $1 (the command line option) is not empty
+			case "$1" in
+				# Process the parsed option
+				"-c" | "--config")
+					# Pass Config File
+					cfg_name="$2"
+					shift 2
+					;;
+				"-d" | "--distro")
+					# Set distro to use
+					DISTRO="$2"
+					shift 2
+					;;
+				"-r" | "--release")
+					# Run/Commit Installation
+					MODE="RELEASE"
+					shift 1
+					;;
+				"-t" | "--test")
+					# Test Install
+					# echo -e "Running test install..."
+					MODE="DEBUG"
+					shift 1
+					;;
+				"-h" | "--help")
+					# Help
+					echo -e "Display this help message"
+					shift 1
+					break
+					;;
+				"-v" | "--version")
+					# Help
+					echo -e "Show current system version info"
+					shift 1
+					break
+					;;
+				*)
+					# Invalid Option
+					shift 1
+					;;
+			esac
+		done
+	fi
+
+	: "
+	Process Command Line Options
+	"
+	# Source setup script
+	if [[ -f ./setup.sh ]]; then
+		source setup.sh
+	fi
+
+	body "$@"
+	res="$?"
+	echo "$res"
+}
+
+if [[ "${BASH_SOURCE[@]}" == "${0}" ]]; then
+    # START
+    init
+	main "$@"
+    END
+fi
+

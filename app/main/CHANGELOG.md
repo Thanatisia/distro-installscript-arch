@@ -26,6 +26,7 @@
     - 2022-06-19 0113H, v0.7.0, Asura
     - 2022-06-19 2351H, v0.8.0, Asura
     - 2022-07-02 0025H, v1.0.0, Asura
+	- 2022-07-07 2311H, v1.1.0, Asura
     
 #### I.1. Changelog
 - v0.4.0
@@ -107,8 +108,15 @@
     - After careful consideration and testing, the application will follow a "seperate config" structure on top of the initial portable design paradigm
         + With this change, essentially all updates and patches made will NOT affect your configurations unless the patch is a major patch that removes/deprecated variables.
         + Thus, this makes the program more portable, configurable and customizable.
-    
-### I.2. installer-manual.sh
+- v1.1.0
+	- Performing Refactoring of codes
+		- Created external directories for 
+			+ library
+	- Added Command Line Options support
+	- Seperated all functions into their respective libraries
+		- distro-specific functions into their respective distro external helper library files
+		- general functions into its own function library/module
+			
 
 #### I.2. Information
 

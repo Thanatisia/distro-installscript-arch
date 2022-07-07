@@ -9,8 +9,9 @@ MOUNT_PATHS = "/mnt/boot" "/mnt" "/mnt/home"
 
 # Program Variables
 ENV = TARGET_DISK_NAME="$(TARGET_DISK)"	# Environment Variables
-SCRIPT = "distinstall"					# Script Filename
-CFLAGS = "RELEASE"						# Compilation Flags
+SCRIPT = "src/distinstall"					# Script Filename
+CFLAGS = "-r -d ArchLinux"						# Compilation Flags
+DISTRO = "ArchLinux"					# Target Distribution
 
 # [Commands]
 CMD = $(ENV) ./$(SCRIPT)
@@ -38,6 +39,11 @@ help:
 init:
 	## Initialize Environment Variables and System/Program Information
 
+setup: 
+	## Setup and create all required directories and 
+	# dependencies
+		
+
 testinstall: init
 	## Run the install script testsuite
 	# - Run this with sudo for username verification
@@ -50,9 +56,9 @@ install: clean
 	$(CMD) $(CFLAGS)
 
 genscript:
-	## Run install-gen and generate the commands to install and
+	## Run installer without config path and generate the commands to install and
 	# Output as a script file for backup
-	./install-gen
+	./$(SCRIPT)
 
 clean: 
 	## Clean all temporary files and unmount drives 

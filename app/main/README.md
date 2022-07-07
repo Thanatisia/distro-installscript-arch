@@ -143,6 +143,16 @@ This page contains the Base Installation Scripts
             + DEBUG     : Use this to run the program and see the commands being used 				(DEFAULT) 
             + RELEASE   : Use this to set the program to release and actually make changes to the system 
 
+- Optional Arguments
+	+ -c [config-file] | --config [config-file] : Set a config file
+	+ -d [distro-name] | --distro [distro-name] : set distro to use
+		- Distros
+			+ ArchLinux (currently supporting)
+			+ Debian (WIP)
+			+ Gentoo (WIP)
+	+ -h | --help : Display this help message
+	+ -v | --version : Display current system version information
+
 ### Usage
 
 1. Change Permission for use (Execute [+x])
@@ -207,7 +217,17 @@ This page contains the Base Installation Scripts
     - installer.remake.sh is renamed to 'distinstall' for the time being
     - Documentations have been modified and deleted accordingly
     - Old files can currently (as of release) be found in the Archives references folder for a short period of time
-    
+
+- 2022-07-07 2326H : Asura
+	- Performing Refactoring of codes
+		- Created external directories for 
+			+ libraries & modules
+	- Added Command Line Options support
+	- Seperated all functions into their respective libraries
+		- distro-specific functions into their respective distro external helper library files
+		- general functions into its own function library/module
+
+
 ## FAQs
 
 ## TODO
