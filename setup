@@ -1,0 +1,171 @@
+#!/bin/env bash
+<<EOF
+Linux Distribution installer setup script
+
+## Information
+### Description
+Helper script to make obtaining, configuring and running the distribution installer easier for beginners
+## Setup
+### Pre-Requisites
+### Dependencies
+## Documentation
+### Synopsis
+(./)setup [{options} [arguments]...]
+### Parameters
+#### Program Options
++ -d {keyword [arguments]...} | --download {keyword [arguments]...} : Download the specific script/config file
+    - Arguments
+        + config [config name]
+        + script [script name]
+        + custom : Set custom file name and URL
+#### Flags
++ -V | --verbose : Set 'verbose' flag to True; Display more descriptive standard output
+#### General Options
++ -h | --help : Display this help menu
++ -v | --version : Display current system version information
+### Usage
+./setup -d "distinstall" : Download Distribution Installer Script
+EOF
+
+### Program Functions ###
+download()
+{
+	## Download scripts
+	file_url="$1"
+	file_name="$2"
+
+	if [[ "$file_name" == "" ]]; then
+		curl -L -O $file_url
+	else
+		curl -L -o $file_name $file_url
+	fi
+}
+
+### Preparation Functions ###
+init()
+{
+	: "
+	Initialize Variables
+	"
+    ### Variables
+    REPO_AUTHOR="Thanatisia"
+    REPO_BRANCH="main"
+    REPO_RAW_URL="https://raw.githubusercontent.com/$REPO_AUTHOR/$REPO_BRANCH"
+    BASE_INSTALL_SCRIPTS_RAW_URL="$REPO_RAW_URL/src/base-installation/"
+    CONFIG_TEMPLATE_RAW_URL="$REPO_RAW_URL/docs/configs/"
+
+    ### Associative Array
+    declare -gA CONFIGS=(
+        # [File Name]=[File URL]
+        [config.sh]="$CONFIG_TEMPLATE_RAW_URL"
+        [Makefile]="$CONFIG_TEMPLATE_RAW_URL"
+    )
+    declare -gA SCRIPTS=(
+        # [File Name]=[File URL]
+		[distinstall]="$BASE_INSTALL_SCRIPTS_RAW_URL"
+	)
+}
+
+setup()
+{
+	## All setup processes
+	init
+}
+
+menu_help()
+{
+	## Display help message
+}
+
+main()
+{
+	argv=("$@")
+	argc="${#argv[@]}"
+
+	# Get Command Line Options/Arguments
+	if [[ "$argc" -gt 0 ]]; then
+		while [[ "$1" != "" ]]; do
+			arg="$1"
+			case "$arg" in
+                "-d" | "--download")
+                    # Download script
+                    if [[ "$2" != "" ]]; then
+                        keyword="$2"
+                        case "$keyword")
+                            "script")
+                                # Download script file
+                                if [[ "$3" != "" ]]; then
+                                    script_name="$3"
+                                    script_url="${SCRIPTS[$script_name]}"
+                                    script="$script_url/$script_name"
+                                    download "$script_url" "$script_name"
+                                    shift 3
+                                else
+                                    echo -e "No scriptname provided"
+                                    shift 2
+                                fi
+                                ;;
+                            "config")
+                                # Get Config file
+                                if [[ "$3" != "" ]]; then
+                                    cfg_name="$3"
+                                    cfg_url="${CONFIGS[$cfg_name]}"
+                                    cfg="$cfg_url/$cfg_name"
+                                    download "$cfg_url" "$cfg_name"
+                                    shift 3
+                                else
+                                    echo -e "No configs provided."
+                                    shift 2
+                                fi
+                                ;;
+                            "custom")
+                                # Get custom file 
+                                read -p "Custom file name: " file_name 
+                                read -p "Custom file URL: " file_url 
+                                file="$file_url/$file_name"
+                                if [[ "$file_url" != "" ]] && [[ "$file_name" != "" ]]; then
+                                    download "$file_url" "$file_name"
+                                else if [[ "$file_url" != "" ]]; then
+                                    download "$file_url"
+                                fi
+                                shift 2
+                                ;;
+                            *)
+                                # Invalid Option
+                                shift 2
+                                ;;
+                        esac
+                    else
+                        shift 1
+                    fi
+                    ;;
+                ### Flags
+                "-V" | "--verbose")
+                    # Set flag 'verbose' to True
+                    # Display more descriptive standard output
+                    verbose=True
+                    shift 1
+                    ;;
+                ### General Options
+				"-h" | "--help")
+					# Display this help menu
+					menu_help
+                    exit
+                    ;;
+                "-v" | "--version")
+                    # Display current system version information
+                    exit
+                    ;;
+				*)
+					# Default Option
+					shift 1
+					;;
+			esac
+		done
+	fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+	setup
+	main "$@"
+fi

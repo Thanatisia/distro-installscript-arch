@@ -225,9 +225,13 @@ function main()
 	Process Command Line Options
 	"
 	# Source setup script
-	if [[ -f ./setup.sh ]]; then
-		source setup.sh
-	fi
+	if [[ -f $PWD/setup.sh ]]; then
+		echo -e "Sourcing setup.sh"
+        source $PWD/setup.sh
+    else
+        echo -e "(X) setup.sh not found, exiting..."
+        exit
+    fi
 
 	body "$@"
 	res="$?"
