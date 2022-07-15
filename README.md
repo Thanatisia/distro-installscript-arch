@@ -42,6 +42,7 @@ and/or the tools required by the target distribution changed, thus, leading to t
 + arch-install-scripts
 + make
 + git
++ parted
 
 ### Files and Folders
 
