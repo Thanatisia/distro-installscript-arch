@@ -167,9 +167,12 @@ Documentations for Base Installation script [distinstall]
 
 ## Configuration and Customization
 
-#### Variables
-
+#### Environment Variables
 + TARGET_DISK_NAME : To set the disk/device label you wish to use (/dev/sdX)
+
+#### Modifiable Variables (in distinstall)
+- cfg_name : the default configuration file name, change this variable before executing to use a specific config file *AND/OR* generate a default file in this custom filename
+    + Default Value : config.sh
 
 ### To Note
 

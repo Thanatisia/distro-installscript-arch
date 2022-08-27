@@ -7,4 +7,8 @@
 + [] UEFI Support
 - Other Bootloader Support
     + [] syslinux
+- [] Add support for filesystems : 'btrfs'
++ [] Replace 'dev' folder with an official development branch
+- [] Complete creation of the additional installer GUI/CLI helper utility
+
 

@@ -35,6 +35,22 @@ and/or the tools required by the target distribution changed, thus, leading to t
     + change that line of code and that should do it, as some of the general steps are universal across the distro CLI-based installation steps
     + Thus, with the modular, containerized method, the modification of codes will be easier and customizable
 
+ ### Files and Folders
+- [base-installation/](src/base-installation) : This is the Base Installation script. All files placed here have been tested from those found in dev (Development Folder). This is probably where you want to go first.
+- [post-installation/](src/post-installation) : This is the Post-Installation related scripts. All files placed here have been tested from those found in dev
+- [references/](references) : This references directory contains various useful files such as Sample configurations, Sample templates and Sample usage scripts.
+- [development](dev) : This is the development directory. This directory is essentially the Nightly Build branch and to be considered as Testing or unsafe, just to be safe, please test the files found here in a Virtual Machine.
+- [documentations](docs) : This contains all documentations and guides for references
+    + including detailed setup; usage
+    
+## Setup
+> This is a basic rundown of how to use the program, please refer to [Base Installation Manual](docs/base-installation/manuals/distinstall/manual.md) for a more detailed rundown
+### Pre-Requisites
++ (Optional) Internet Connection
+    ```
+    Required for curl and wget
+    ```
+
 ### Dependencies (General)
 
 + curl
@@ -44,18 +60,61 @@ and/or the tools required by the target distribution changed, thus, leading to t
 + git
 + parted
 
-### Files and Folders
+### Obtaining Installer
+- via Curl (Recommended)
+    ```console
+    curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/distinstall"
+    ```
 
-- [base-installation/](src/base-installation) : This is the Base Installation script. All files placed here have been tested from those found in dev (Development Folder). This is probably where you want to go first.
-- [post-installation/](src/post-installation) : This is the Post-Installation related scripts. All files placed here have been tested from those found in dev
-- [references/](references) : This references directory contains various useful files such as Sample configurations, Sample templates and Sample usage scripts.
-- [development](dev) : This is the development directory. This directory is essentially the Nightly Build branch and to be considered as Testing or unsafe, just to be safe, please test the files found here in a Virtual Machine.
-- [documentations](docs) : This contains all documentations and guides for references.
+### Obtaining Config File
+- via Autogeneration (Default)
+    - The application will check if a a config file exists (Default config file name is 'config.sh')
+        - If config file doesnt exist
+            + Application will automatically generate a 'config.sh' file on startup
+      
+- (OPTIONAL) Specifying a specific config file
+    - If you have a config file of a specific name
+        + Edit the variable "cfg_name" in *distinstall* with your custom config file name (TODO: Flag to specify custom config file)
+   
+- (OPTIONAL) Curling the example config.sh
+    ```console
+    curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/docs/configs/config.sh"
+    ```
+   
+### Obtaining additional helper utilities/files
+- (OPTIONAL) Obtaining Makefile
+    + I designed this Makefile to automate and make running the installer easier
+    ```console
+    curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/docs/configs/Makefile"
+    ```
+
+   
+## Documentation
+### Usage
+- Modify configuration file variables
+    + Default configuration file name: 'config.sh'
+        ```console
+        $EDITOR config.sh
+        ```
+
+- (OPTIONAL) Editing the Makefile
+    + If you have obtained the Makefile and will be using this to install
+    + Edit the Makefile and specify your device labels and information
+        ```console
+        $EDITOR Makefile
+        ```
+        
+- Execute installer (Default)
+    + At the moment, the script is called 'distinstall'
+    + By default: the script will execute in DEBUG mode whereby it shows you all the commands but it wont execute the formatting (security purposes)
+    ```console
+    TARGET_DISK_NAME='/dev/sdX' (./)distinstall {RERLEASE}
+    ```
 
 ## FAQs
 
 ## Remarks
-
+```
 - Please do contact me in any of the platforms below if you have any ideas | bugs | comments | suggestions or if you just wanna talk!
 I am open for suggestions as well as talking to everyone
 
@@ -91,7 +150,7 @@ I am open for suggestions as well as talking to everyone
 - Please star/follow this repository if you think this is useful!
 
 thank you again for using!
-
+```
 
 ## Contacts
 + [Twitter: @phantasu](https://twitter.com/phantasu)
