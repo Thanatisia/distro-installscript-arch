@@ -89,5 +89,9 @@ release_date | version_number:
     - Updated Makefile : Replaced 'installer.remake.sh' with 'distinstall'
     - Updated [TODO](TODO.md) with new TODO in the pipeline
 
-
+- 2023-01-19 1849H | v1.1.1
+    - Packaged release v1.1.0 and created first GitHub releases
+        + Will create more releases for any changes regarding the main scripts
+    + Updated README with command to download the latest packaged release instead of just cloning
+    + Updated TODO list pipeline
       

@@ -66,6 +66,11 @@ and/or the tools required by the target distribution changed, thus, leading to t
     curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/distinstall"
     ```
 
+- Downloading the latest release
+    ```console
+    wget "https://github.com/Thanatisia/distro-installscript-arch/releases/latest/distinstall-*.zip"
+    ```
+    
 ### Obtaining Config File
 - via Autogeneration (Default)
     - The application will check if a a config file exists (Default config file name is 'config.sh')

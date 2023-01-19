@@ -3,3 +3,6 @@
 # Ignore all '.old' files
 *.old*
 
+# Ignore 'release' folder
+release/
+
