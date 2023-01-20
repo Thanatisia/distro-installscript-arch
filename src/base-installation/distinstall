@@ -66,13 +66,51 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-MODE="${1:-DEBUG}" # { DEBUG | RELEASE }
+PROGRAM_VERSION="v1.1.8-testing"
+MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 cfg_name="config.sh"
 
 # --- Functions
 
 # General Functions
+display_help()
+{
+	: "
+	Display help message
+
+	- Message Contents
+		+ Syntax/Synopsis
+		+ CLI Arguments/Parameters
+	"
+
+	help_msg=$(cat <<EOF
+Script Name : $PROGRAM_SCRIPTNAME
+Program Name : $PROGRAM_NAME
+Program Version : $PROGRAM_VERSION
+
+Command Line (CLI) Arguments:
+	- Optional Parameters
+		+ -c | --config 			: Set custom configuration file name
+		+ -d | --target-disk 		: Set target disk name
+		+ -g | --generate-config	: Generate configuration file
+		+ -m | --mode				: Set mode (DEBUG|RELEASE)
+		+ -h | --help				: Display this help menu and all commands/command line arguments
+
+	- Positional Parameters
+		+ start : Start the installer
+
+Modes:
+	+ DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
+	+ RELEASE : Performs the real RELEASE; must use with sudo
+
+Environment Variables:
+	+ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
+EOF
+	)
+    echo -e "$help_msg"
+}
+
 debug_printAll()
 {
 	#
@@ -1461,12 +1499,23 @@ body()
                 "-h" | "--help")
                     # Display this help menu and all commands/command line arguments
 					echo -e "Display Help"
+					display_help
 					shift 1
                     ;;
                 "start")
                     # Start the installer
-                    init
-	                installer
+                    init # Initialize and perform pre-processing and pre-startup checks
+	                installer # Start installer
+
+                    # Check the function outcome
+                    res="$?"
+
+                    # Output exit message
+                    if [[ "$res" == 0 ]]; then
+                        END "installation has ended successfully."
+                    else
+                        END "installation has encountered errors."
+                    fi
                     shift 1
                     ;;
                 *)
@@ -1496,14 +1545,6 @@ function main()
 	#
 
 	body "$@"
-	res="$?"
-
-	# Return values
-	if [[ "$res" == 0 ]]; then
-    	END "installation has ended successfully."
-	else
-    	END "installation has encountered errors."
-	fi
 }
 
 if [[ "${BASH_SOURCE[@]}" == "${0}" ]]; then
