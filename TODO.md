@@ -13,7 +13,7 @@
 - [] Perform application overhaul
     + [] Restructure project repository to become more coherent
 - [] Rename application from distinstall to something better
-- [] Add command line (CLI) argument (parameters/flag) support
-    + [] To fit the mission
+- [O] Add command line (CLI) argument (parameters/flag) support
+    + [O] To fit the mission
 - [] Refactor and rename variable 'devicePrams_Boot' in the configuration template structure as well as the installer
 

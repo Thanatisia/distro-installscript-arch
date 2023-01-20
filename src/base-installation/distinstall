@@ -91,11 +91,11 @@ Program Version : $PROGRAM_VERSION
 
 Command Line (CLI) Arguments:
 	- Optional Parameters
-		+ -c | --config 			: Set custom configuration file name
-		+ -d | --target-disk 		: Set target disk name
-		+ -g | --generate-config	: Generate configuration file
-		+ -m | --mode				: Set mode (DEBUG|RELEASE)
-		+ -h | --help				: Display this help menu and all commands/command line arguments
+		+ -c | --config             : Set custom configuration file name
+		+ -d | --target-disk        : Set target disk name
+		+ -g | --generate-config    : Generate configuration file
+		+ -m | --mode               : Set mode (DEBUG|RELEASE)
+		+ -h | --help               : Display this help menu and all commands/command line arguments
 
 	- Positional Parameters
 		+ start : Start the installer
@@ -1426,6 +1426,7 @@ init()
     if [[ -f "$PWD/$cfg_name" ]]; then
         source "$PWD/$cfg_name"
     else
+        generate_config
 		echo -e "please modify the variables and rerun the program again, thank you!"
     	exit 1
 	fi
