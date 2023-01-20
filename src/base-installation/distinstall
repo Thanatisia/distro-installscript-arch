@@ -68,18 +68,77 @@ PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
 MODE="${1:-DEBUG}" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
-
 cfg_name="config.sh"
-# Import Variables
-if [[ -f "$PWD/$cfg_name" ]]; then
-    source "$PWD/$cfg_name"
-else
-    : "
-    Generate a template env config file
-    that will contain the variables to be used 
-    in the install script
-    "
-    cfg=$(cat <<EOF
+
+# --- Functions
+
+# General Functions
+debug_printAll()
+{
+	#
+	# Debugger : Print all
+	#
+	cat="$1"
+
+	case "$cat" in
+		"device_Parameters")
+			for k in "${!device_Parameters[@]}"; do
+				echo "[$k] : ${device_Parameters[$k]}"
+			done
+			;;
+		"partition_Parameters")
+			for k in "${!partition_Parameters[@]}"; do
+				echo "[$k] : ${partition_Parameters[$k]}"
+			done
+			;;
+		"partition_Configuration")
+			for k in "${!partition_Configuration[@]}"; do
+				echo "[$k] : ${partition_Configuration[$k]}"
+			done
+			;;
+		*)
+			;;
+	esac
+}
+seperate_by_Delim()
+{
+	#
+	# Seperate a string into an array by the delimiter
+	#
+
+	# --- Input
+	
+	# Command Line Argument
+	str="$1"			# String to be seperated
+	delim="${2:-';'}"	# Delimiter to split
+
+	# Local Variables
+
+	# Array
+	content=()			# Array container to store results
+	char=''				# Single character for splitting element of a string
+
+	# Associative Array
+
+	# --- Processing
+	# Split string into individual characters
+	IFS=$delim read -r -a content <<< "$str"
+	
+	# --- Output
+	echo "${content[@]}"
+}
+generate_config()
+{
+    # Import Variables
+    if [[ -f "$PWD/$cfg_name" ]]; then
+        source "$PWD/$cfg_name"
+    else
+        : "
+        Generate a template env config file
+        that will contain the variables to be used 
+        in the install script
+        "
+        cfg=$(cat <<EOF
 #==============================#
 # Distro Installer Config File #
 #==============================#
@@ -160,93 +219,6 @@ EOF
     echo -e "Config file template generated, please modify the variables and rerun the program again, thank you!"
     exit 1
 fi
-
-: "Empty Data Storage
-- Please do not edit these
-- (If Required) Edit the associative array values specified in [setup()]
-"
-## Lists
-
-### Stores all external scripts created
-external_scripts=()
-
-## Associative Array
-
-### Device and Partitions
-declare -A device_Parameters=()
-declare -A partition_Configuration=()
-declare -A partition_Parameters=()
-### Mounts
-declare -A mount_Group=()
-### Region & Location
-declare -A location=()
-### Packages
-declare -A pkgs=()
-### User Control
-declare -A user_Info=()
-### Network Configurations
-declare -A network_config=()
-### Operating System Definitions
-declare -A osdef=()
-### Linux Definitions
-declare -A linux=()
-
-# --- Functions
-
-# General Functions
-debug_printAll()
-{
-	#
-	# Debugger : Print all
-	#
-	cat="$1"
-
-	case "$cat" in
-		"device_Parameters")
-			for k in "${!device_Parameters[@]}"; do
-				echo "[$k] : ${device_Parameters[$k]}"
-			done
-			;;
-		"partition_Parameters")
-			for k in "${!partition_Parameters[@]}"; do
-				echo "[$k] : ${partition_Parameters[$k]}"
-			done
-			;;
-		"partition_Configuration")
-			for k in "${!partition_Configuration[@]}"; do
-				echo "[$k] : ${partition_Configuration[$k]}"
-			done
-			;;
-		*)
-			;;
-	esac
-}
-seperate_by_Delim()
-{
-	#
-	# Seperate a string into an array by the delimiter
-	#
-
-	# --- Input
-	
-	# Command Line Argument
-	str="$1"			# String to be seperated
-	delim="${2:-';'}"	# Delimiter to split
-
-	# Local Variables
-
-	# Array
-	content=()			# Array container to store results
-	char=''				# Single character for splitting element of a string
-
-	# Associative Array
-
-	# --- Processing
-	# Split string into individual characters
-	IFS=$delim read -r -a content <<< "$str"
-	
-	# --- Output
-	echo "${content[@]}"
 }
 
 # Installation stages
@@ -1372,6 +1344,42 @@ setup()
     )
 }
 
+init_Variables()
+{
+    : "
+    Initialize Variables
+
+    - Empty Data Storage
+        - Please do not edit these
+        - (If Required) Edit the associative array values specified in [setup()]
+    "
+    ## Lists
+
+    ### Stores all external scripts created
+    external_scripts=()
+
+    ## Associative Array
+
+    ### Device and Partitions
+    declare -gA device_Parameters=()
+    declare -gA partition_Configuration=()
+    declare -gA partition_Parameters=()
+    ### Mounts
+    declare -gA mount_Group=()
+    ### Region & Location
+    declare -gA location=()
+    ### Packages
+    declare -gA pkgs=()
+    ### User Control
+    declare -gA user_Info=()
+    ### Network Configurations
+    declare -gA network_config=()
+    ### Operating System Definitions
+    declare -gA osdef=()
+    ### Linux Definitions
+    declare -gA linux=()
+}
+
 init()
 {
 	#
@@ -1381,6 +1389,9 @@ init()
 	echo "Program Name: $PROGRAM_NAME"
 	echo "Program Type: $PROGRAM_TYPE"
 	echo "Distro: $DISTRO"
+
+    # Initialize Variables
+    init_Variables
 
     echo -e ""
 
@@ -1418,8 +1429,16 @@ body()
                     cfg_name="$2"
                     shift 2
                     ;;
+                "-g" | "--generate-config")
+                    # Generate configuration file
+                    generate_config
+                    ;;
+                "-h" | "--help")
+                    # Display this help menu and all commands/command line arguments
+                    ;;
                 "start")
                     # Start the installer
+                    init
 	                installer
                     shift 1
                     ;;
@@ -1447,7 +1466,7 @@ function main()
 	# Main Function 
 	#  - You may not edit this if you want to leave it as default
 	#
-	
+
 	body "$@"
 	res="$?"
 	echo "$res"
@@ -1455,7 +1474,6 @@ function main()
 
 if [[ "${BASH_SOURCE[@]}" == "${0}" ]]; then
     # START
-    init
 	main "$@"
     END
 fi
