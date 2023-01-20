@@ -1432,9 +1432,12 @@ body()
                 "-g" | "--generate-config")
                     # Generate configuration file
                     generate_config
+					shift 1
                     ;;
                 "-h" | "--help")
                     # Display this help menu and all commands/command line arguments
+					echo -e "Display Help"
+					shift 1
                     ;;
                 "start")
                     # Start the installer
@@ -1456,8 +1459,9 @@ body()
 
 function END()
 {
+	msg="${1:-'Pause'}"
     line=""
-    read -p "Pause" line
+    read -p $msg line
 }
 
 function main()
@@ -1469,12 +1473,18 @@ function main()
 
 	body "$@"
 	res="$?"
+
+	# Return values
 	echo "$res"
 }
 
 if [[ "${BASH_SOURCE[@]}" == "${0}" ]]; then
     # START
-	main "$@"
-    END
+	ret_Code=`main "$@"`
+	if [[ "$ret_Code" == 0 ]]; then
+    	END "installation has ended successfully."
+	else
+    	END "installation has encountered errors."
+	fi
 fi
 
