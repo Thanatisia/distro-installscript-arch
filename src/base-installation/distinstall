@@ -129,16 +129,12 @@ seperate_by_Delim()
 }
 generate_config()
 {
-    # Import Variables
-    if [[ -f "$PWD/$cfg_name" ]]; then
-        source "$PWD/$cfg_name"
-    else
-        : "
-        Generate a template env config file
-        that will contain the variables to be used 
-        in the install script
-        "
-        cfg=$(cat <<EOF
+	: "
+	Generate a template env config file
+	that will contain the variables to be used 
+	in the install script
+	"
+	cfg=$(cat <<EOF
 #==============================#
 # Distro Installer Config File #
 #==============================#
@@ -216,9 +212,7 @@ platform_Arch="<platform-architecture>" # Your Platform Architecture i.e. [ i386
 EOF
     )
     echo -e "$cfg" > $cfg_name && chmod +x $cfg_name
-    echo -e "Config file template generated, please modify the variables and rerun the program again, thank you!"
-    exit 1
-fi
+    echo -e "Config file template generated."
 }
 
 # Installation stages
@@ -1389,6 +1383,14 @@ init()
 	echo "Program Name: $PROGRAM_NAME"
 	echo "Program Type: $PROGRAM_TYPE"
 	echo "Distro: $DISTRO"
+
+    # Import Variables
+    if [[ -f "$PWD/$cfg_name" ]]; then
+        source "$PWD/$cfg_name"
+    else
+		echo -e "please modify the variables and rerun the program again, thank you!"
+    	exit 1
+	fi
 
     # Initialize Variables
     init_Variables
