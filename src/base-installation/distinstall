@@ -1426,14 +1426,36 @@ body()
             case $1 in
                 "-c" | "--config")
                     # Set custom configuration file name
-                    cfg_name="$2"
-                    shift 2
+					if [[ "$2" != "" ]]; then
+						cfg_name="$2"
+						shift 2
+					else
+						shift 1
+					fi
                     ;;
+				"-d" | "--target-disk")
+					# Set target disk name
+					if [[ "$2" != "" ]]; then
+						TARGET_DISK_NAME="$2"
+						shift 2
+					else
+						shift 1
+					fi
+					;;
                 "-g" | "--generate-config")
                     # Generate configuration file
                     generate_config
 					shift 1
                     ;;
+				"-m" | "--mode")
+					# Set mode (DEBUG|RELEASE)
+					if [[ "$2" != "" ]]; then
+						MODE="$2"
+						shift 2
+					else
+						shift 1
+					fi
+					;;
                 "-h" | "--help")
                     # Display this help menu and all commands/command line arguments
 					echo -e "Display Help"
@@ -1461,7 +1483,7 @@ function END()
 {
 	msg="${1:-'Pause'}"
     line=""
-    read -p $msg line
+    read -p "$msg" line
 }
 
 function main()
@@ -1475,16 +1497,15 @@ function main()
 	res="$?"
 
 	# Return values
-	echo "$res"
-}
-
-if [[ "${BASH_SOURCE[@]}" == "${0}" ]]; then
-    # START
-	ret_Code=`main "$@"`
-	if [[ "$ret_Code" == 0 ]]; then
+	if [[ "$res" == 0 ]]; then
     	END "installation has ended successfully."
 	else
     	END "installation has encountered errors."
 	fi
+}
+
+if [[ "${BASH_SOURCE[@]}" == "${0}" ]]; then
+    # START
+	main "$@"
 fi
 
