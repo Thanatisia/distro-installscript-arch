@@ -21,6 +21,12 @@ release_date | version_number | release_author
 + 2022-04-23 1120H | v0.3.0 | Asura
 + 2022-04-23 1450H | v0.4.0-alpha | Asura
 + 2022-06-19 0133H | v0.5.0-alpha | Asura
++ 2022-06-20 1637H | v0.6.0-alpha | Asura
++ 2022-07-02 0025H | v1.0.0 | Asura 
++ 2022-07-15 1633H | v1.0.1 | Asura
++ 2022-08-27 1651H | v1.1.0 | Asura
++ 2023-01-19 1849H | v1.1.1 | Asura
++ 2023-01-20 1635H | v1.1.2 | Asura
 
 ### CHANGELOGS
 ```
@@ -94,4 +100,9 @@ release_date | version_number:
         + Will create more releases for any changes regarding the main scripts
     + Updated README with command to download the latest packaged release instead of just cloning
     + Updated TODO list pipeline
-      
+
+- 2023-01-20 1636H | v1.1.2
+    - Created documentation guide for the installer configuration file in [Docs - installer configuration.md]('docs/installer configuration.md')
+    - Created features write-up
+    - Updated TODO pipeline list
+    - Relocated manuals and implementation ideas
