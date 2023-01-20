@@ -1,3 +1,4 @@
+#!/bin/env bash
 : "
 Distro Install Script
 Modular, Portable, Customizable and Configurable script that can be modified into other distro installers
@@ -1375,11 +1376,14 @@ init()
 {
 	#
 	# Initialization
-	# 
+	#
     echo -e "(S) Starting Initialization..."
 	echo "Program Name: $PROGRAM_NAME"
 	echo "Program Type: $PROGRAM_TYPE"
 	echo "Distro: $DISTRO"
+
+    echo -e ""
+
     echo -e "(+) Verifying Environment Variables..."
     setup
     if [[ "$TARGET_DISK_NAME" == "" ]]; then
@@ -1397,12 +1401,38 @@ init()
 body()
 {
 	#
-	# Main function to run
+	# Main body
+    # - Perform command line arguments and pre-processing checks and validation before running
 	#
 	argv=("$@")
 	argc="${#argv[@]}"
 
-	installer
+    # Check that there are arguments
+    if [[ "${argc}" -gt 0 ]]; then
+        # There are arguments
+        while [[ "$1" != "" ]]; do
+            # Loop through all arguments until there are no more
+            case $1 in
+                "-c" | "--config")
+                    # Set custom configuration file name
+                    cfg_name="$2"
+                    shift 2
+                    ;;
+                "start")
+                    # Start the installer
+	                installer
+                    shift 1
+                    ;;
+                *)
+                    # Invalid arguments provided
+                    echo -e "Invalid parameter : $i"
+                    shift 1
+                    ;;
+            esac
+        done
+    else
+        echo -e "No arguments provided."
+    fi
 }
 
 function END()
