@@ -1,3 +1,4 @@
+#!/bin/env bash
 : "
 Distro Install Script
 Modular, Portable, Customizable and Configurable script that can be modified into other distro installers
@@ -65,20 +66,113 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-MODE="${1:-DEBUG}" # { DEBUG | RELEASE }
+PROGRAM_VERSION="v1.1.8-testing"
+MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
-
 cfg_name="config.sh"
-# Import Variables
-if [[ -f "$PWD/$cfg_name" ]]; then
-    source "$PWD/$cfg_name"
-else
-    : "
-    Generate a template env config file
-    that will contain the variables to be used 
-    in the install script
-    "
-    cfg=$(cat <<EOF
+
+# --- Functions
+
+# General Functions
+display_help()
+{
+	: "
+	Display help message
+
+	- Message Contents
+		+ Syntax/Synopsis
+		+ CLI Arguments/Parameters
+	"
+
+	help_msg=$(cat <<EOF
+Script Name : $PROGRAM_SCRIPTNAME
+Program Name : $PROGRAM_NAME
+Program Version : $PROGRAM_VERSION
+
+Command Line (CLI) Arguments:
+	- Optional Parameters
+		+ -c | --config             : Set custom configuration file name
+		+ -d | --target-disk        : Set target disk name
+		+ -g | --generate-config    : Generate configuration file
+		+ -m | --mode               : Set mode (DEBUG|RELEASE)
+		+ -h | --help               : Display this help menu and all commands/command line arguments
+
+	- Positional Parameters
+		+ start : Start the installer
+
+Modes:
+	+ DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
+	+ RELEASE : Performs the real RELEASE; must use with sudo
+
+Environment Variables:
+	+ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
+EOF
+	)
+    echo -e "$help_msg"
+}
+
+debug_printAll()
+{
+	#
+	# Debugger : Print all
+	#
+	cat="$1"
+
+	case "$cat" in
+		"device_Parameters")
+			for k in "${!device_Parameters[@]}"; do
+				echo "[$k] : ${device_Parameters[$k]}"
+			done
+			;;
+		"partition_Parameters")
+			for k in "${!partition_Parameters[@]}"; do
+				echo "[$k] : ${partition_Parameters[$k]}"
+			done
+			;;
+		"partition_Configuration")
+			for k in "${!partition_Configuration[@]}"; do
+				echo "[$k] : ${partition_Configuration[$k]}"
+			done
+			;;
+		*)
+			;;
+	esac
+}
+seperate_by_Delim()
+{
+	#
+	# Seperate a string into an array by the delimiter
+	#
+
+	# --- Input
+	
+	# Command Line Argument
+	str="$1"			# String to be seperated
+	delim="${2:-';'}"	# Delimiter to split
+
+	# Local Variables
+
+	# Array
+	content=()			# Array container to store results
+	char=''				# Single character for splitting element of a string
+
+	# Associative Array
+
+	# --- Processing
+	# Split string into individual characters
+	IFS=$delim read -r -a content <<< "$str"
+	
+	# --- Output
+	echo "${content[@]}"
+}
+generate_config()
+{
+	: "
+	Generate a template env config file
+	that will contain the variables to be used 
+	in the install script
+	"
+	cfg=$(cat <<EOF
 #==============================#
 # Distro Installer Config File #
 #==============================#
@@ -156,96 +250,7 @@ platform_Arch="<platform-architecture>" # Your Platform Architecture i.e. [ i386
 EOF
     )
     echo -e "$cfg" > $cfg_name && chmod +x $cfg_name
-    echo -e "Config file template generated, please modify the variables and rerun the program again, thank you!"
-    exit 1
-fi
-
-: "Empty Data Storage
-- Please do not edit these
-- (If Required) Edit the associative array values specified in [setup()]
-"
-## Lists
-
-### Stores all external scripts created
-external_scripts=()
-
-## Associative Array
-
-### Device and Partitions
-declare -A device_Parameters=()
-declare -A partition_Configuration=()
-declare -A partition_Parameters=()
-### Mounts
-declare -A mount_Group=()
-### Region & Location
-declare -A location=()
-### Packages
-declare -A pkgs=()
-### User Control
-declare -A user_Info=()
-### Network Configurations
-declare -A network_config=()
-### Operating System Definitions
-declare -A osdef=()
-### Linux Definitions
-declare -A linux=()
-
-# --- Functions
-
-# General Functions
-debug_printAll()
-{
-	#
-	# Debugger : Print all
-	#
-	cat="$1"
-
-	case "$cat" in
-		"device_Parameters")
-			for k in "${!device_Parameters[@]}"; do
-				echo "[$k] : ${device_Parameters[$k]}"
-			done
-			;;
-		"partition_Parameters")
-			for k in "${!partition_Parameters[@]}"; do
-				echo "[$k] : ${partition_Parameters[$k]}"
-			done
-			;;
-		"partition_Configuration")
-			for k in "${!partition_Configuration[@]}"; do
-				echo "[$k] : ${partition_Configuration[$k]}"
-			done
-			;;
-		*)
-			;;
-	esac
-}
-seperate_by_Delim()
-{
-	#
-	# Seperate a string into an array by the delimiter
-	#
-
-	# --- Input
-	
-	# Command Line Argument
-	str="$1"			# String to be seperated
-	delim="${2:-';'}"	# Delimiter to split
-
-	# Local Variables
-
-	# Array
-	content=()			# Array container to store results
-	char=''				# Single character for splitting element of a string
-
-	# Associative Array
-
-	# --- Processing
-	# Split string into individual characters
-	IFS=$delim read -r -a content <<< "$str"
-	
-	# --- Output
-	echo "${content[@]}"
+    echo -e "Config file template generated."
 }
 
 # Installation stages
@@ -1371,15 +1376,66 @@ setup()
     )
 }
 
+init_Variables()
+{
+    : "
+    Initialize Variables
+
+    - Empty Data Storage
+        - Please do not edit these
+        - (If Required) Edit the associative array values specified in [setup()]
+    "
+    ## Lists
+
+    ### Stores all external scripts created
+    external_scripts=()
+
+    ## Associative Array
+
+    ### Device and Partitions
+    declare -gA device_Parameters=()
+    declare -gA partition_Configuration=()
+    declare -gA partition_Parameters=()
+    ### Mounts
+    declare -gA mount_Group=()
+    ### Region & Location
+    declare -gA location=()
+    ### Packages
+    declare -gA pkgs=()
+    ### User Control
+    declare -gA user_Info=()
+    ### Network Configurations
+    declare -gA network_config=()
+    ### Operating System Definitions
+    declare -gA osdef=()
+    ### Linux Definitions
+    declare -gA linux=()
+}
+
 init()
 {
 	#
 	# Initialization
-	# 
+	#
     echo -e "(S) Starting Initialization..."
 	echo "Program Name: $PROGRAM_NAME"
 	echo "Program Type: $PROGRAM_TYPE"
 	echo "Distro: $DISTRO"
+
+    # Import Variables
+    if [[ -f "$PWD/$cfg_name" ]]; then
+        source "$PWD/$cfg_name"
+    else
+        generate_config
+		echo -e "please modify the variables and rerun the program again, thank you!"
+    	exit 1
+	fi
+
+    # Initialize Variables
+    init_Variables
+
+    echo -e ""
+
     echo -e "(+) Verifying Environment Variables..."
     setup
     if [[ "$TARGET_DISK_NAME" == "" ]]; then
@@ -1397,18 +1453,89 @@ init()
 body()
 {
 	#
-	# Main function to run
+	# Main body
+    # - Perform command line arguments and pre-processing checks and validation before running
 	#
 	argv=("$@")
 	argc="${#argv[@]}"
 
-	installer
+    # Check that there are arguments
+    if [[ "${argc}" -gt 0 ]]; then
+        # There are arguments
+        while [[ "$1" != "" ]]; do
+            # Loop through all arguments until there are no more
+            case $1 in
+                "-c" | "--config")
+                    # Set custom configuration file name
+					if [[ "$2" != "" ]]; then
+						cfg_name="$2"
+						shift 2
+					else
+						shift 1
+					fi
+                    ;;
+				"-d" | "--target-disk")
+					# Set target disk name
+					if [[ "$2" != "" ]]; then
+						TARGET_DISK_NAME="$2"
+						shift 2
+					else
+						shift 1
+					fi
+					;;
+                "-g" | "--generate-config")
+                    # Generate configuration file
+                    generate_config
+					shift 1
+                    ;;
+				"-m" | "--mode")
+					# Set mode (DEBUG|RELEASE)
+					if [[ "$2" != "" ]]; then
+						MODE="$2"
+						shift 2
+					else
+						shift 1
+					fi
+					;;
+                "-h" | "--help")
+                    # Display this help menu and all commands/command line arguments
+					echo -e "Display Help"
+					display_help
+					shift 1
+                    ;;
+                "start")
+                    # Start the installer
+                    init # Initialize and perform pre-processing and pre-startup checks
+	                installer # Start installer
+
+                    # Check the function outcome
+                    res="$?"
+
+                    # Output exit message
+                    if [[ "$res" == 0 ]]; then
+                        END "installation has ended successfully."
+                    else
+                        END "installation has encountered errors."
+                    fi
+                    shift 1
+                    ;;
+                *)
+                    # Invalid arguments provided
+                    echo -e "Invalid parameter : $i"
+                    shift 1
+                    ;;
+            esac
+        done
+    else
+        echo -e "No arguments provided."
+    fi
 }
 
 function END()
 {
+	msg="${1:-'Pause'}"
     line=""
-    read -p "Pause" line
+    read -p "$msg" line
 }
 
 function main()
@@ -1417,16 +1544,12 @@ function main()
 	# Main Function 
 	#  - You may not edit this if you want to leave it as default
 	#
-	
+
 	body "$@"
-	res="$?"
-	echo "$res"
 }
 
 if [[ "${BASH_SOURCE[@]}" == "${0}" ]]; then
     # START
-    init
 	main "$@"
-    END
 fi
 

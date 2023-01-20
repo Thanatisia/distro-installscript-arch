@@ -106,3 +106,17 @@ release_date | version_number:
     - Created features write-up
     - Updated TODO pipeline list
     - Relocated manuals and implementation ideas
+
+- 2023-01-21 0007H | v1.2.0
+    - [New Features]
+        - Command Line Arguments (CLI) support in install script
+            + -c | --config : For setting custom configuration file
+            + -d | --target-disk : For setting target disk name via CLI argument
+            + -g | --generate-config : For generating a new config file template right from the get-go
+            + -h | --help : Display help message
+            + -m | --mode : Set startup mode; DEBUG or RELEASE
+    - [Refactor/Modification]
+        - Changed 'MODE' variable from  to a static DEBUG as the command line argument is now dynamic
+        - Refactored global variables into individual functions for reusability (i.e. generating or resetting)
+            + Script should be cleaner
+
