@@ -1134,8 +1134,8 @@ installer()
     echo "(D) Network testing completed."
 
     if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1148,8 +1148,8 @@ installer()
     echo -e "(D) Boot Mode verification completed."
 
     if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1157,13 +1157,16 @@ installer()
 	echo "Stage 3: Update System Clock"
 	echo "============================"
     echo -e "(S) Updating System Clock..."
-    update_system_Clock && \ 
-        echo -e "(D) System clock updated." || \
-        echo -e "(X) Error updating system clock via Network Time Protocol (NTP)"; exit 1
+    update_system_Clock
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error updating system clock via Network Time Protocol (NTP)"
+        exit 1
+    fi
+    echo -e "(D) System clock updated."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1171,13 +1174,16 @@ installer()
 	echo "Stage 4: Partition the Disks"
 	echo "============================"
     echo -e "(S) Starting Disk Management..."
-    device_partition_Manager && \
-        echo -e "(D) Disk Management completed." || \
-        echo -e "(X) Error formatting disk and partitions"; exit 1
+    device_partition_Manager
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error formatting disk and partitions"
+        exit 1
+    fi
+    echo -e "(D) Disk Management completed."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1185,13 +1191,16 @@ installer()
 	echo "Stage 5: Mount Disks"
 	echo "===================="
     echo -e "(S) Mounting disks..."
-	mount_Disks && \
-        echo -e "(D) Disks mounted." || \
-        echo -e "(X) Error mounting disks"; exit 1
+    mount_Disks
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error mounting disks"
+        exit 1
+    fi
+    echo -e "(D) Disks mounted."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1202,9 +1211,9 @@ installer()
 	echo $EDITOR /etc/pacman.d/mirrorlist
     echo -e "(D) Mirror selected."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1212,13 +1221,16 @@ installer()
 	echo "Stage 7: Install essential packages"
 	echo "==================================="
     echo -e "(S) Strapping packages to mount point..."
-	pacstrap_Install && \
-        echo -e "(D) Packages strapped." || \
-        echo -e "(X) Errors bootstrapping packages"; exit 1
+    pacstrap_Install
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Errors bootstrapping packages"
+        exit 1
+    fi
+    echo -e "(D) Packages strapped."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1226,13 +1238,16 @@ installer()
 	echo "Stage 8: Generate fstab (File System Table)"
 	echo "==========================================="
     echo -e "(S) Generating Filesystems Table in /etc/fstab"
-	fstab_Generate && \
-        echo -e "(D) Filesystems Table generated." || \
-        echo -e "(X) Error generating filesystems table"; exit 1
+    fstab_Generate
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error generating filesystems table"
+        exit 1
+    fi
+    echo -e "(D) Filesystems Table generated."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1240,13 +1255,16 @@ installer()
 	echo "Stage 9: Chroot and execute"
 	echo "==========================="
     echo -e "(S) Executing chroot commands"
-	arch_chroot_Exec && \ # Execute commands in arch-chroot
-        echo -e "(D) Commands executed" || \
-        echo -e "(X) Error executing commands in chroot"; exit 1
+    arch_chroot_Exec # Execute commands in arch-chroot
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error executing commands in chroot"
+        exit 1
+    fi
+    echo -e "(D) Commands executed"
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1262,13 +1280,16 @@ installer()
     echo -e "(S) Starting Basic Post-Installation"
 
     echo -e "(+) Running post-installation..."
-	postinstallation && \
-        echo -e "(+) Post-Installation execution completed" || \
-        echo -e "(-) Error detected in post-installation process"; exit 1
+    postinstallation
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(-) Error detected in post-installation process"
+        exit 1
+    fi
+    echo -e "(+) Post-Installation execution completed"
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1276,13 +1297,16 @@ installer()
 	echo "Sanitization and Cleanup"
 	echo "========================"
     echo -e "(+) Running finalization and sanitization..."
-	postinstall_sanitize && \
-        echo -e "(+) Sanitization completed" || \
-        echo -e "(-) Error detected in post-installation sanitization and cleanup"; exit 1
+    postinstall_sanitize
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(-) Error detected in post-installation sanitization and cleanup"
+        exit 1
+    fi
+    echo -e "(+) Sanitization completed"
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
