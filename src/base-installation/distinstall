@@ -89,16 +89,21 @@ Script Name : $PROGRAM_SCRIPTNAME
 Program Name : $PROGRAM_NAME
 Program Version : $PROGRAM_VERSION
 
-Command Line (CLI) Arguments:
-	- Optional Parameters
-		+ -c | --config             : Set custom configuration file name
-		+ -d | --target-disk        : Set target disk name
-		+ -g | --generate-config    : Generate configuration file
-		+ -m | --mode               : Set mode (DEBUG|RELEASE)
-		+ -h | --help               : Display this help menu and all commands/command line arguments
+Synopsis/Syntax:
+    $0 {options} [positional] <arguments>
 
-	- Positional Parameters
-		+ start : Start the installer
+Command Line (CLI) Arguments:
+    - Optional Parameters
+        - With Arguments
+            + -c [config-file-name] | --config      [config-file-name] : Set custom configuration file name
+            + -d [target-disk-name] | --target-disk [target-disk-name] : Set target disk name
+            + -m [DEBUG|RELEASE]    | --mode        [MODE|RELEASE]     : Set mode (DEBUG|RELEASE)
+        - Flags
+            + -g | --generate-config    : Generate configuration file
+            + -h | --help               : Display this help menu and all commands/command line arguments
+
+    - Positional Parameters
+        + start : Start the installer
 
 Modes:
 	+ DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
@@ -106,6 +111,31 @@ Modes:
 
 Environment Variables:
 	+ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
+
+Examples:
+    1. Default (Test Install; Did not specify target disk name explicitly)
+        $0 start
+
+    2. Test Install; with target disk name specified as flag
+        $0 -d "/dev/sdX" start
+
+    3. Test Install; with target disk name specified with environment variable TARGET_DISK_NAME
+        TARGET_DISK_NAME="/dev/sdX" $0 start
+
+    4. Start installation (Did not specify target disk name explicitly)
+        sudo $0 -m RELEASE start
+
+    5. Start installation (with target disk name specified as flag)
+        sudo $0 -d "/dev/sdX" -m RELEASE start
+
+    6. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
+        sudo TARGET_DISK_NAME="/dev/sdX" $0 -m RELEASE start
+
+    7. Test Install; using Makefile
+        make testinstall
+
+    8. Start installation; using Makefile
+        sudo make install
 EOF
 	)
     echo -e "$help_msg"
@@ -1127,8 +1157,9 @@ installer()
 	echo "Stage 3: Update System Clock"
 	echo "============================"
     echo -e "(S) Updating System Clock..."
-    update_system_Clock
-    echo -e "(D) System clock updated."
+    update_system_Clock && \ 
+        echo -e "(D) System clock updated." || \
+        echo -e "(X) Error updating system clock via Network Time Protocol (NTP)"; exit 1
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1140,8 +1171,9 @@ installer()
 	echo "Stage 4: Partition the Disks"
 	echo "============================"
     echo -e "(S) Starting Disk Management..."
-    device_partition_Manager
-    echo -e "(D) Disk Management completed."
+    device_partition_Manager && \
+        echo -e "(D) Disk Management completed." || \
+        echo -e "(X) Error formatting disk and partitions"; exit 1
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1153,8 +1185,9 @@ installer()
 	echo "Stage 5: Mount Disks"
 	echo "===================="
     echo -e "(S) Mounting disks..."
-	mount_Disks
-    echo -e "(D) Disks mounted."
+	mount_Disks && \
+        echo -e "(D) Disks mounted." || \
+        echo -e "(X) Error mounting disks"; exit 1
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1179,8 +1212,9 @@ installer()
 	echo "Stage 7: Install essential packages"
 	echo "==================================="
     echo -e "(S) Strapping packages to mount point..."
-	pacstrap_Install
-    echo -e "(D) Packages strapped."
+	pacstrap_Install && \
+        echo -e "(D) Packages strapped." || \
+        echo -e "(X) Errors bootstrapping packages"; exit 1
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1192,8 +1226,9 @@ installer()
 	echo "Stage 8: Generate fstab (File System Table)"
 	echo "==========================================="
     echo -e "(S) Generating Filesystems Table in /etc/fstab"
-	fstab_Generate
-    echo -e "(D) Filesystems Table generated."
+	fstab_Generate && \
+        echo -e "(D) Filesystems Table generated." || \
+        echo -e "(X) Error generating filesystems table"; exit 1
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1205,8 +1240,9 @@ installer()
 	echo "Stage 9: Chroot and execute"
 	echo "==========================="
     echo -e "(S) Executing chroot commands"
-	arch_chroot_Exec # Execute commands in arch-chroot
-    echo -e "(D) Commands executed"
+	arch_chroot_Exec && \ # Execute commands in arch-chroot
+        echo -e "(D) Commands executed" || \
+        echo -e "(X) Error executing commands in chroot"; exit 1
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1226,8 +1262,9 @@ installer()
     echo -e "(S) Starting Basic Post-Installation"
 
     echo -e "(+) Running post-installation..."
-	postinstallation
-    echo -e "(+) Post-Installation execution completed"
+	postinstallation && \
+        echo -e "(+) Post-Installation execution completed" || \
+        echo -e "(-) Error detected in post-installation process"; exit 1
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
@@ -1239,8 +1276,9 @@ installer()
 	echo "Sanitization and Cleanup"
 	echo "========================"
     echo -e "(+) Running finalization and sanitization..."
-	postinstall_sanitize
-    echo -e "(+) Sanitization completed"
+	postinstall_sanitize && \
+        echo -e "(+) Sanitization completed" || \
+        echo -e "(-) Error detected in post-installation sanitization and cleanup"; exit 1
 
 	if [[ "$MODE" == "DEBUG" ]]; then
 		read -p "Press anything to continue..." tmp
