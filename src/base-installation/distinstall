@@ -48,8 +48,8 @@ Modular, Portable, Customizable and Configurable script that can be modified int
 
 ### Usage
 
-+ TARGET_DISK_NAME='/dev/sdX' (./)distinstall           : Run in DEBUG mode
-+ TARGET_DISK_NAME='/dev/sdX' (./)distinstall RELEASE   : Run installation
++ TARGET_DISK_NAME='/dev/sdX' (./)distinstall              : Run in DEBUG mode
++ TARGET_DISK_NAME='/dev/sdX' (./)distinstall -m RELEASE   : Run installation
 
 ## Configuration and Customization
     ## Environment Variables
@@ -66,7 +66,7 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-PROGRAM_VERSION="v1.1.8-testing"
+PROGRAM_VERSION="v1.2.2-testing"
 MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 cfg_name="config.sh"
@@ -1509,6 +1509,9 @@ init()
 
         device_Parameters["device_Name"]=$deviceParams_Name
     fi
+
+    echo -e ""
+
     echo -e "(D) Initialization completed"
 }
 
@@ -1568,6 +1571,9 @@ body()
                 "start")
                     # Start the installer
                     init # Initialize and perform pre-processing and pre-startup checks
+
+                    echo -e ""
+
 	                installer # Start installer
 
                     # Check the function outcome
@@ -1585,6 +1591,7 @@ body()
                     # Invalid arguments provided
                     echo -e "Invalid parameter : $i"
                     shift 1
+                    exit 1
                     ;;
             esac
         done
