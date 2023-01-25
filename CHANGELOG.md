@@ -120,3 +120,27 @@ release_date | version_number:
         - Refactored global variables into individual functions for reusability (i.e. generating or resetting)
             + Script should be cleaner
 
+- 2023-01-25 1435H | v1.3.0-rc1
+    - Compilation of all changes and releases
+    ```
+    [New Features]
+    - Command Line Arguments (CLI) support in install script
+        + -c | --config : For setting custom configuration file
+        + -d | --target-disk : For setting target disk name via CLI argument
+        + -g | --generate-config : For generating a new config file template right from the get-go
+        + -h | --help : Display help message
+        + -m | --mode : Set startup mode; DEBUG or RELEASE
+    - display_help() function to display a help menu
+
+    [Refactor/Modification]
+    - Changed 'MODE' variable from  to a static DEBUG as the command line argument is now dynamic
+    - Refactored global variables into individual functions for reusability (i.e. generating or resetting)
+        + Script should also be cleaner, improving readability 
+    - Changed documentation for 'distinstall' and README to reflect the latest usage
+    - Removed documentation from distinstall script as the help function explains it
+
+    [Errors/Bug Fixes]
+    - Error validation and checking, implementing exit if error was detected
+    ```
+
+

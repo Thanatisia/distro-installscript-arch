@@ -32,29 +32,6 @@ Modular, Portable, Customizable and Configurable script that can be modified int
         + Testing using ArchISO completed, status : Success
         + Testing using Existing Linux Distribution (Base Arch) completed, status: Success
 
-## Documentation
-
-### Synopsis/Syntax
-
-+ TARGET_DISK_NAME='your-disk-label (/dev/sdX)' (./)distinstall {MODE}
-
-### Parameters
-
-- Positional Arguments
-    1. MODE
-        - Options
-            + DEBUG     : Display only the commands
-            + RELEASE   : Run the installation
-
-### Usage
-
-+ TARGET_DISK_NAME='/dev/sdX' (./)distinstall              : Run in DEBUG mode
-+ TARGET_DISK_NAME='/dev/sdX' (./)distinstall -m RELEASE   : Run installation
-
-## Configuration and Customization
-    ## Environment Variables
-    + TARGET_DISK_NAME : To set the disk/device label you wish to use (/dev/sdX)
-
 References:
     1. Multiline-scripting in Arch-chroot : https://www.reddit.com/r/archlinux/comments/bssbze/scripting_into_chroot/
 =====================================
@@ -66,7 +43,7 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-PROGRAM_VERSION="v1.2.2-testing"
+PROGRAM_VERSION="v1.3.0"
 MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 cfg_name="config.sh"
@@ -1589,7 +1566,7 @@ body()
                     ;;
                 *)
                     # Invalid arguments provided
-                    echo -e "Invalid parameter : $i"
+                    echo -e "Invalid parameter : $1"
                     shift 1
                     exit 1
                     ;;
