@@ -5,6 +5,9 @@ Linux Distribution Portable, Modular CLI/Terminal Base-Installation + Essential 
 ## Table of Contents
 
 - [Information](#information)
+- [Setup](#setup)
+- [Documentation](#documentation)
+- [Wiki](#wiki)
 - [FAQs](#faqs)
 - [Remarks](#remarks)
 - [Contacts](#contacts)
@@ -36,15 +39,16 @@ and/or the tools required by the target distribution changed, thus, leading to t
     + Thus, with the modular, containerized method, the modification of codes will be easier and customizable
 
  ### Files and Folders
-- [base-installation/](src/base-installation) : This is the Base Installation script. All files placed here have been tested from those found in dev (Development Folder). This is probably where you want to go first.
-- [post-installation/](src/post-installation) : This is the Post-Installation related scripts. All files placed here have been tested from those found in dev
+- [Source codes](src) : This is the root working directory containing the source files, configuration and scripts
+    - [base-installation/](src/base-installation) : This is the Base Installation script. All files placed here have been tested from those found in dev (Development Folder). This is probably where you want to go first.
+    - [post-installation/](src/post-installation) : This is the Post-Installation related scripts. All files placed here have been tested from those found in dev
 - [references/](references) : This references directory contains various useful files such as Sample configurations, Sample templates and Sample usage scripts.
 - [development](dev) : This is the development directory. This directory is essentially the Nightly Build branch and to be considered as Testing or unsafe, just to be safe, please test the files found here in a Virtual Machine.
 - [documentations](docs) : This contains all documentations and guides for references
     + including detailed setup; usage
     
 ## Setup
-> This is a basic rundown of how to use the program, please refer to [Base Installation Manual](docs/base-installation/manuals/distinstall/manual.md) for a more detailed rundown
+> This is a basic rundown of how to use the program, please refer to [Base Installation Manual](docs/manuals/distinstall.md) for a more detailed rundown
 ### Pre-Requisites
 + (Optional) Internet Connection
     ```
@@ -66,71 +70,156 @@ and/or the tools required by the target distribution changed, thus, leading to t
     curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/distinstall"
     ```
 
-- Downloading the latest release
-    ```console
-    wget "https://github.com/Thanatisia/distro-installscript-arch/releases/latest/distinstall-*.zip"
-    ```
-    
+- Change Permission for use (Execute [x] and User [u])
+	```console
+	chmod u+x distinstall
+	```
+
 ### Obtaining Config File
-- via Autogeneration (Default)
-    - The application will check if a a config file exists (Default config file name is 'config.sh')
-        - If config file doesnt exist
-            + Application will automatically generate a 'config.sh' file on startup
-      
-- (OPTIONAL) Specifying a specific config file
-    - If you have a config file of a specific name
-        + Edit the variable "cfg_name" in *distinstall* with your custom config file name (TODO: Flag to specify custom config file)
-   
+- Default config file
+    + Default config file name : config.sh
+    + WIP/TODO: check if a a config file exists (Default config file name is 'config.sh')
+    ```console
+    ./distinstall -g
+    ```
+
+- Generate custom config file
+    + WIP/TODO: check if a a config file exists (Default config file name is 'config.sh')
+    ```console
+    ./distinstall -c [new-config-file-name]
+    ```
+
 - (OPTIONAL) Curling the example config.sh
     ```console
     curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/docs/configs/config.sh"
     ```
-   
+
+- Edit config file
+    ```console
+    $EDITOR [config file name]
+    ```
+
 ### Obtaining additional helper utilities/files
-- (OPTIONAL) Obtaining Makefile
-    + I designed this Makefile to automate and make running the installer easier
+- Makefile
+    - (OPTIONAL) Obtaining Makefile
+        + I designed this Makefile to automate and make running the installer easier
+        ```console
+        curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/docs/configs/Makefile"
+        ```
+
+    - (OPTIONAL) Editing the Makefile
+        + If you have obtained the Makefile and will be using this to install
+        + Edit the Makefile and specify your device labels and information
+            ```console
+            $EDITOR Makefile
+            ```
+
+### Obtaining all necessary files
+> Includes the above - Installer, config file and additional utilities
+- Downloading the latest release
     ```console
-    curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/docs/configs/Makefile"
+    wget "https://github.com/Thanatisia/distro-installscript-arch/releases/latest/distinstall-*.zip"
     ```
 
-   
 ## Documentation
+### Synopsis/Syntax
+```console
+./distinstall {options} [positional] <arguments>
+```
+
+### Parameters
+- Optional Parameters
+    - With Arguments
+        + -c [config-file-name] | --config      [config-file-name] : Set custom configuration file name
+        + -d [target-disk-name] | --target-disk [target-disk-name] : Set target disk name
+        + -m [DEBUG|RELEASE]    | --mode        [DEBUG|RELEASE]    : Set mode (DEBUG|RELEASE)
+    - Flags
+        + -g | --generate-config    : Generate configuration file
+        + -h | --help               : Display this help menu and all commands/command line arguments
+
+- Positional Parameters
+    + start : Start the installer
+
 ### Usage
-- Modify configuration file variables
-    + Default configuration file name: 'config.sh'
+- Examples
+    1. Default (Test Install; Did not specify target disk name explicitly)
         ```console
-        $EDITOR config.sh
+        ./distinstall start
         ```
 
-- (OPTIONAL) Editing the Makefile
-    + If you have obtained the Makefile and will be using this to install
-    + Edit the Makefile and specify your device labels and information
+    2. Test Install; with target disk name specified as flag
         ```console
-        $EDITOR Makefile
+        ./distinstall -d "/dev/sdX" start
         ```
-        
-- Execute installer (Default)
-    + At the moment, the script is called 'distinstall'
-    + By default: the script will execute in DEBUG mode whereby it shows you all the commands but it wont execute the formatting (security purposes)
-    ```console
-    TARGET_DISK_NAME='/dev/sdX' (./)distinstall {RERLEASE}
-    ```
+
+    3. Test Install; with target disk name specified with environment variable TARGET_DISK_NAME
+        ```console
+        TARGET_DISK_NAME="/dev/sdX" ./distinstall start
+        ```
+
+    4. Test Install; with custom configuration file
+        ```console
+        ./distinstall -c "new config file" -d "/dev/sdX" start
+        ```
+
+    5. Start installation (Did not specify target disk name explicitly)
+        ```console
+        sudo ./distinstall -m RELEASE start
+        ```
+
+    6. Start installation (with target disk name specified as flag)
+        ```console
+        sudo ./distinstall -d "/dev/sdX" -m RELEASE start
+        ```
+
+    7. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
+        ```console
+        sudo TARGET_DISK_NAME="/dev/sdX" ./distinstall -m RELEASE start
+        ```
+
+    8. Start installation (with custom configuration file)
+        ```console
+        sudo ./distinstall -c "new config file" -d "/dev/sdX" -m RELEASE start
+        ```
+
+    9. Test Install; using Makefile
+        ```console
+        make testinstall
+        ```
+
+    10. Start installation; using Makefile
+        ```console
+        sudo make install
+        ```
+
+    11. Dis/Unmount using Makefile
+        ```console
+        sudo make clean
+        ```
+
+## Wiki
+- Modes
+    + DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
+    + RELEASE : Performs the real RELEASE; must use with sudo
+
+- Environment Variables
+	+ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
+
+- Configuration guide
+    + Please refer to the [configuration guide](docs/installer%20configuration.md) for full information with regards to editing the configuration file
 
 ## FAQs
 
 ## Remarks
-```
 - Please do contact me in any of the platforms below if you have any ideas | bugs | comments | suggestions or if you just wanna talk!
-I am open for suggestions as well as talking to everyone
+    + I am open for suggestions as well as talking to everyone
 
 - Immediate Newsletter
 	- 2022-03-04 1349H | The current status of the scripts is tested primarily for brand new installations
 		+ I am attempting to and in the midst of adding pre-existing installation features as well as testings surrounding pre-existing distributions
 		+ Thus, please do becareful when attempting to multiboot with this script
-
 	- 2022-03-05 1147H | The script only has support for MBR (MSDOS/BIOS) Bootloader
 		+ Implementation of UEFI (EFI) support is currently in the plans
-        
     - 2022-06-20 1603H | Script has 2 types
         + This is a brief summary of the differences between type-1 and type-2, for more info, please check out the [Base Installation README.md](src/base-installation/README.md)
         - As of installer.remake.sh v1.0.5 and v1.0.8, I have created 2 types, known as [type-1] and [type-2]
@@ -139,7 +228,6 @@ I am open for suggestions as well as talking to everyone
             + type-2 is operating as a source-config environment, theres a template config generated inside the script itself though, you can also just curl/download th template i have in my docs directory that I will push to githube
         + I am still considering which format is more configurable, once I have decided, I will rework the project filestructure and tidy up the repository.
         + I apologise for the messy structure at the moment.
-
     - 2022-07-02 0019H | Stable release v1.0.0
         + First of all, thank you to everyone whom have provided feedback as to which type you prefer.
         - After careful consideration and testing, the application will follow a "seperate config" structure on top of the initial portable design paradigm
@@ -147,6 +235,14 @@ I am open for suggestions as well as talking to everyone
             + Thus, this makes the program more portable, configurable and customizable.
         + This means that this is what I would consider the first stable release
         + Other changes can be found in [Changelog](CHANGELOG.md)
+    - 2023-01-25 1311H | Implemented CLI Argument support and refactoring of documentations
+        - New Features
+            + Finally implemented CLI argument capabilities as well as writing it to be as easy to understand as possible, so as to make it customizable and modular
+        - Modifications
+            + Refactored installer to place initialized global variables into functions, allowing reusability, and readability as it is now cleaner
+        + Tested multiple times, should be stable (please create issues if any are found, thank you!)
+        + Please refer to the [CHANGELOGS](CHANGELOG.md) for all changes
+
 
 - I am thinking of making a discord group for my set of Linux Installation Script plans, do message me in any of the following contacts if you are interested.
 
@@ -155,7 +251,6 @@ I am open for suggestions as well as talking to everyone
 - Please star/follow this repository if you think this is useful!
 
 thank you again for using!
-```
 
 ## Contacts
 + [Twitter: @phantasu](https://twitter.com/phantasu)

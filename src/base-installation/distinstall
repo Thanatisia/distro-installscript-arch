@@ -32,29 +32,6 @@ Modular, Portable, Customizable and Configurable script that can be modified int
         + Testing using ArchISO completed, status : Success
         + Testing using Existing Linux Distribution (Base Arch) completed, status: Success
 
-## Documentation
-
-### Synopsis/Syntax
-
-+ TARGET_DISK_NAME='your-disk-label (/dev/sdX)' (./)distinstall {MODE}
-
-### Parameters
-
-- Positional Arguments
-    1. MODE
-        - Options
-            + DEBUG     : Display only the commands
-            + RELEASE   : Run the installation
-
-### Usage
-
-+ TARGET_DISK_NAME='/dev/sdX' (./)distinstall           : Run in DEBUG mode
-+ TARGET_DISK_NAME='/dev/sdX' (./)distinstall RELEASE   : Run installation
-
-## Configuration and Customization
-    ## Environment Variables
-    + TARGET_DISK_NAME : To set the disk/device label you wish to use (/dev/sdX)
-
 References:
     1. Multiline-scripting in Arch-chroot : https://www.reddit.com/r/archlinux/comments/bssbze/scripting_into_chroot/
 =====================================
@@ -66,7 +43,7 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-PROGRAM_VERSION="v1.1.8-testing"
+PROGRAM_VERSION="v1.3.0"
 MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 cfg_name="config.sh"
@@ -89,16 +66,21 @@ Script Name : $PROGRAM_SCRIPTNAME
 Program Name : $PROGRAM_NAME
 Program Version : $PROGRAM_VERSION
 
-Command Line (CLI) Arguments:
-	- Optional Parameters
-		+ -c | --config             : Set custom configuration file name
-		+ -d | --target-disk        : Set target disk name
-		+ -g | --generate-config    : Generate configuration file
-		+ -m | --mode               : Set mode (DEBUG|RELEASE)
-		+ -h | --help               : Display this help menu and all commands/command line arguments
+Synopsis/Syntax:
+    $0 {options} [positional] <arguments>
 
-	- Positional Parameters
-		+ start : Start the installer
+Command Line (CLI) Arguments:
+    - Optional Parameters
+        - With Arguments
+            + -c [config-file-name] | --config      [config-file-name] : Set custom configuration file name
+            + -d [target-disk-name] | --target-disk [target-disk-name] : Set target disk name
+            + -m [DEBUG|RELEASE]    | --mode        [MODE|RELEASE]     : Set mode (DEBUG|RELEASE)
+        - Flags
+            + -g | --generate-config    : Generate configuration file
+            + -h | --help               : Display this help menu and all commands/command line arguments
+
+    - Positional Parameters
+        + start : Start the installer
 
 Modes:
 	+ DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
@@ -106,6 +88,31 @@ Modes:
 
 Environment Variables:
 	+ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
+
+Examples:
+    1. Default (Test Install; Did not specify target disk name explicitly)
+        $0 start
+
+    2. Test Install; with target disk name specified as flag
+        $0 -d "/dev/sdX" start
+
+    3. Test Install; with target disk name specified with environment variable TARGET_DISK_NAME
+        TARGET_DISK_NAME="/dev/sdX" $0 start
+
+    4. Start installation (Did not specify target disk name explicitly)
+        sudo $0 -m RELEASE start
+
+    5. Start installation (with target disk name specified as flag)
+        sudo $0 -d "/dev/sdX" -m RELEASE start
+
+    6. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
+        sudo TARGET_DISK_NAME="/dev/sdX" $0 -m RELEASE start
+
+    7. Test Install; using Makefile
+        make testinstall
+
+    8. Start installation; using Makefile
+        sudo make install
 EOF
 	)
     echo -e "$help_msg"
@@ -1104,8 +1111,8 @@ installer()
     echo "(D) Network testing completed."
 
     if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1118,8 +1125,8 @@ installer()
     echo -e "(D) Boot Mode verification completed."
 
     if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1128,11 +1135,15 @@ installer()
 	echo "============================"
     echo -e "(S) Updating System Clock..."
     update_system_Clock
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error updating system clock via Network Time Protocol (NTP)"
+        exit 1
+    fi
     echo -e "(D) System clock updated."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1141,11 +1152,15 @@ installer()
 	echo "============================"
     echo -e "(S) Starting Disk Management..."
     device_partition_Manager
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error formatting disk and partitions"
+        exit 1
+    fi
     echo -e "(D) Disk Management completed."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1153,12 +1168,16 @@ installer()
 	echo "Stage 5: Mount Disks"
 	echo "===================="
     echo -e "(S) Mounting disks..."
-	mount_Disks
+    mount_Disks
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error mounting disks"
+        exit 1
+    fi
     echo -e "(D) Disks mounted."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1169,9 +1188,9 @@ installer()
 	echo $EDITOR /etc/pacman.d/mirrorlist
     echo -e "(D) Mirror selected."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1179,12 +1198,16 @@ installer()
 	echo "Stage 7: Install essential packages"
 	echo "==================================="
     echo -e "(S) Strapping packages to mount point..."
-	pacstrap_Install
+    pacstrap_Install
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Errors bootstrapping packages"
+        exit 1
+    fi
     echo -e "(D) Packages strapped."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1192,12 +1215,16 @@ installer()
 	echo "Stage 8: Generate fstab (File System Table)"
 	echo "==========================================="
     echo -e "(S) Generating Filesystems Table in /etc/fstab"
-	fstab_Generate
+    fstab_Generate
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error generating filesystems table"
+        exit 1
+    fi
     echo -e "(D) Filesystems Table generated."
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1205,12 +1232,16 @@ installer()
 	echo "Stage 9: Chroot and execute"
 	echo "==========================="
     echo -e "(S) Executing chroot commands"
-	arch_chroot_Exec # Execute commands in arch-chroot
+    arch_chroot_Exec # Execute commands in arch-chroot
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(X) Error executing commands in chroot"
+        exit 1
+    fi
     echo -e "(D) Commands executed"
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1226,12 +1257,16 @@ installer()
     echo -e "(S) Starting Basic Post-Installation"
 
     echo -e "(+) Running post-installation..."
-	postinstallation
+    postinstallation
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(-) Error detected in post-installation process"
+        exit 1
+    fi
     echo -e "(+) Post-Installation execution completed"
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1239,12 +1274,16 @@ installer()
 	echo "Sanitization and Cleanup"
 	echo "========================"
     echo -e "(+) Running finalization and sanitization..."
-	postinstall_sanitize
+    postinstall_sanitize
+    if [[ "$?" -gt 0 ]]; then
+        echo -e "(-) Error detected in post-installation sanitization and cleanup"
+        exit 1
+    fi
     echo -e "(+) Sanitization completed"
 
-	if [[ "$MODE" == "DEBUG" ]]; then
-		read -p "Press anything to continue..." tmp
-	fi
+    if [[ "$MODE" == "DEBUG" ]]; then
+        read -p "Press anything to continue..." tmp
+    fi
 
 	echo ""
 
@@ -1447,6 +1486,9 @@ init()
 
         device_Parameters["device_Name"]=$deviceParams_Name
     fi
+
+    echo -e ""
+
     echo -e "(D) Initialization completed"
 }
 
@@ -1506,6 +1548,9 @@ body()
                 "start")
                     # Start the installer
                     init # Initialize and perform pre-processing and pre-startup checks
+
+                    echo -e ""
+
 	                installer # Start installer
 
                     # Check the function outcome
@@ -1521,8 +1566,9 @@ body()
                     ;;
                 *)
                     # Invalid arguments provided
-                    echo -e "Invalid parameter : $i"
+                    echo -e "Invalid parameter : $1"
                     shift 1
+                    exit 1
                     ;;
             esac
         done
