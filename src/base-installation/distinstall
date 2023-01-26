@@ -43,7 +43,7 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-PROGRAM_VERSION="v1.3.0"
+PROGRAM_VERSION="v1.3.2-testing"
 MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 cfg_name="config.sh"
@@ -1335,10 +1335,14 @@ setup()
         # Please append according to your needs
         # [Syntax]
         # ROW_ID="<partition_ID>;<partition_Name>;<partition_file_Type>;<partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
-        [1]="${boot_Partition[0]}"
-        [2]="${boot_Partition[1]}"
-        [3]="${boot_Partition[2]}"
+        # [1]="${boot_Partition[0]}"
+        # [2]="${boot_Partition[1]}"
+        # [3]="${boot_Partition[2]}"
     )
+    for curr_partition_row in "${!boot_Partition[@]}"; do
+        curr_partition="${boot_Partition[$curr_partition_row]}"
+        partition_Configuration[$curr_mount_row]="$curr_partition"
+    done
 
     partition_Parameters=(
         # This is the default container for partition parameters
@@ -1362,10 +1366,14 @@ setup()
         #	corresponding to the partition number
         # [Syntax]
         #   [partition-n]="/partition/mount/path"
-        [1]="${mount_Paths[0]}"	# Boot
-        [2]="${mount_Paths[1]}"	# Root
-        [3]="${mount_Paths[2]}"	# Home
+        # [1]="${mount_Paths[0]}"	# Boot
+        # [2]="${mount_Paths[1]}"	# Root
+        # [3]="${mount_Paths[2]}"	# Home
     )
+    for curr_mount_row in "${!mount_Paths[@]}"; do
+        curr_mount="${mount_Paths[$curr_mount_row]}"
+        mount_Group[$curr_mount_row]="$curr_mount"
+    done
 
     ### Region & Location
     location=(
@@ -1406,8 +1414,12 @@ setup()
         # "
         # [Examples]
         # [1]="username,wheel,NIL,/home/profiles/username"
-        [1]="${user_ProfileInfo[0]}"
+        # [1]="${user_ProfileInfo[0]}"
     )
+    for curr_profile_row in "${!user_ProfileInfo[@]}"; do
+        curr_profile="${user_ProfileInfo[$curr_profile_row]}"
+        user_Info[$curr_profile_row]=$curr_profile
+    done
 
     ### Network Configurations
     network_config=(
