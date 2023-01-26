@@ -74,7 +74,7 @@ Command Line (CLI) Arguments:
         - With Arguments
             + -c [config-file-name] | --config      [config-file-name] : Set custom configuration file name
             + -d [target-disk-name] | --target-disk [target-disk-name] : Set target disk name
-            + -m [DEBUG|RELEASE]    | --mode        [MODE|RELEASE]     : Set mode (DEBUG|RELEASE)
+            + -m [DEBUG|RELEASE]    | --mode        [DEBUG|RELEASE]    : Set mode (DEBUG|RELEASE)
         - Flags
             + -g | --generate-config    : Generate configuration file
             + -h | --help               : Display this help menu and all commands/command line arguments
@@ -99,20 +99,29 @@ Examples:
     3. Test Install; with target disk name specified with environment variable TARGET_DISK_NAME
         TARGET_DISK_NAME="/dev/sdX" $0 start
 
-    4. Start installation (Did not specify target disk name explicitly)
+    4. Test Install; with custom configuration file
+        $0 -c "new config file" -d "/dev/sdX" start
+
+    5. Start installation (Did not specify target disk name explicitly)
         sudo $0 -m RELEASE start
 
-    5. Start installation (with target disk name specified as flag)
+    6. Start installation (with target disk name specified as flag)
         sudo $0 -d "/dev/sdX" -m RELEASE start
 
-    6. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
+    7. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
         sudo TARGET_DISK_NAME="/dev/sdX" $0 -m RELEASE start
 
-    7. Test Install; using Makefile
+    8. Start installation (with custom configuration file)
+        sudo ./distinstall -c "new config file" -d "/dev/sdX" -m RELEASE start
+
+    9. Test Install; using Makefile
         make testinstall
 
-    8. Start installation; using Makefile
+    10. Start installation; using Makefile
         sudo make install
+
+    11. Dis/Unmount using Makefile
+        sudo make clean
 EOF
 	)
     echo -e "$help_msg"
@@ -1022,9 +1031,12 @@ postinstall_sanitize()
 						u_home_Dir="${curr_user_Params[3]}"             # Home Directory
 						u_other_Params="${curr_user_Params[@]:4}"       # Any other parameters after the first 3
 
-						echo "Copying from [$PWD] : curl_repositories.sh => /mnt/$u_home_Dir"
-						cp curl_repositories.sh /mnt/$u_home_Dir/curl_repositories.sh														# Copy script from root to user
-						arch-chroot $dir_Mount /bin/bash -c "chown -R $u_name:$u_primary_Group $u_home_Dir/curl_repositories.sh"		# Change ownership of file to user
+                        for ((i=0; i < $number_of_external_scripts; i++)); do
+                            curr_script="${external_scripts[$i]}"
+                            echo "Copying from [$dir_Mount] : $curr_script => /mnt/$u_home_Dir"
+                            cp $curr_script /mnt/$u_home_Dir/														# Copy script from root to user
+                            # arch-chroot $dir_Mount /bin/bash -c "chown -R $u_name:$u_primary_Group $u_home_Dir/$curr_script"		# Change ownership of file to user
+                        done
 					done
 					;;
 				"S" | "Select")
@@ -1032,9 +1044,14 @@ postinstall_sanitize()
 					read -p "User name: " sel_uhome
 					sel_primary_group=$(arch-chroot $dir_Mount /bin/bash -c "su - $sel_uhome -c 'echo \$(id -gn $sel_uhome)'")
 					sel_uhome_dir=$(arch-chroot $dir_Mount /bin/bash -c "su - $sel_uhome -c 'echo \$HOME'")
-					echo "Copying from [$PWD] : curl_repositories.sh => /mnt/$sel_uhome_dir/curl_repositories.sh"
-					cp curl_repositories.sh /mnt/$sel_uhome_dir/curl_repositories.sh
-					arch-chroot $dir_Mount /bin/bash -c "chown -R $sel_uhome:$sel_primary_group $sel_uhome_dir/curl_repositories.sh"		# Change ownership of file to user
+
+                    # Start copy
+                    for ((i=0; i < $number_of_external_scripts; i++)); do
+                        curr_script="${external_scripts[$i]}"
+                        echo "Copying from [$dir_Mount] : $curr_script => /mnt/$sel_uhome_dir/"
+                        cp $curr_script /mnt/$sel_uhome_dir/
+                        # arch-chroot $dir_Mount /bin/bash -c "chown -R $sel_uhome:$sel_primary_group $sel_uhome_dir/$curr_script"		# Change ownership of file to user
+                    done
 					;;
 				*)
 					;;
