@@ -421,44 +421,26 @@ mount_Disks()
 	# Local Vairiables
 	device_Name="${device_Parameters["device_Name"]}"
 	device_Label="${device_Parameters["device_Label"]}"
-	
-	# Directories
-	dir_Boot="${mount_Group["1"]}"
-	dir_Mount="${mount_Group["2"]}"
-	dir_Home="${mount_Group["3"]}"
 
-	# --- Processing
-	# Mount the root volume to /mnt
-	if [[ "$MODE" == "DEBUG" ]]; then
-		echo mount "$device_Name"2 $dir_Mount
-	else
-		mount "$device_Name"2 $dir_Mount
-	fi
+    # Mount all specified in the mount group
+    for i in "${!mount_Group[@]}"; do
+        # Get current directory
+        curr_dir="${mount_Group[$i]}"
 
-	# Make other directories (i.e. home)
-	# Home Directory
-	if [[ "$MODE" == "DEBUG" ]]; then
-		echo mkdir -p $dir_Home
-	else
-		mkdir -p $dir_Home
-	fi
-	# Boot Directory
-	if [[ "$MODE" == "DEBUG" ]]; then
-		echo mkdir -p $dir_Boot
-	else
-		mkdir -p $dir_Boot
-	fi
+        # Create directories if does not exists
+        if [[ ! -d "$curr_dir" ]]; then
+            # Directory does not exist
+            mkdir -p "$curr_dir"
+        fi
 
-	# Mount remaining directories
-	if [[ "$MODE" == "DEBUG" ]]; then
-		echo mount "$device_Name"3 $dir_Home
-		echo mount "$device_Name"1 $dir_Boot
-	else
-		mount "$device_Name"3 $dir_Home
-		mount "$device_Name"1 $dir_Boot
-	fi
-
-	# --- Output
+        # --- Processing
+        # Mount the volume to the path
+        if [[ "$MODE" == "DEBUG" ]]; then
+            echo mount "$device_Name"$i $curr_dir
+        else
+            mount "$device_Name"$i $curr_dir
+        fi
+    done
 }
 
 pacstrap_Install()
@@ -1341,7 +1323,8 @@ setup()
     )
     for curr_partition_row in "${!boot_Partition[@]}"; do
         curr_partition="${boot_Partition[$curr_partition_row]}"
-        partition_Configuration[$curr_mount_row]="$curr_partition"
+        count=$((curr_partition_row+1))
+        partition_Configuration[$count]=$curr_partition
     done
 
     partition_Parameters=(
@@ -1372,7 +1355,8 @@ setup()
     )
     for curr_mount_row in "${!mount_Paths[@]}"; do
         curr_mount="${mount_Paths[$curr_mount_row]}"
-        mount_Group[$curr_mount_row]="$curr_mount"
+        count=$((curr_mount_row+1))
+        mount_Group[$count]=$curr_mount
     done
 
     ### Region & Location

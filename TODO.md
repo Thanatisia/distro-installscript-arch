@@ -8,6 +8,7 @@
 - Other Bootloader Support
     + [] syslinux
 - [] Add support for filesystems : 'btrfs'
+- [] Add support for Swap partitions
 + [] Replace 'dev' folder with an official development branch
 - [] Complete creation of the additional installer GUI/CLI helper utility
 - [O] Perform application overhaul
