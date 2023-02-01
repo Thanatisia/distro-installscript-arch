@@ -1,17 +1,26 @@
 #!/bin/env bash
 : "
 Distro Install Script
-Modular, Portable, Customizable and Configurable script that can be modified into other distro installers
+A Modular, Portable, Customizable and Configurable script that can be modified into other distro installers
+as a template (WIP)
+
+Name is TBC, for the time being, it is 'distinstall' (horrendous name, needs change)
 =====================================
 ## Information
 + Author: Asura
 - Features: 
     + Full minimal user input install script
+    + Custom
+    + Reusable
+    + Command Line Argument support for instant running
+
 - Dependencies
     + arch-install-scripts
     + build-devel
+
 - Recommendation
     + Download the Makefile in the same directory as the script
+
 ### Background Information: 
 + A full minimal user-input, modular install script that allows user to
     change just afew variables and be able to effectively customize their system according to what they need
@@ -43,7 +52,7 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-PROGRAM_VERSION="v1.3.2-testing"
+PROGRAM_VERSION="v1.3.4-testing"
 MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 cfg_name="config.sh"
@@ -219,10 +228,20 @@ boot_Partition=(
     "3;Home;primary;ext4;<x1MiB>;100%;False;NIL"
 )
 mount_Paths=(
-    # Append this and append a [n]="\${mount_Paths[<n-1>]}" in
-    "/mnt/boot"	# Boot
-    "/mnt"		# Root
-    "/mnt/home"	# Home
+	# This contains the mount paths mapped to the partition name
+	# Note:
+	#   - Please seperate all parameters with delimiter ','
+	#   - Please seperate all subvalues with delimiter ';'
+	#
+	# Syntax:
+	# [Partition Name],[mount path]
+	#
+	# Some Manadatory partition names:
+	#   - For Boot Partition : 'Boot'
+	#   - For Root Partition : 'Root'
+	"Boot,/mnt/boot"	# Boot
+	"Root,/mnt"			# Root
+	"Home,/mnt/home"	# Home
 )
 pacstrap_pkgs=(
         # EDIT: MODIFY THIS
@@ -430,7 +449,11 @@ mount_Disks()
         # Create directories if does not exists
         if [[ ! -d "$curr_dir" ]]; then
             # Directory does not exist
-            mkdir -p "$curr_dir"
+            if [[ "$MODE" == "DEBUG" ]]; then
+                echo mkdir -p "$curr_dir"
+            else
+                mkdir -p "$curr_dir"
+            fi
         fi
 
         # --- Processing
