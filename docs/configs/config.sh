@@ -1,4 +1,6 @@
-
+#==============================#
+# Distro Installer Config File #
+#==============================#
 : "
 Variables to be imported into the installer file
 
@@ -26,7 +28,7 @@ Variables to be imported into the installer file
 deviceParams_devType="<hdd|ssd|flashdrive|microSD>"
 deviceParams_Name="$TARGET_DISK_NAME"
 deviceParams_Size="<x {GB | GiB | MB | MiB}"
-devicePrams_Boot="<mbr|uefi>"
+deviceParams_Boot="<mbr|uefi>"
 deviceParams_Label="<msdos|gpt>"
 boot_Partition=(
 	# Append this and append a [n]="${boot_Partition[<n-1>]}" in
@@ -38,9 +40,20 @@ boot_Partition=(
 )
 mount_Paths=(
 	# Append this and append a [n]="${mount_Paths[<n-1>]}" in
-	"/mnt/boot"	# Boot
-	"/mnt"		# Root
-	"/mnt/home"	# Home
+	# This contains the mount paths mapped to the partition name
+	# Note:
+	#   - Please seperate all parameters with delimiter ','
+	#   - Please seperate all subvalues with delimiter ';'
+	#
+	# Syntax:
+	# [Partition Name],[mount path]
+	#
+	# Some Manadatory partition names:
+	#   - For Boot Partition : 'Boot'
+	#   - For Root Partition : 'Root'
+	"Boot,/mnt/boot"	# Boot
+	"Root,/mnt"			# Root
+	"Home,/mnt/home"	# Home
 )
 pacstrap_pkgs=(
 		# EDIT: MODIFY THIS

@@ -1,17 +1,26 @@
 #!/bin/env bash
 : "
 Distro Install Script
-Modular, Portable, Customizable and Configurable script that can be modified into other distro installers
+A Modular, Portable, Customizable and Configurable script that can be modified into other distro installers 
+as a template (WIP)
+
+Name is TBC, for the time being, it is 'distinstall' (horrendous name, needs change)
 =====================================
 ## Information
 + Author: Asura
 - Features: 
     + Full minimal user input install script
+    + Custom
+    + Reusable
+    + Command Line Argument support for instant running
+
 - Dependencies
     + arch-install-scripts
     + build-devel
+
 - Recommendation
     + Download the Makefile in the same directory as the script
+
 ### Background Information: 
 + A full minimal user-input, modular install script that allows user to
     change just afew variables and be able to effectively customize their system according to what they need
@@ -43,7 +52,7 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-PROGRAM_VERSION="v1.3.0"
+PROGRAM_VERSION="v1.3.5"
 MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 cfg_name="config.sh"
@@ -74,7 +83,7 @@ Command Line (CLI) Arguments:
         - With Arguments
             + -c [config-file-name] | --config      [config-file-name] : Set custom configuration file name
             + -d [target-disk-name] | --target-disk [target-disk-name] : Set target disk name
-            + -m [DEBUG|RELEASE]    | --mode        [MODE|RELEASE]     : Set mode (DEBUG|RELEASE)
+            + -m [DEBUG|RELEASE]    | --mode        [DEBUG|RELEASE]    : Set mode (DEBUG|RELEASE)
         - Flags
             + -g | --generate-config    : Generate configuration file
             + -h | --help               : Display this help menu and all commands/command line arguments
@@ -99,20 +108,29 @@ Examples:
     3. Test Install; with target disk name specified with environment variable TARGET_DISK_NAME
         TARGET_DISK_NAME="/dev/sdX" $0 start
 
-    4. Start installation (Did not specify target disk name explicitly)
+    4. Test Install; with custom configuration file
+        $0 -c "new config file" -d "/dev/sdX" start
+
+    5. Start installation (Did not specify target disk name explicitly)
         sudo $0 -m RELEASE start
 
-    5. Start installation (with target disk name specified as flag)
+    6. Start installation (with target disk name specified as flag)
         sudo $0 -d "/dev/sdX" -m RELEASE start
 
-    6. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
+    7. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
         sudo TARGET_DISK_NAME="/dev/sdX" $0 -m RELEASE start
 
-    7. Test Install; using Makefile
+    8. Start installation (with custom configuration file)
+        sudo ./distinstall -c "new config file" -d "/dev/sdX" -m RELEASE start
+
+    9. Test Install; using Makefile
         make testinstall
 
-    8. Start installation; using Makefile
+    10. Start installation; using Makefile
         sudo make install
+
+    11. Dis/Unmount using Makefile
+        sudo make clean
 EOF
 	)
     echo -e "$help_msg"
@@ -210,24 +228,34 @@ boot_Partition=(
     "3;Home;primary;ext4;<x1MiB>;100%;False;NIL"
 )
 mount_Paths=(
-    # Append this and append a [n]="\${mount_Paths[<n-1>]}" in
-    "/mnt/boot"	# Boot
-    "/mnt"		# Root
-    "/mnt/home"	# Home
+    # This contains the mount paths mapped to the partition name
+    # Note:
+    #   - Please seperate all parameters with delimiter ','
+    #   - Please seperate all subvalues with delimiter ';'
+    #
+    # Syntax:
+    # [Partition Name],[mount path]
+    #
+    # Some Manadatory partition names:
+    #   - For Boot Partition : 'Boot'
+    #   - For Root Partition : 'Root'
+    "Boot,/mnt/boot"	# Boot
+    "Root,/mnt"		    # Root
+    "Home,/mnt/home"	# Home
 )
 pacstrap_pkgs=(
-        # EDIT: MODIFY THIS
-        # Add the packages you want to strap in here
-        "base"
-        "linux"
-        "linux-firmware"
-        "linux-lts"
-        "linux-lts-headers"
-        "base-devel"
-        "nano"
-        "vim"
-        "networkmanager"
-        "os-prober"
+    # EDIT: MODIFY THIS
+    # Add the packages you want to strap in here
+    "base"
+    "linux"
+    "linux-firmware"
+    "linux-lts"
+    "linux-lts-headers"
+    "base-devel"
+    "nano"
+    "vim"
+    "networkmanager"
+    "os-prober"
 )
 location_Region="<your-region (Asia|US etc)>" # Refer to /usr/share/zoneinfo for your region
 location_City="<your-city (Singapore etc)>" # Refer to /usr/share/zoneinfo/<your-region> for your City
@@ -258,6 +286,36 @@ EOF
     )
     echo -e "$cfg" > $cfg_name && chmod +x $cfg_name
     echo -e "Config file template generated."
+}
+unset_arr_value()
+{
+    : "
+    Unset an array value by its position 
+
+    Returns an array using Named References
+
+    :: Parameters
+        1 : Target value to search and unset
+        2 : The array container to return to
+        3 : Your target arr to parse in
+    "
+    target_value="$1"
+    declare -n ret_val=$2
+    in_arr=("${@:3}")
+    tmp_arr=("${in_arr[@]}")
+
+    for i in ${!tmp_arr[@]}; do
+        # Get value of current index
+        curr_val="${tmp_arr[$i]}"
+ 
+        # Check if current value is the target
+        if [[ "$curr_val" == "$target_value" ]]; then
+            unset tmp_arr[$i]
+        fi
+    done
+
+    # Return array
+    ret_val=("${tmp_arr[@]}")
 }
 
 # Installation stages
@@ -410,46 +468,104 @@ mount_Disks()
 	
 	# --- Input
 	# Local Vairiables
-	device_Name="${device_Parameters["device_Name"]}"
-	device_Label="${device_Parameters["device_Label"]}"
-	
-	# Directories
-	dir_Boot="${mount_Group["1"]}"
-	dir_Mount="${mount_Group["2"]}"
-	dir_Home="${mount_Group["3"]}"
+    device_Name="${device_Parameters["device_Name"]}"
+    device_Label="${device_Parameters["device_Label"]}"
+    partition_Name=partition_Parameters["part_Name"]
+    mount_Names=("${!mount_Group[@]}") # Temporary storage to hold the partition names for removal
 
-	# --- Processing
-	# Mount the root volume to /mnt
-	if [[ "$MODE" == "DEBUG" ]]; then
-		echo mount "$device_Name"2 $dir_Mount
-	else
-		mount "$device_Name"2 $dir_Mount
-	fi
+    # Get mount partition numbers
+    declare -A mount_path_Index=()
+    for path_Index in "${!mount_Paths[@]}"; do
+        # Get mount path information
+        # Column 1 = Partition Name
+        # Column 2 = Mount Path
+        path_Info="${mount_Paths[$path_Index]}"
+		curr_partition_Name="$(echo $path_Info | cut -d ',' -f1)"
+        curr_partition_Path="$(echo $path_Info | cut -d ',' -f2)"
 
-	# Make other directories (i.e. home)
-	# Home Directory
-	if [[ "$MODE" == "DEBUG" ]]; then
-		echo mkdir -p $dir_Home
-	else
-		mkdir -p $dir_Home
-	fi
-	# Boot Directory
-	if [[ "$MODE" == "DEBUG" ]]; then
-		echo mkdir -p $dir_Boot
-	else
-		mkdir -p $dir_Boot
-	fi
+        # Increment by 1 to make it human-readable (Counter by 1)
+        counter=$((path_Index + 1))
 
-	# Mount remaining directories
-	if [[ "$MODE" == "DEBUG" ]]; then
-		echo mount "$device_Name"3 $dir_Home
-		echo mount "$device_Name"1 $dir_Boot
-	else
-		mount "$device_Name"3 $dir_Home
-		mount "$device_Name"1 $dir_Boot
-	fi
+        # Assign path index number to the partition name
+        mount_path_Index[$curr_partition_Name]=$counter
+    done
 
-	# --- Output
+    # Mount root partition
+    mount_dir="${mount_Group[Root]}"
+    
+    ## Create directories if does not exists
+    if [[ ! -d "$mount_dir" ]]; then
+        ### Directory does not exist
+        if [[ "$MODE" == "DEBUG" ]]; then
+            echo mkdir -p "$mount_dir"
+        else
+            mkdir -p "$mount_dir"
+        fi
+    fi
+
+    ## --- Processing
+    ### Mount the volume to the path
+    if [[ "$MODE" == "DEBUG" ]]; then
+        echo mount "$device_Name"${mount_path_Index["Root"]} $mount_dir
+    else
+        mount "$device_Name"${mount_path_Index["Root"]} $mount_dir && \
+            echo -e "Partition [Root] Mounted." || \
+            echo -e "Error mounting Partition [Root]"
+    fi   
+
+    ### Unset/Remove Root partition from mount list
+    unset_arr_value "Root" mount_Names "${mount_Names[@]}"
+
+    # Mount boot partition
+    boot_dir="${mount_Group[Boot]}"
+
+    ## Create directories if does not exists
+    if [[ ! -d "$boot_dir" ]]; then
+        ### Directory does not exist
+        if [[ "$MODE" == "DEBUG" ]]; then
+            echo mkdir -p "$boot_dir"
+        else
+            mkdir -p "$boot_dir"
+        fi
+    fi
+
+    ## --- Processing
+    ### Mount the volume to the path
+    if [[ "$MODE" == "DEBUG" ]]; then
+        echo mount "$device_Name"${mount_path_Index["Boot"]} $boot_dir
+    else
+        mount "$device_Name"${mount_path_Index["Boot"]} $boot_dir && \
+            echo -e "Partition [Boot] Mounted." || \
+            echo -e "Error mounting Partition [Boot]"
+    fi
+
+    ### Unset/Remove Boot partition from mount list
+    unset_arr_value "Boot" mount_Names "${mount_Names[@]}"
+ 
+    # Mount all other partitions
+    for part_Names in "${mount_Names[@]}"; do
+        part_mount_dir="${mount_Group[$part_Names]}"
+
+        ## Create directories if does not exists
+        if [[ ! -d "$part_mount_dir" ]]; then
+            ### Directory does not exist
+            if [[ "$MODE" == "DEBUG" ]]; then
+                echo mkdir -p "$part_mount_dir"
+            else
+                mkdir -p "$part_mount_dir"
+            fi
+        fi
+
+        ## --- Processing
+        ### Mount the volume to the path
+        if [[ "$MODE" == "DEBUG" ]]; then
+            echo mount "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir
+        else
+            mount "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir && \
+                echo -e "Partition [$part_Names] Mounted." || \
+                echo -e "Error mounting Partition [$part_Names]"
+        fi
+    done
 }
 
 pacstrap_Install()
@@ -470,8 +586,7 @@ pacstrap_Install()
 	pacstrap_Pkgs=${pkgs["pacstrap"]}
 
 	# Local Variables
-	mount_Point=${mount_Group["2"]}
-
+	mount_Point=${mount_Group["Root"]}
 
 	# --- Processing
 	if [[ "$MODE" == "DEBUG" ]]; then
@@ -493,7 +608,7 @@ fstab_Generate()
 
 	# --- Input
 	# Local Variables
-	dir_Mount="${mount_Group["2"]}"
+	dir_Mount="${mount_Group["Root"]}" # Look for root/mount partition
 
 	# Generate an fstab file (use -U or -L to define by UUID or labels, respectively):
 	if [[ "$MODE" == "DEBUG" ]]; then
@@ -513,7 +628,7 @@ arch_chroot_Exec()
 	# Local Variables
 	device_Name="${device_Parameters["device_Name"]}"
 	device_Label="${device_Parameters["device_Label"]}"
-	dir_Mount="${mount_Group["2"]}"
+	dir_Mount="${mount_Group["Root"]}"
 	region="${location["region"]}"
 	city="${location["city"]}"
 	language="${location["language"]}"
@@ -994,7 +1109,7 @@ postinstall_sanitize()
 	# from any unnecessary files #
 	# ========================== #
 	# Local Variables
-	dir_Mount="${mount_Group["2"]}"
+	dir_Mount="${mount_Group["Root"]}"
 
 	number_of_external_scripts="${#external_scripts[@]}"
 	echo -e "External Scripts created:"
@@ -1022,9 +1137,12 @@ postinstall_sanitize()
 						u_home_Dir="${curr_user_Params[3]}"             # Home Directory
 						u_other_Params="${curr_user_Params[@]:4}"       # Any other parameters after the first 3
 
-						echo "Copying from [$PWD] : curl_repositories.sh => /mnt/$u_home_Dir"
-						cp curl_repositories.sh /mnt/$u_home_Dir/curl_repositories.sh														# Copy script from root to user
-						arch-chroot $dir_Mount /bin/bash -c "chown -R $u_name:$u_primary_Group $u_home_Dir/curl_repositories.sh"		# Change ownership of file to user
+                        for ((i=0; i < $number_of_external_scripts; i++)); do
+                            curr_script="${external_scripts[$i]}"
+                            echo "Copying from [$dir_Mount] : $curr_script => /mnt/$u_home_Dir"
+                            cp $curr_script /mnt/$u_home_Dir/														# Copy script from root to user
+                            # arch-chroot $dir_Mount /bin/bash -c "chown -R $u_name:$u_primary_Group $u_home_Dir/$curr_script"		# Change ownership of file to user
+                        done
 					done
 					;;
 				"S" | "Select")
@@ -1032,9 +1150,14 @@ postinstall_sanitize()
 					read -p "User name: " sel_uhome
 					sel_primary_group=$(arch-chroot $dir_Mount /bin/bash -c "su - $sel_uhome -c 'echo \$(id -gn $sel_uhome)'")
 					sel_uhome_dir=$(arch-chroot $dir_Mount /bin/bash -c "su - $sel_uhome -c 'echo \$HOME'")
-					echo "Copying from [$PWD] : curl_repositories.sh => /mnt/$sel_uhome_dir/curl_repositories.sh"
-					cp curl_repositories.sh /mnt/$sel_uhome_dir/curl_repositories.sh
-					arch-chroot $dir_Mount /bin/bash -c "chown -R $sel_uhome:$sel_primary_group $sel_uhome_dir/curl_repositories.sh"		# Change ownership of file to user
+
+                    # Start copy
+                    for ((i=0; i < $number_of_external_scripts; i++)); do
+                        curr_script="${external_scripts[$i]}"
+                        echo "Copying from [$dir_Mount] : $curr_script => /mnt/$sel_uhome_dir/"
+                        cp $curr_script /mnt/$sel_uhome_dir/
+                        # arch-chroot $dir_Mount /bin/bash -c "chown -R $sel_uhome:$sel_primary_group $sel_uhome_dir/$curr_script"		# Change ownership of file to user
+                    done
 					;;
 				*)
 					;;
@@ -1318,10 +1441,15 @@ setup()
         # Please append according to your needs
         # [Syntax]
         # ROW_ID="<partition_ID>;<partition_Name>;<partition_file_Type>;<partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
-        [1]="${boot_Partition[0]}"
-        [2]="${boot_Partition[1]}"
-        [3]="${boot_Partition[2]}"
+        # [1]="${boot_Partition[0]}"
+        # [2]="${boot_Partition[1]}"
+        # [3]="${boot_Partition[2]}"
     )
+    for curr_partition_row in "${!boot_Partition[@]}"; do
+        curr_partition="${boot_Partition[$curr_partition_row]}"
+        count=$((curr_partition_row+1))
+        partition_Configuration[$count]=$curr_partition
+    done
 
     partition_Parameters=(
         # This is the default container for partition parameters
@@ -1340,15 +1468,31 @@ setup()
 
     ### Mounts
     mount_Group=(
+        # This corresponds to the configuration variable 'mount_Paths'
+        #
         # EDIT: Modify this
         # Place all your partition path 
-        #	corresponding to the partition number
+        #	corresponding to the partition name
+        #
         # [Syntax]
-        #   [partition-n]="/partition/mount/path"
-        [1]="${mount_Paths[0]}"	# Boot
-        [2]="${mount_Paths[1]}"	# Root
-        [3]="${mount_Paths[2]}"	# Home
+        #   [partition-name]="/partition/mount/path"
+        #
+        # [Example]
+        #     [Boot]="${mount_Paths[0]}"	# Boot
+        #     [Root]="${mount_Paths[1]}"	# Root
+        #     [Home]="${mount_Paths[2]}"	# Home
     )
+    for i in ${!mount_Paths[@]}; do
+        # Get current mount row
+        curr_mount_row=${mount_Paths[$i]}
+
+        # Get mount directory and partition name from path definition
+        part_Name="$(echo $curr_mount_row | cut -d ',' -f1)"
+        mount_dir="$(echo $curr_mount_row | cut -d ',' -f2)"
+
+        # Set Key-Value
+        mount_Group[$part_Name]=$mount_dir
+    done
 
     ### Region & Location
     location=(
@@ -1389,8 +1533,12 @@ setup()
         # "
         # [Examples]
         # [1]="username,wheel,NIL,/home/profiles/username"
-        [1]="${user_ProfileInfo[0]}"
+        # [1]="${user_ProfileInfo[0]}"
     )
+    for curr_profile_row in "${!user_ProfileInfo[@]}"; do
+        curr_profile="${user_ProfileInfo[$curr_profile_row]}"
+        user_Info[$curr_profile_row]=$curr_profile
+    done
 
     ### Network Configurations
     network_config=(

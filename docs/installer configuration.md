@@ -131,21 +131,29 @@
 			```
 - mount_Paths : Specify all paths and directories you want to mount corresponding to the partition number specified in 'boot_Partition'
 	+ Data Type: ArrayList; List
+	- Notes
+		+ Please seperate all parameters with delimiter ','
+		+ Please seperate all subvalues with delimiter ';'
+	- Syntax/Synopsis
+		- Components
+			+ Partition Name : This is the name of the partition you wish to mount the corresponding mount path to; the partition name is the same as the one specified in 'boot_Partition'
+			+ Mount Path : This is the path to the mount filesystem/directory
 	- Structure
 		```shellscript
 		mount_Paths=(
 			# Add a seperate path/directory you want to mount corresponding to the partition number specified in 'boot_Partition'
-			"/directory/to/mount/filesystem/or/directory/path/1" # partition 1
-			"/directory/to/mount/filesystem/or/directory/path/2" # partition 2
-			"/directory/to/mount/filesystem/or/directory/path/3" # partition 3
+			# "[Partition Name],[Mount Path]"
+			"Partition Name,/directory/to/mount/filesystem/or/directory/path/1" # partition 1
+			"Partition Name,/directory/to/mount/filesystem/or/directory/path/2" # partition 2
+			"Partition Name,/directory/to/mount/filesystem/or/directory/path/3" # partition 3
 		)
 		```
 	- Examples
 		```shellscript
 		mount_Paths=(
-			"/mnt/boot"	# Boot
-			"/mnt"		# Root
-			"/mnt/home"	# Home
+			"Boot,/mnt/boot"	# Boot
+			"Root,/mnt"         # Root
+			"Home,/mnt/home"	# Home
 		)
 		```
 

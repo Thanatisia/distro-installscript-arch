@@ -10,7 +10,7 @@ MOUNT_PATHS = "/mnt/boot" "/mnt" "/mnt/home"
 # Program Variables
 ENV = TARGET_DISK_NAME="$(TARGET_DISK)"	# Environment Variables
 SCRIPT = "distinstall"					# Script Filename
-CFLAGS = "RELEASE"						# Compilation Flags
+CFLAGS =         						# Compilation Flags
 
 # [Commands]
 CMD = $(ENV) ./$(SCRIPT)
@@ -41,18 +41,20 @@ init:
 testinstall: init
 	## Run the install script testsuite
 	# - Run this with sudo for username verification
-	$(CMD)
+	$(CMD) $(CFLAGS) start
 
 install: clean
 	## Run the install script and install
 	# WARNING: This will overwrite the target disk/filesystem, please be careful
 	# - Run this with sudo
-	$(CMD) $(CFLAGS)
+	$(eval CFLAGS=-m "RELEASE")
+	$(CMD) $(CFLAGS) start
 
 genscript:
 	## Run install-gen and generate the commands to install and
 	# Output as a script file for backup
-	./install-gen
+	# Still in testing and development phase
+	@makes -s testinstall | tee -a commands.sh
 
 clean: 
 	## Clean all temporary files and unmount drives 
