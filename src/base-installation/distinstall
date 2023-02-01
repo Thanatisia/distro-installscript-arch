@@ -1,7 +1,7 @@
 #!/bin/env bash
 : "
 Distro Install Script
-A Modular, Portable, Customizable and Configurable script that can be modified into other distro installers
+A Modular, Portable, Customizable and Configurable script that can be modified into other distro installers 
 as a template (WIP)
 
 Name is TBC, for the time being, it is 'distinstall' (horrendous name, needs change)
@@ -228,34 +228,34 @@ boot_Partition=(
     "3;Home;primary;ext4;<x1MiB>;100%;False;NIL"
 )
 mount_Paths=(
-	# This contains the mount paths mapped to the partition name
-	# Note:
-	#   - Please seperate all parameters with delimiter ','
-	#   - Please seperate all subvalues with delimiter ';'
-	#
-	# Syntax:
-	# [Partition Name],[mount path]
-	#
-	# Some Manadatory partition names:
-	#   - For Boot Partition : 'Boot'
-	#   - For Root Partition : 'Root'
-	"Boot,/mnt/boot"	# Boot
-	"Root,/mnt"			# Root
-	"Home,/mnt/home"	# Home
+    # This contains the mount paths mapped to the partition name
+    # Note:
+    #   - Please seperate all parameters with delimiter ','
+    #   - Please seperate all subvalues with delimiter ';'
+    #
+    # Syntax:
+    # [Partition Name],[mount path]
+    #
+    # Some Manadatory partition names:
+    #   - For Boot Partition : 'Boot'
+    #   - For Root Partition : 'Root'
+    "Boot,/mnt/boot"	# Boot
+    "Root,/mnt"		    # Root
+    "Home,/mnt/home"	# Home
 )
 pacstrap_pkgs=(
-        # EDIT: MODIFY THIS
-        # Add the packages you want to strap in here
-        "base"
-        "linux"
-        "linux-firmware"
-        "linux-lts"
-        "linux-lts-headers"
-        "base-devel"
-        "nano"
-        "vim"
-        "networkmanager"
-        "os-prober"
+    # EDIT: MODIFY THIS
+    # Add the packages you want to strap in here
+    "base"
+    "linux"
+    "linux-firmware"
+    "linux-lts"
+    "linux-lts-headers"
+    "base-devel"
+    "nano"
+    "vim"
+    "networkmanager"
+    "os-prober"
 )
 location_Region="<your-region (Asia|US etc)>" # Refer to /usr/share/zoneinfo for your region
 location_City="<your-city (Singapore etc)>" # Refer to /usr/share/zoneinfo/<your-region> for your City
@@ -286,6 +286,36 @@ EOF
     )
     echo -e "$cfg" > $cfg_name && chmod +x $cfg_name
     echo -e "Config file template generated."
+}
+unset_arr_value()
+{
+    : "
+    Unset an array value by its position 
+
+    Returns an array using Named References
+
+    :: Parameters
+        1 : Target value to search and unset
+        2 : The array container to return to
+        3 : Your target arr to parse in
+    "
+    target_value="$1"
+    declare -n ret_val=$2
+    in_arr=("${@:3}")
+    tmp_arr=("${in_arr[@]}")
+
+    for i in ${!tmp_arr[@]}; do
+        # Get value of current index
+        curr_val="${tmp_arr[$i]}"
+ 
+        # Check if current value is the target
+        if [[ "$curr_val" == "$target_value" ]]; then
+            unset tmp_arr[$i]
+        fi
+    done
+
+    # Return array
+    ret_val=("${tmp_arr[@]}")
 }
 
 # Installation stages
@@ -438,30 +468,102 @@ mount_Disks()
 	
 	# --- Input
 	# Local Vairiables
-	device_Name="${device_Parameters["device_Name"]}"
-	device_Label="${device_Parameters["device_Label"]}"
+    device_Name="${device_Parameters["device_Name"]}"
+    device_Label="${device_Parameters["device_Label"]}"
+    partition_Name=partition_Parameters["part_Name"]
+    mount_Names=("${!mount_Group[@]}") # Temporary storage to hold the partition names for removal
 
-    # Mount all specified in the mount group
-    for i in "${!mount_Group[@]}"; do
-        # Get current directory
-        curr_dir="${mount_Group[$i]}"
+    # Get mount partition numbers
+    declare -A mount_path_Index=()
+    for path_Index in "${!mount_Paths[@]}"; do
+        # Get mount path information
+        # Column 1 = Partition Name
+        # Column 2 = Mount Path
+        path_Info="${mount_Paths[$path_Index]}"
+		curr_partition_Name="$(echo $path_Info | cut -d ',' -f1)"
+        curr_partition_Path="$(echo $path_Info | cut -d ',' -f2)"
 
-        # Create directories if does not exists
-        if [[ ! -d "$curr_dir" ]]; then
-            # Directory does not exist
+        # Increment by 1 to make it human-readable (Counter by 1)
+        counter=$((path_Index + 1))
+
+        # Assign path index number to the partition name
+        mount_path_Index[$curr_partition_Name]=$counter
+    done
+
+    # Mount root partition
+    mount_dir="${mount_Group[Root]}"
+    
+    ## Create directories if does not exists
+    if [[ ! -d "$mount_dir" ]]; then
+        ### Directory does not exist
+        if [[ "$MODE" == "DEBUG" ]]; then
+            echo mkdir -p "$mount_dir"
+        else
+            mkdir -p "$mount_dir"
+        fi
+    fi
+
+    ## --- Processing
+    ### Mount the volume to the path
+    if [[ "$MODE" == "DEBUG" ]]; then
+        echo mount "$device_Name"${mount_path_Index["Root"]} $mount_dir
+    else
+        mount "$device_Name"${mount_path_Index["Root"]} $mount_dir && \
+            echo -e "Partition [Root] Mounted." || \
+            echo -e "Error mounting Partition [Root]"
+    fi   
+
+    ### Unset/Remove Root partition from mount list
+    unset_arr_value "Root" mount_Names "${mount_Names[@]}"
+
+    # Mount boot partition
+    boot_dir="${mount_Group[Boot]}"
+
+    ## Create directories if does not exists
+    if [[ ! -d "$boot_dir" ]]; then
+        ### Directory does not exist
+        if [[ "$MODE" == "DEBUG" ]]; then
+            echo mkdir -p "$boot_dir"
+        else
+            mkdir -p "$boot_dir"
+        fi
+    fi
+
+    ## --- Processing
+    ### Mount the volume to the path
+    if [[ "$MODE" == "DEBUG" ]]; then
+        echo mount "$device_Name"${mount_path_Index["Boot"]} $boot_dir
+    else
+        mount "$device_Name"${mount_path_Index["Boot"]} $boot_dir && \
+            echo -e "Partition [Boot] Mounted." || \
+            echo -e "Error mounting Partition [Boot]"
+    fi
+
+    ### Unset/Remove Boot partition from mount list
+    unset_arr_value "Boot" mount_Names "${mount_Names[@]}"
+ 
+    # Mount all other partitions
+    for part_Names in "${mount_Names[@]}"; do
+        part_mount_dir="${mount_Group[$part_Names]}"
+
+        ## Create directories if does not exists
+        if [[ ! -d "$part_mount_dir" ]]; then
+            ### Directory does not exist
             if [[ "$MODE" == "DEBUG" ]]; then
-                echo mkdir -p "$curr_dir"
+                echo mkdir -p "$part_mount_dir"
             else
-                mkdir -p "$curr_dir"
+                mkdir -p "$part_mount_dir"
             fi
         fi
 
-        # --- Processing
-        # Mount the volume to the path
+        ## --- Processing
+        ### Mount the volume to the path
         if [[ "$MODE" == "DEBUG" ]]; then
-            echo mount "$device_Name"$i $curr_dir
+            echo mount "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir
         else
-            mount "$device_Name"$i $curr_dir
+            mount "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir && \
+                echo -e "Partition [$part_Names] Mounted." || \
+                echo -e "Error mounting Partition [$part_Names]"
         fi
     done
 }
@@ -484,8 +586,7 @@ pacstrap_Install()
 	pacstrap_Pkgs=${pkgs["pacstrap"]}
 
 	# Local Variables
-	mount_Point=${mount_Group["2"]}
-
+	mount_Point=${mount_Group["Root"]}
 
 	# --- Processing
 	if [[ "$MODE" == "DEBUG" ]]; then
@@ -507,7 +608,7 @@ fstab_Generate()
 
 	# --- Input
 	# Local Variables
-	dir_Mount="${mount_Group["2"]}"
+	dir_Mount="${mount_Group["Root"]}" # Look for root/mount partition
 
 	# Generate an fstab file (use -U or -L to define by UUID or labels, respectively):
 	if [[ "$MODE" == "DEBUG" ]]; then
@@ -527,7 +628,7 @@ arch_chroot_Exec()
 	# Local Variables
 	device_Name="${device_Parameters["device_Name"]}"
 	device_Label="${device_Parameters["device_Label"]}"
-	dir_Mount="${mount_Group["2"]}"
+	dir_Mount="${mount_Group["Root"]}"
 	region="${location["region"]}"
 	city="${location["city"]}"
 	language="${location["language"]}"
@@ -1008,7 +1109,7 @@ postinstall_sanitize()
 	# from any unnecessary files #
 	# ========================== #
 	# Local Variables
-	dir_Mount="${mount_Group["2"]}"
+	dir_Mount="${mount_Group["Root"]}"
 
 	number_of_external_scripts="${#external_scripts[@]}"
 	echo -e "External Scripts created:"
@@ -1367,19 +1468,30 @@ setup()
 
     ### Mounts
     mount_Group=(
+        # This corresponds to the configuration variable 'mount_Paths'
+        #
         # EDIT: Modify this
         # Place all your partition path 
-        #	corresponding to the partition number
+        #	corresponding to the partition name
+        #
         # [Syntax]
-        #   [partition-n]="/partition/mount/path"
-        # [1]="${mount_Paths[0]}"	# Boot
-        # [2]="${mount_Paths[1]}"	# Root
-        # [3]="${mount_Paths[2]}"	# Home
+        #   [partition-name]="/partition/mount/path"
+        #
+        # [Example]
+        #     [Boot]="${mount_Paths[0]}"	# Boot
+        #     [Root]="${mount_Paths[1]}"	# Root
+        #     [Home]="${mount_Paths[2]}"	# Home
     )
-    for curr_mount_row in "${!mount_Paths[@]}"; do
-        curr_mount="${mount_Paths[$curr_mount_row]}"
-        count=$((curr_mount_row+1))
-        mount_Group[$count]=$curr_mount
+    for i in ${!mount_Paths[@]}; do
+        # Get current mount row
+        curr_mount_row=${mount_Paths[$i]}
+
+        # Get mount directory and partition name from path definition
+        part_Name="$(echo $curr_mount_row | cut -d ',' -f1)"
+        mount_dir="$(echo $curr_mount_row | cut -d ',' -f2)"
+
+        # Set Key-Value
+        mount_Group[$part_Name]=$mount_dir
     done
 
     ### Region & Location
