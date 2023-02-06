@@ -22,9 +22,10 @@ Documentations for Base Installation script [distinstall]
 ### Obtaining
 - Installer
     1. via cloning (Whole)
-        - This method will require you to download/clone the entire repository
-
-        + Syntax: git clone https://github.com/Thanatisia/distro-installscript-arch
+        + This method will require you to download/clone the entire repository
+        ```console
+        git clone https://github.com/Thanatisia/distro-installscript-arch
+        ```
 
     2. via cloning (Folder)
         - This method will use the git 'sparse-checkout' to download a specific folder in the repository
@@ -67,9 +68,10 @@ Documentations for Base Installation script [distinstall]
             ```console
             curl -L -O https://raw.githubusercontent.com/<author>/<repository_name>/<branch>/[folder/to/script_name.sh]
             ```
-        - Examples:
-            - Development Branch (Deprecating soon in favour of the proper branch-PR method): https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/dev/src/distinstall
-            - Stable : https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/distinstall
+        - Usage
+            ```console
+            curl -L -O https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/distinstall
+            ```
 
 - Makefile
     - (OPTIONAL) Obtaining Makefile
@@ -87,9 +89,17 @@ Documentations for Base Installation script [distinstall]
 
 - All necessary files
     > Includes the above - Installer, config file and additional utilities
-    - Downloading the latest release
+    - Download the latest release from 'https://github.com/Thanatisia/distro-installscript-arch/releases/latest'
+
+- Download via the Makefile
+    - Download Makefile
         ```console
-        wget "https://github.com/Thanatisia/distro-installscript-arch/releases/latest/distinstall-*.zip"
+        curl -L -O https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/Makefile
+        ```
+    - Execute the 'download' rule/target
+        + You should get all the necessary files required (i.e. installer, generated configuration file)
+        ```console
+        make download
         ```
 
 ### Preparation/Setup
@@ -124,6 +134,11 @@ Documentations for Base Installation script [distinstall]
 
 - (OPTIONAL) Backup the config file for re-usage
 
++ Change Permission for use (Execute [+x])
+	```console
+	chmod +x distinstall
+	```
+
 ### Installation/Compilation
 > Currently installation is not required as it is using shellscript, however, there are plans on making a Rust-based/python installer for even easier configuration
 
@@ -139,10 +154,13 @@ Documentations for Base Installation script [distinstall]
     - With Arguments
         + -c [config-file-name] | --config      [config-file-name] : Set custom configuration file name
         + -d [target-disk-name] | --target-disk [target-disk-name] : Set target disk name
+        + -e [default-editor]   | --editor      [default-editor]   : Set default text editor
         + -m [DEBUG|RELEASE]    | --mode        [DEBUG|RELEASE]    : Set mode (DEBUG|RELEASE)
     - Flags
         + -g | --generate-config    : Generate configuration file
         + -h | --help               : Display this help menu and all commands/command line arguments
+        + --fdisk                   : Open up fdisk for manual partition configuration
+        + --cfdisk                  : Open up cfdisk for manual partition configuration
 
 - Positional Parameters
     + start : Start the installer
@@ -189,58 +207,35 @@ Documentations for Base Installation script [distinstall]
     sudo ./distinstall -c "new config file" -d "/dev/sdX" -m RELEASE start
     ```
 
-9. Test Install; using Makefile
+9. Open up fdisk for Manual Partitioning
+    ```console
+    sudo ./distinstall --fdisk
+    ```
+
+10. Open up cfdisk for Manual Partitioning
+    ```console
+    sudo ./distinstall --cfdisk
+    ```
+
+11. Test Install; using Makefile
     ```console
     make testinstall
     ```
 
-10. Start installation; using Makefile
+12. Start installation; using Makefile
     ```console
     sudo make install
     ```
 
-11. Dis/Unmount using Makefile
+13. Dis/Unmount using Makefile
     ```console
     sudo make clean
     ```
 
-1. Change Permission for use (Execute [+x])
-	```console
-	chmod +x distinstall
-	```
-
-2. (OPTIONAL) If you want to test before official use (RECOMMENDED)
-	```console
-    TARGET_DISK_NAME='/dev/sdX' (./)distinstall           : Run in DEBUG mode	
-	```	
-
-3. Run Program
-	```console
-    TARGET_DISK_NAME='/dev/sdX' (./)distinstall RELEASE   : Run installation	
-	```
-    
-4. Let Program run and just input your answers if there are any prompts
-
-5. (OPTIONAL) using the provided Makefile
-    - Download Makefile
-        ```console
-        curl -L -O https://raw.githubusercontent.com/Thanatisia/main/docs/configs/Makefile
-        ```
-        
-    - Start test installation (outputs the steps and standard output)
-        ```console
-        make testinstall
-        ```
-        
-    - Start full installation
-        ```console
-        sudo make install
-        ```
-        
-    - Clean all temporary variables and unmount drives mounted
-        ```console
-        sudo make clean
-        ```
+14. Generate configuration file using Makefile
+    ```console
+    make genscript
+    ```
 
 ## Configuration and Customization
 
