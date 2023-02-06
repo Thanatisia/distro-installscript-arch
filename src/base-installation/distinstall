@@ -52,7 +52,7 @@ References:
 PROGRAM_SCRIPTNAME="installer"
 PROGRAM_NAME="ArchLinux Profile Setup Installer"
 PROGRAM_TYPE="Main"
-PROGRAM_VERSION="v1.3.5"
+PROGRAM_VERSION="v1.4.0"
 MODE="DEBUG" # { DEBUG | RELEASE }
 DISTRO="ArchLinux"
 cfg_name="config.sh"
@@ -83,10 +83,13 @@ Command Line (CLI) Arguments:
         - With Arguments
             + -c [config-file-name] | --config      [config-file-name] : Set custom configuration file name
             + -d [target-disk-name] | --target-disk [target-disk-name] : Set target disk name
+            + -e [default-editor]   | --editor      [default-editor]   : Set default text editor
             + -m [DEBUG|RELEASE]    | --mode        [DEBUG|RELEASE]    : Set mode (DEBUG|RELEASE)
         - Flags
             + -g | --generate-config    : Generate configuration file
             + -h | --help               : Display this help menu and all commands/command line arguments
+            + --fdisk                   : Open up fdisk for manual partition configuration
+            + --cfdisk                  : Open up cfdisk for manual partition configuration
 
     - Positional Parameters
         + start : Start the installer
@@ -123,14 +126,23 @@ Examples:
     8. Start installation (with custom configuration file)
         sudo ./distinstall -c "new config file" -d "/dev/sdX" -m RELEASE start
 
-    9. Test Install; using Makefile
+    9. Open up fdisk for manual partition configuration
+        sudo ./distinstall --fdisk
+
+    10. Open up fdisk for manual partition configuration
+        sudo ./distinstall --cfdisk
+
+    11. Test Install; using Makefile
         make testinstall
 
-    10. Start installation; using Makefile
+    12. Start installation; using Makefile
         sudo make install
 
-    11. Dis/Unmount using Makefile
+    13. Dis/Unmount using Makefile
         sudo make clean
+
+    14. Download the important files (i.e. installer and generate config files) using Makefile
+        sudo make genscript
 EOF
 	)
     echo -e "$help_msg"
@@ -214,15 +226,24 @@ Variables to be imported into the installer file
         . $cfg_name
     fi
 '
-deviceParams_devType="<hdd|ssd|flashdrive|microSD>"
-deviceParams_Name="\$TARGET_DISK_NAME"
-deviceParams_Size="<x {GB | GiB | MB | MiB}>"
-deviceParams_Boot="<mbr|uefi>"
-deviceParams_Label="<msdos|gpt>"
+deviceParams_devType="<hdd|ssd|flashdrive|microSD>" # Your disk/device/file type
+deviceParams_Name="\$TARGET_DISK_NAME" # Your disk/device/file pathname (i.e. /dev/sdX)
+deviceParams_Size="<x {GB | GiB | MB | MiB}>" # Your total disk size
+deviceParams_Boot="<bios|uefi>" # Your bootloader filesystem label type (i.e. BIOS/GPT)
+deviceParams_Label="<msdos|mbr|gpt>" # Your bootloader filesystem label type (i.e. MBR (msdos)/GPT)
 boot_Partition=(
-    # Append this and append a [n]="\${boot_Partition[<n-1>]}" in
-    #	partition_Configuration
-    # <partition_Number>;<partition_Name>;<partition_Type>;<partition_file_Type><partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
+	# [Configuration Synopsis/Syntax]
+    # - MBR Partition Table/MSDOS Bootloader Firmware
+	#   <partition_Number>;<partition_Name>;<partition_Type>;<partition_file_Type><partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
+	# - GPT Partition Table/UEFI Bootloader Firmware
+	#   <partition_Number>;<partition_Label>;<partition_Type>;<partition_filesystem>;<partition_start_Size>;<partition_end_Size>;<partition_Bootable>;<partition_Others>
+	#
+	# [Notes]
+	# - The Boot partition for a GPT partition layout/configuration needs to be an EFI System Partition type
+	#
+	# Some Manadatory partition names:
+	#   - For Boot Partition : 'Boot'
+	#   - For Root Partition : 'Root'
     "1;Boot;primary;ext4;0%;1024MiB;True;NIL"
     "2;Root;primary;ext4;1024MiB;<x1MiB>;False;NIL"
     "3;Home;primary;ext4;<x1MiB>;100%;False;NIL"
@@ -279,9 +300,10 @@ user_ProfileInfo=(
 )
 networkConfig_hostname="<your-network-hostname>" # Similar to workspace group name, used in /etc/hostname
 bootloader="<your-bootloader>" # Your bootloader, at the moment - supported bootloaders are [grub, syslinux], tested: [grub] (TODO: 2022-06-17 2317H : Add more bootloaders (if available))
-bootloader_Params="" # Your Bootloader Parameters - fill this if you have any, leave empty if NIL
+bootloader_directory="/boot/<your-bootloader>" # Your Bootloader's boot mount point; Certain bootloaders (i.e. Grub) have different boot directories based on partition table (i.e. MBR/GPT); Default: /boot/<your-bootloader>
+bootloader_Params="" # Your Bootloader Parameters - fill this if you have any, leave empty if NIL; (If installing on GPT/UEFI) --efi-directory=/boot
 default_kernel="<linux-kernel>" # Your Default Linux Kernel
-platform_Arch="<platform-architecture>" # Your Platform Architecture i.e. [ i386-pc | x86_64 ]   
+platform_Arch="<platform-architecture>" # Your Platform Architecture i.e. [ i386-pc | x86_64-efi (for UEFI|GPT)]
 EOF
     )
     echo -e "$cfg" > $cfg_name && chmod +x $cfg_name
@@ -413,19 +435,35 @@ device_partition_Manager()
 			partition_Parameters["part_Bootable"]="$part_Bootable"
 			partition_Parameters["part_Others"]="$part_Others"
 
+            # Add Partition Layout for current row
+            partition_Layout[$part_Name]="$part_Type,$part_file_Type,$part_start_Size,$part_end_Size,$part_Bootable,$part_Others"
+
 			echo ""
 
             echo "(+) Creating Partition [ $part_ID ]"
 
 			# Create Partition
-			if [[ "$MODE" == "DEBUG" ]]; then
-				echo parted $device_Name mkpart $part_Type $part_file_Type $part_start_Size $part_end_Size
-			else
-				parted $device_Name mkpart $part_Type $part_file_Type $part_start_Size $part_end_Size
-			fi
+            ## Check if disk label/partition table is MBR or GPT
+            case "$device_Label" in
+                "msdos" | "mbr")
+                    if [[ "$MODE" == "DEBUG" ]]; then
+                        echo parted $device_Name mkpart $part_Type $part_file_Type $part_start_Size $part_end_Size
+                    else
+                        parted $device_Name mkpart $part_Type $part_file_Type $part_start_Size $part_end_Size
+                    fi
+                    ;;
+                "gpt")
+                    # Using partition label instead of primary,extended or logical
+                    if [[ "$MODE" == "DEBUG" ]]; then
+                        echo parted $device_Name mkpart $part_Name $part_file_Type $part_start_Size $part_end_Size
+                    else
+                        parted $device_Name mkpart $part_Name $part_file_Type $part_start_Size $part_end_Size
+                    fi
+                    ;;
+            esac
 
 			## Format file system
-			case "$part_file_Type" in 
+			case "$part_file_Type" in
 				"fat32")
 					if [[ "$MODE" == "DEBUG" ]]; then
 						echo mkfs.fat -F32 $device_Name$part_ID
@@ -440,18 +478,45 @@ device_partition_Manager()
 						mkfs.ext4 $device_Name$part_ID
 					fi
 					;;
+                "swap")
+					if [[ "$MODE" == "DEBUG" ]]; then
+						echo mkswap $device_Name$part_ID
+					else
+						mkswap $device_Name$part_ID
+					fi
+                    ;;
 				*)
                     echo "(-) Unknown File System: [$part_file_Type]"
 					;;
 			esac
+
 			## Check bootable
 			if [[ "$part_Bootable" == "True" ]]; then
-				if [[ "$MODE" == "DEBUG" ]]; then
-					echo parted $device_Name set $part_ID boot on
-				else
-					parted $device_Name set $part_ID boot on
-				fi
+                ### Check if disk label is MBR or GPT
+                case "$device_Label" in
+                    "msdos" | "mbr")
+                        if [[ "$MODE" == "DEBUG" ]]; then
+                            echo parted $device_Name set $part_ID boot on
+                        else
+                            parted $device_Name set $part_ID boot on
+                        fi
+                        ;;
+                    "gpt")
+                        if [[ "$MODE" == "DEBUG" ]]; then
+                            echo parted $device_Name set $part_ID esp on
+                        else
+                            parted $device_Name set $part_ID esp on
+                        fi
+                        ;;
+                esac
 			fi
+
+            ## Check Swap partition
+            if [[ "$part_Name" == "Swap" ]]; then
+                if [[ "$MODE" == "DEBUG" ]]; then
+                    swapon $device_Name$part_ID
+                fi
+            fi
 		fi
 	done
 
@@ -470,8 +535,9 @@ mount_Disks()
 	# Local Vairiables
     device_Name="${device_Parameters["device_Name"]}"
     device_Label="${device_Parameters["device_Label"]}"
-    partition_Name=partition_Parameters["part_Name"]
+    partition_Name="${partition_Parameters["part_Name"]}"
     mount_Names=("${!mount_Group[@]}") # Temporary storage to hold the partition names for removal
+    declare -A partition_filesystems=() # To temporarily store the filesystem of the current partition mapped to its name
 
     # Get mount partition numbers
     declare -A mount_path_Index=()
@@ -490,6 +556,18 @@ mount_Disks()
         mount_path_Index[$curr_partition_Name]=$counter
     done
 
+    # Get partition filesystem types from partition layout
+    for part_Label in "${!partition_Layout[@]}"; do
+        # Get current partition row
+        curr_partition_row="${partition_Layout[$part_Label]}"
+        
+        # Get partition filesystem
+        curr_partition_filesystem="$(echo $curr_partition_row | cut -d ',' -f2)"
+
+        # Populate local associative array
+        partition_filesystems[$part_Label]="$curr_partition_filesystem"
+    done
+
     # Mount root partition
     mount_dir="${mount_Group[Root]}"
     
@@ -505,13 +583,31 @@ mount_Disks()
 
     ## --- Processing
     ### Mount the volume to the path
-    if [[ "$MODE" == "DEBUG" ]]; then
-        echo mount "$device_Name"${mount_path_Index["Root"]} $mount_dir
-    else
-        mount "$device_Name"${mount_path_Index["Root"]} $mount_dir && \
-            echo -e "Partition [Root] Mounted." || \
-            echo -e "Error mounting Partition [Root]"
-    fi   
+    #### Check filesystem
+    curr_filesystem="${partition_filesystems[Root]}"
+    echo -e "Current Filesystem [Root] => [$curr_filesystem]"
+    case "$curr_filesystem" in
+        "fat32")
+            # FAT32 formatting is in vfat
+            if [[ "$MODE" == "DEBUG" ]]; then
+                echo mount -t vfat "$device_Name"${mount_path_Index["Root"]} $mount_dir
+            else
+                mount -t vfat "$device_Name"${mount_path_Index["Root"]} $mount_dir && \
+                    echo -e "Partition [Root] Mounted." || \
+                    echo -e "Error mounting Partition [Root]"
+            fi
+            ;;
+        *)
+            # Any other filesystems
+            if [[ "$MODE" == "DEBUG" ]]; then
+                echo mount -t "${partition_filesystems[Root]}" "$device_Name"${mount_path_Index["Root"]} $mount_dir
+            else
+                mount -t "${partition_filesystems[Root]}" "$device_Name"${mount_path_Index["Root"]} $mount_dir && \
+                    echo -e "Partition [Root] Mounted." || \
+                    echo -e "Error mounting Partition [Root]"
+            fi   
+            ;;
+    esac
 
     ### Unset/Remove Root partition from mount list
     unset_arr_value "Root" mount_Names "${mount_Names[@]}"
@@ -531,13 +627,32 @@ mount_Disks()
 
     ## --- Processing
     ### Mount the volume to the path
-    if [[ "$MODE" == "DEBUG" ]]; then
-        echo mount "$device_Name"${mount_path_Index["Boot"]} $boot_dir
-    else
-        mount "$device_Name"${mount_path_Index["Boot"]} $boot_dir && \
-            echo -e "Partition [Boot] Mounted." || \
-            echo -e "Error mounting Partition [Boot]"
-    fi
+    #### Check filesystem
+    curr_filesystem="${partition_filesystems[Boot]}"
+    echo -e "Current Filesystem [Boot] => [$curr_filesystem]"
+    case "$curr_filesystem" in
+        "fat32")
+            # FAT32 formatting is in vfat
+            # Any other filesystems
+            if [[ "$MODE" == "DEBUG" ]]; then
+                echo mount -t vfat "$device_Name"${mount_path_Index["Boot"]} $boot_dir
+            else
+                mount -t vfat "$device_Name"${mount_path_Index["Boot"]} $boot_dir && \
+                    echo -e "Partition [Boot] Mounted." || \
+                    echo -e "Error mounting Partition [Boot]"
+            fi
+            ;;
+        *)
+            # Any other filesystems
+            if [[ "$MODE" == "DEBUG" ]]; then
+                echo mount -t "$curr_filesystem" "$device_Name"${mount_path_Index["Boot"]} $boot_dir
+            else
+                mount -t "$curr_filesystem" "$device_Name"${mount_path_Index["Boot"]} $boot_dir && \
+                    echo -e "Partition [Boot] Mounted." || \
+                    echo -e "Error mounting Partition [Boot]"
+            fi
+            ;;
+    esac
 
     ### Unset/Remove Boot partition from mount list
     unset_arr_value "Boot" mount_Names "${mount_Names[@]}"
@@ -558,13 +673,29 @@ mount_Disks()
 
         ## --- Processing
         ### Mount the volume to the path
-        if [[ "$MODE" == "DEBUG" ]]; then
-            echo mount "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir
-        else
-            mount "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir && \
-                echo -e "Partition [$part_Names] Mounted." || \
-                echo -e "Error mounting Partition [$part_Names]"
-        fi
+        #### Check filesystem
+        curr_filesystem="${partition_filesystems[$part_Names]}"
+        echo -e "Current Filesystem [$part_Names] => [$curr_filesystem]"
+        case "$curr_filesystem" in
+            "fat32")
+                if [[ "$MODE" == "DEBUG" ]]; then
+                    echo mount -t vfat "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir
+                else
+                    mount -t vfat "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir && \
+                        echo -e "Partition [$part_Names] Mounted." || \
+                        echo -e "Error mounting Partition [$part_Names]"
+                fi
+                ;;
+            *)
+                if [[ "$MODE" == "DEBUG" ]]; then
+                    echo mount -t "$curr_filesystem" "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir
+                else
+                    mount -t "$curr_filesystem" "$device_Name"${mount_path_Index[$part_Names]} $part_mount_dir && \
+                        echo -e "Partition [$part_Names] Mounted." || \
+                        echo -e "Error mounting Partition [$part_Names]"
+                fi
+                ;;
+        esac
     done
 }
 
@@ -635,6 +766,7 @@ arch_chroot_Exec()
 	hostname="${network_config["hostname"]}"
     default_Kernel="${linux["kernel"]}"
 	bootloader="${osdef["bootloader"]}"
+    bootloader_directory="${osdef["bootloader-directory"]}"
 	bootloader_optional_Params="${osdef["optional-parameters"]}"
 	bootloader_target_device_Type="${osdef["target_device_Type"]}"
 
@@ -682,15 +814,40 @@ arch_chroot_Exec()
 	case "$bootloader" in
 		# Step 15: Bootloader
 		"grub")
-			chroot_commands+=(
+            # Default Bootloader Directory
+            if [[ "$bootloader_directory" == "" ]]; then
+                # Empty : Reset to 'Grub'
+                echo "(-) Sorry, $bootloader_directory is not provided, defaulting to /boot/grub"
+                bootloader_directory="/boot/grub"
+            fi
+
+            # Setup bootloader
+            chroot_commands+=(
                 "echo \(+\) Installing Bootloader : Grub"
                 "sudo pacman -S grub"																# Install Grub Package
-				"grub-install --target=$bootloader_target_device_Type --debug $bootloader_optional_Params $device_Name"	# Install Grub Bootloader
-				"mkdir -p /boot/grub"																# Create grub folder
-				"grub-mkconfig -o /boot/grub/grub.cfg"												# Create grub config
-			)
+            )
+
+            # Check if partition table is GPT
+            if [[ "$device_Label" == "gpt" ]]; then
+                # Install GPT/(U)EFI dependencies
+                chroot_commands+=(
+                    "sudo pacman -S efibootmgr"
+                )
+            fi
+
+            # Install Bootloader
+            chroot_commands+=(
+                "grub-install --target=$bootloader_target_device_Type $bootloader_optional_Params $device_Name"	# Install Grub Bootloader
+            )
+
+            # Generate bootloader configuration file
+            chroot_commands+=(
+                "mkdir -p $bootloader_directory"                                                                # Create grub folder
+                "grub-mkconfig -o $bootloader_directory/grub.cfg"                                               # Create grub config
+            )
 			;;
 		"syslinux")
+            ### Syslinux bootloader support is currently still a WIP and Testing
 			chroot_commands+=(
                 "echo \(+\) Installing Bootloader : Syslinux"
 				"sudo pacman -S syslinux"
@@ -699,7 +856,7 @@ arch_chroot_Exec()
 				"extlinux --install /boot/syslinux"
 			)
 			case "$device_Label" in
-				"mbr")
+				"msdos" | "mbr")
 					chroot_commands+=(
 						"dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=$device_Name"
 					)
@@ -1245,6 +1402,7 @@ installer()
     echo -e "(S) Verifying Boot Mode..."
 	boot_Mode="$(verify_boot_Mode)"
     echo -e "(+) Boot Mode: $boot_Mode"
+
     echo -e "(D) Boot Mode verification completed."
 
     if [[ "$MODE" == "DEBUG" ]]; then
@@ -1552,9 +1710,10 @@ setup()
         # EDIT: Modify this
         # Operating System Definitions 
         # - Bootloader, Kernels (to be added) etc.
-        [bootloader]="$bootloader"					# Your Bootloader
-        [optional-parameters]="$bootloader_Params"	# Your Bootloader's additional parameters outside of the main important ones
-        [target_device_Type]="$platform_Arch"		# Your Target Device Type
+        [bootloader]="$bootloader"					# Your Bootloader as defined in the configuration file
+        [bootloader-directory]="$bootloader_directory" # The Bootloader directory as defined in the configuration file; Default: /boot/grub
+        [optional-parameters]="$bootloader_Params"	# Your Bootloader's additional parameters outside of the main important ones as defined in the configuration file
+        [target_device_Type]="$platform_Arch"		# Your Target Device Architecture/Type as defined in the configuration file
     )
 
     ### Linux Definitions
@@ -1583,6 +1742,7 @@ init_Variables()
     declare -gA device_Parameters=()
     declare -gA partition_Configuration=()
     declare -gA partition_Parameters=()
+    declare -gA partition_Layout=()
     ### Mounts
     declare -gA mount_Group=()
     ### Region & Location
@@ -1673,6 +1833,15 @@ body()
 						shift 1
 					fi
 					;;
+                "-e" | "--editor")
+                    # Set default editor
+                    if [[ "$2" != "" ]]; then
+                        EDITOR="$2"
+                        shift 2
+                    else
+                        shift 1
+                    fi
+                    ;;
                 "-g" | "--generate-config")
                     # Generate configuration file
                     generate_config
@@ -1692,6 +1861,26 @@ body()
 					echo -e "Display Help"
 					display_help
 					shift 1
+                    ;;
+                "--cfdisk")
+                    # Open up cfdisk for manual partition configuration
+                    if [[ "$TARGET_DISK_NAME" == "" ]]; then
+                        echo -e "Target Disk Pathname (i.e. /dev/sdX) is not specified."
+                        exit 1
+                    else
+                        cfdisk "$TARGET_DISK_NAME"
+                    fi
+                    shift 1
+                    ;;
+                "--fdisk")
+                    # Open up fdisk for manual partition configuration
+                    if [[ "$TARGET_DISK_NAME" == "" ]]; then
+                        echo -e "Target Disk Pathname (i.e. /dev/sdX) is not specified."
+                        exit 1
+                    else
+                        fdisk "$TARGET_DISK_NAME"
+                    fi
+                    shift 1
                     ;;
                 "start")
                     # Start the installer

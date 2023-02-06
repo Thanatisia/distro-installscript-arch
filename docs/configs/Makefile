@@ -3,14 +3,15 @@
 # [Variables]
 
 # Settings and Configurations
-TARGET_DISK = /dev/sdd
+TARGET_DISK = /dev/sdX
 MOUNT_ROOT = "/mnt"
 MOUNT_PATHS = "/mnt/boot" "/mnt" "/mnt/home"
 
 # Program Variables
 ENV = TARGET_DISK_NAME="$(TARGET_DISK)"	# Environment Variables
-SCRIPT = "distinstall"					# Script Filename
-CFLAGS =         						# Compilation Flags
+SCRIPT = distinstall					# Script Filename
+CFG_FILE = config.sh					# Script Default Configuration File
+CFLAGS =                                # Compilation Flags
 
 # [Commands]
 CMD = $(ENV) ./$(SCRIPT)
@@ -26,6 +27,7 @@ help:
 	@declare -A opts=( \
 		[help]="Displays this help menu" \
 		[init]="Initialize Environment Variables and System/Program Information" \
+		[download]="Download all files required: installer, config file" \
         [testinstall]="Run the install script's test suite and see the commands it will run before committing" \
         [install]="Run the install script. WARNING: This will overwrite the target disk/filesystem, please becareful. You will need to run 'sudo make install' to execute this" \
 		[genscript]="Run install-gen and generate the commands to output as a script" \
@@ -37,6 +39,17 @@ help:
 
 init:
 	## Initialize Environment Variables and System/Program Information
+
+download:
+	## Download all files required
+	### 1. Installer
+	### 2. Configuration File
+
+	# Download installer if not found
+	@test -f "$(SCRIPT)" || curl -L -O "https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/distinstall"
+
+	# Generate config file if not found
+	@test -f "$(CFG_FILE)" || ./$(SCRIPT) -g
 
 testinstall: init
 	## Run the install script testsuite
@@ -53,8 +66,7 @@ install: clean
 genscript:
 	## Run install-gen and generate the commands to install and
 	# Output as a script file for backup
-	# Still in testing and development phase
-	@makes -s testinstall | tee -a commands.sh
+	$(CMD) $(CFLAGS) -g
 
 clean: 
 	## Clean all temporary files and unmount drives 
@@ -62,5 +74,3 @@ clean:
 	! mountpoint -q "$(MOUNT_ROOT)" || sudo umount -l $(MOUNT_ROOT) # If error, assume no errors
 
 ### Test Suites / Unit Tests
-
-

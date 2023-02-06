@@ -33,13 +33,14 @@
 		+ x GiB : Size in Gibibytes
 		+ x MB : Size in Megabytes
 		+ x MiB : Size in Mebibytes
-- devicePrams_Boot : The bootloader firmware types
+- deviceParams_Boot : The motherboard bootloader firmware types
 	- Possible Values:
-		+ msdos : The DOS firmware type; aka BIOS
+		+ bios : The DOS firmware type; aka BIOS
 		+ uefi : The Unified Extensible Firmware Interface; Supports MBR hard drive bootloader partition table
 - deviceParams_Label : The Bootloader Partition Table
 	- Possible Values:
-		- mbr : The Master Boot Record
+		- mbr/msdos : The Master Boot Record
+			+ also known as MSDOS
 			+ Only supports drives of 2TB and lower
 			- Partition Types
 				- Primary : The main read-writable partition type
@@ -48,6 +49,8 @@
 					- Logical
 		+ gpt : The GUID Partition Table; part of the UEFI
 			+ Supports drives 2TB and above
+			+ GPT uses Partition Labels - effectively, these are names tagged to the target disk/device in use - instead of Partition Types (i.e. primary, extended, logical)
+				- Device partitions can then be searched in '/dev/disk/by-partlabel/[your-partition-label]' instead of its UUID or its disk name (i.e. /dev/sdX)
 - boot_Partition : The disk/filesystem partition definition you wish to create on the disk
 	+ Data Type: Associative Array; HashMap; Dictionary
 	- Notes
@@ -278,19 +281,58 @@
 		```shellscript
 		bootloader="<your-bootloader>"
 		```
+- bootloader_directory : Your Bootloader's mount point; Typically is also your boot partition mount point. 
+	- Notes
+		+ Certain bootloaders (i.e. Grub) have different boot directories based on the Partition Table (i.e. MBR/GPT)
+		- For GPT (UEFI) systems
+			+ Commonly known as the 'ESP' - aka the EFI System Partition directory
+			+ This directory is also where GRUB will create and install the 'EFI\[distribution]\grubx64.efi' or equivalent files in, alongside the GRUB general files.
+	+ Default Value: /boot/grub
+	- Synopsis/Syntax
+		```shellscript
+		bootloader_directory="[mount-point]/grub"
+		```
+	- Examples
+		- Recommended
+			```shellscript
+			bootloader_directory="/boot/grub"
+			```
+		- EFI Root directory
+			```shellscript
+			bootloader_directory="/efi/grub"
+			```
+		- Boot-EFI directory
+			```shellscript
+			bootloader_directory="/boot/efi/grub"
+			```
 - bootloader_Params : Bootloader Parameters to parse into the installation process
 	- Notes
 		+ This is used during the installation process of the bootloader you identified
+		+ Please place all additional parameters you wish to parse into the bootloader installation proes
 		+ fill this if you have any, leave empty if NIL
+	- Possible Values
+		- For GPT (UEFI) systems
+			- GRUB
+				+ --efi-directory : Your EFI system/boot partition directory; Required for UEFI systems to detect the startup script
+					- Notes
+						+ Recommended to place it in the same directory as where you mounted
+					- Possible Values
+						+ /boot
+						+ /boot/efi
 	- Syntax/Synopsis
 		```shellscript
-		bootloader_Params=""
+		bootloader_Params="[parameters]"
 		```
 	- Examples
 		- GRUB
-			```console
-			bootloader_Params="--debug"
-			```
+			- General
+				```console
+				bootloader_Params="--debug"
+				```
+			- For GPT (UEFI) Systems
+				```console
+				bootloader_Params="--efi-directr=/boot --debug"
+				```
 - default_kernel : A Default Linux Kernel to assign to use in case none is identified
 	- Notes
 		+ This feature is still under testing
@@ -306,16 +348,21 @@
 	- Brief Description
 		- Your system architecture refers - more specifically - to your CPU architecture
 	- Possible Values:
-		+ i386-pc : Supports 32-bit and 64-bit CPU architectures; Recommended by default
-		+ x86_64 : x86-64 (32-bit/64-bit)
+		+ i386-pc    : Supports 32-bit and 64-bit CPU architectures; Recommended by default as this is generally used by Non-UEFI systems (basically MBR/MSDOS/BIOS systems).
+		+ x86_64-efi : x86-64 (32-bit/64-bit) CPU architectures; This is generally used by UEFI systems
 	- Synopsis/Syntax
 		```shellscript
 		platform_Arch="<platform-architecture>"
 		```
 	- Examples
-		```shellscript
-		platform_Arch="i386-pc"
-		```
+		- i386-pc
+			```shellscript
+			platform_Arch="i386-pc"
+			```
+		- x86_64-efi
+			```shellscript
+			platform_Arch="x86_64-efi"
+			```
 
 ## Resources
 + [GRUB bootloader](https://wiki.archlinux.org/title/GRUB)

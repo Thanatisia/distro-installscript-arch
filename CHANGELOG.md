@@ -27,6 +27,7 @@ release_date | version_number | release_author
 + 2022-08-27 1651H | v1.1.0 | Asura
 + 2023-01-19 1849H | v1.1.1 | Asura
 + 2023-01-20 1635H | v1.1.2 | Asura
++ 2023-02-06 1518H | v1.4.0 | Asura
 
 ### CHANGELOGS
 ```
@@ -143,4 +144,119 @@ release_date | version_number:
     - Error validation and checking, implementing exit if error was detected
     ```
 
+- 2023-02-01 2206H | v1.3.6
+    ```
+    [New Features]
+    - Installer
+        - For Developers:
+            - 'partition_Configuration', 'mount_Group', 'user_Info' variables in installer now do not need to be statically modified, they will now dynamically read from the config file
+                + The syntax is provided in the comments, thus if you wish to statically define, you may do so
+            - Partition mounting are no longer statically defined and is now dynamic
+                + This means that you can define the mount path in the config file mapped to the Partition Name
+                - Note that there's a couple of requirements:
+                    - There are special partitions that has a special naming convention
+                        + Root partition : For root partitions, you need to name it 'Root' as the mount_Disk function will mount the root partition first before mounting the others
+            + New function 'unset_arr_value': To remove an element from an array via the 'unset' function
 
+    [Bug Fixes]
+    - Fixed bug where copying of files in postinstall_sanitize() wasnt detecting the user properly, and thus, wasnt copying to the accounts properly
+    - Fixed issue where user_ProfileInfo and user_Info variables needed to be manually modified by user (Inefficient)
+        + because of that, 'user_Info' was only reading 1 item from the 'user_ProfileInfo' array from the config file
+    - Fixed issue where mounting of disk partition wasnt mounting the 'Root' partition first, thus all the mounting were out of position
+        - I.E
+           + Partition 'Boot' was mounted before Root => Mounting Root overwrote the boot partition => only Root and Home partitions were mounted
+           + Partition 'Home' was mounted before Root => Mounting Root overwrote the home partition => Only Root and Boot partitions were mounted, and the Home directory was created inside the mount partition and mounted as the 'Home partition'
+
+    [Changes]
+    - configuration file
+        - Modified variable 'mount_Paths'
+            - Prepended a new column in each row for Partition Name, this is for identification purposes
+            - Seperated by ',' delimiter
+            - Thus, the current structure for the 'mount_Paths' array is 'Paritition Name,Mount Path'
+            - Reason: 
+                - This change was made to solve bug/issue no.1 whereby the mount paths are being mounted at inconsistent orders, which means mount directories will be overwritten.
+                - This issue can be seen more clearly if you unmount and remount, the home partition will be overwritten - which suggests that the home mount directory was not mounted in the home partition
+
+    - distinstall
+        - Modified global variable 'mount_Group'
+            - Changes
+                - Changed 'curr_mount_row' to 'curr_mount_name'
+        - Created function 'unset_arr_value' to remove an element from an array via the 'unset' function using the target value's index
+        - Modified function 'mount_Disks' to fix bug/issue no.1
+            - Temporary Solution:
+                - Root must be mounted before the Boot partition, thus the decision to add a Paritition name at the back of the mount path
+                - Notes
+                    - There are some mandatory partition names to use
+                        - Boot Partition : 'Boot'
+                        - Root Partition : 'Root'
+        - Fixed static user_Profile definition issue
+
+    - TODO
+        - Added more tasks and ideas to the pipeline
+
+    [Created]
+    - Created file 'ISSUES.md' to store all issues
+    ```
+
+- 2023-02-06 1521H | v1.4.0
+    ```
+    [New Features]
+    - new rule 'download' to download all necessary files in a single target into Makefile
+        - Files
+            - Download installer from the repository
+            - Generate config file using the installer script
+        - Purpose:
+            + This allows the user to easily obtain the required files just by downloading the Makefile
+    - GPT partition table support on UEFI systems into installer
+    - GRUB installation with GPT (UEFI)
+        - Notes for users
+            + Please remember to add '--efi-directory=/boot' to the 'bootloader_Params' variable in the configuration file if you are installing using GPT (UEFI)
+    - Swap Partition support
+    - New CLI Argument flags
+    - New Configuration variables
+
+    [Changes]
+    - Makefile
+        - Added new rule 'download' to download all necessary files in a single target
+            - Download installer
+            - Generate config file
+
+    - distinstall
+        - Added '-e' | '--editor' flags into CLI Argument to set your default editor
+        - Added '--fdisk' and '--cfdisk' flags into CLI Argument for Manual Partition Configuration support
+        - Added Swap partition type formatting
+        - Added Swap partition enabling (swapon)
+        - Removed '--debug' flag from grub-install command by default, please append the '--debug' flag in the 'bootloader_Params' variable in the configuration file
+        - Added variable 'bootloader_directory' that corresponds to the configuration variable 'bootloader_directory' that will contain the bootloader's directory in the boot partition
+        - Refactored Grub installation structure to use the bootloader_directory variable instead of '/boot/grub' directly for dynamic user control
+        - Added Associative Array 'partition_Layout' to map the partition name with the partition configuration for reusability
+        - Added GPT partition table support on UEFI systems
+        - Added GRUB GPT installation support
+
+    - Configuration file
+        - Added new variable 'bootloader-directory' for your bootloader's directory in the boot partition; Certain bootloaders have different boot directories based on the partition table (i.e. MBR/GPT)
+            + Default Value: /boot/[your-bootloader]
+            - GRUB
+                + Recommended: /boot/grub
+                + GPT (UEFI): /efi/grub
+
+    - Files Changed
+        - Root
+            + CHANGELOG
+            + TODO
+
+        - docs
+            + features.md
+            + installer configuration guide
+
+            - Configuration templates
+                + Makefile
+                + config.sh
+
+            - Manuals
+                + distinstall.md
+
+        - Source Files
+            + Makefile
+            + distinstall (Installer)
+    ```
