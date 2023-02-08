@@ -117,9 +117,19 @@ and/or the tools required by the target distribution changed, thus, leading to t
 ### Obtaining all necessary files
 > Includes the above - Installer, config file and additional utilities
 - Downloading the latest release
-    ```console
-    wget "https://github.com/Thanatisia/distro-installscript-arch/releases/latest/distinstall-*.zip"
-    ```
+    > Includes the above - Installer, config file and additional utilities
+    - Download the latest release from 'https://github.com/Thanatisia/distro-installscript-arch/releases/latest'
+
+- Download via the Makefile
+    - Download Makefile
+        ```console
+        curl -L -O https://raw.githubusercontent.com/Thanatisia/distro-installscript-arch/main/src/base-installation/Makefile
+        ```
+    - Execute the 'download' rule/target
+        + You should get all the necessary files required (i.e. installer, generated configuration file)
+        ```console
+        make download
+        ```
 
 ## Documentation
 ### Synopsis/Syntax
@@ -132,70 +142,87 @@ and/or the tools required by the target distribution changed, thus, leading to t
     - With Arguments
         + -c [config-file-name] | --config      [config-file-name] : Set custom configuration file name
         + -d [target-disk-name] | --target-disk [target-disk-name] : Set target disk name
+        + -e [default-editor]   | --editor      [default-editor]   : Set default text editor
         + -m [DEBUG|RELEASE]    | --mode        [DEBUG|RELEASE]    : Set mode (DEBUG|RELEASE)
     - Flags
         + -g | --generate-config    : Generate configuration file
         + -h | --help               : Display this help menu and all commands/command line arguments
+        + --fdisk                   : Open up fdisk for manual partition configuration
+        + --cfdisk                  : Open up cfdisk for manual partition configuration
 
 - Positional Parameters
     + start : Start the installer
 
 ### Usage
-- Examples
-    1. Default (Test Install; Did not specify target disk name explicitly)
-        ```console
-        ./distinstall start
-        ```
+1. Default (Test Install; Did not specify target disk name explicitly)
+    ```console
+    ./distinstall start
+    ```
 
-    2. Test Install; with target disk name specified as flag
-        ```console
-        ./distinstall -d "/dev/sdX" start
-        ```
+2. Test Install; with target disk name specified as flag
+    ```console
+    ./distinstall -d "/dev/sdX" start
+    ```
 
-    3. Test Install; with target disk name specified with environment variable TARGET_DISK_NAME
-        ```console
-        TARGET_DISK_NAME="/dev/sdX" ./distinstall start
-        ```
+3. Test Install; with target disk name specified with environment variable TARGET_DISK_NAME
+    ```console
+    TARGET_DISK_NAME="/dev/sdX" ./distinstall start
+    ```
 
-    4. Test Install; with custom configuration file
-        ```console
-        ./distinstall -c "new config file" -d "/dev/sdX" start
-        ```
+4. Test Install; with custom configuration file
+    ```console
+    ./distinstall -c "new config file" -d "/dev/sdX" start
+    ```
 
-    5. Start installation (Did not specify target disk name explicitly)
-        ```console
-        sudo ./distinstall -m RELEASE start
-        ```
+5. Start installation (Did not specify target disk name explicitly)
+    ```console
+    sudo ./distinstall -m RELEASE start
+    ```
 
-    6. Start installation (with target disk name specified as flag)
-        ```console
-        sudo ./distinstall -d "/dev/sdX" -m RELEASE start
-        ```
+6. Start installation (with target disk name specified as flag)
+    ```console
+    sudo ./distinstall -d "/dev/sdX" -m RELEASE start
+    ```
 
-    7. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
-        ```console
-        sudo TARGET_DISK_NAME="/dev/sdX" ./distinstall -m RELEASE start
-        ```
+7. Start installation (with target disk name specified with environment variable TARGET_DISK_NAME)
+    ```console
+    sudo TARGET_DISK_NAME="/dev/sdX" ./distinstall -m RELEASE start
+    ```
 
-    8. Start installation (with custom configuration file)
-        ```console
-        sudo ./distinstall -c "new config file" -d "/dev/sdX" -m RELEASE start
-        ```
+8. Start installation (with custom configuration file)
+    ```console
+    sudo ./distinstall -c "new config file" -d "/dev/sdX" -m RELEASE start
+    ```
 
-    9. Test Install; using Makefile
-        ```console
-        make testinstall
-        ```
+9. Open up fdisk for Manual Partitioning
+    ```console
+    sudo ./distinstall --fdisk
+    ```
 
-    10. Start installation; using Makefile
-        ```console
-        sudo make install
-        ```
+10. Open up cfdisk for Manual Partitioning
+    ```console
+    sudo ./distinstall --cfdisk
+    ```
 
-    11. Dis/Unmount using Makefile
-        ```console
-        sudo make clean
-        ```
+11. Test Install; using Makefile
+    ```console
+    make testinstall
+    ```
+
+12. Start installation; using Makefile
+    ```console
+    sudo make install
+    ```
+
+13. Dis/Unmount using Makefile
+    ```console
+    sudo make clean
+    ```
+
+14. Generate configuration file using Makefile
+    ```console
+    make genscript
+    ```
 
 ## Wiki
 - Modes
