@@ -1296,8 +1296,8 @@ postinstall_sanitize()
 
                         for ((i=0; i < $number_of_external_scripts; i++)); do
                             curr_script="${external_scripts[$i]}"
-                            echo "Copying from [$dir_Mount] : $curr_script => /mnt/$u_home_Dir"
-                            cp $curr_script /mnt/$u_home_Dir/														# Copy script from root to user
+                            echo "Copying from [$dir_Mount] : $curr_script => $dir_Mount/$u_home_Dir"
+                            cp $curr_script $dir_Mount/$u_home_Dir/														# Copy script from root to user
                             # arch-chroot $dir_Mount /bin/bash -c "chown -R $u_name:$u_primary_Group $u_home_Dir/$curr_script"		# Change ownership of file to user
                         done
 					done
@@ -1311,8 +1311,8 @@ postinstall_sanitize()
                     # Start copy
                     for ((i=0; i < $number_of_external_scripts; i++)); do
                         curr_script="${external_scripts[$i]}"
-                        echo "Copying from [$dir_Mount] : $curr_script => /mnt/$sel_uhome_dir/"
-                        cp $curr_script /mnt/$sel_uhome_dir/
+                        echo "Copying from [$dir_Mount] : $curr_script => $dir_Mount/$sel_uhome_dir/"
+                        cp $curr_script $dir_Mount/$sel_uhome_dir/
                         # arch-chroot $dir_Mount /bin/bash -c "chown -R $sel_uhome:$sel_primary_group $sel_uhome_dir/$curr_script"		# Change ownership of file to user
                     done
 					;;
