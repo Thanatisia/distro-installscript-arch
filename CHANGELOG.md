@@ -28,6 +28,8 @@ release_date | version_number | release_author
 + 2023-01-19 1849H | v1.1.1 | Asura
 + 2023-01-20 1635H | v1.1.2 | Asura
 + 2023-02-06 1518H | v1.4.0 | Asura
++ 2023-02-08 1641H | v1.4.1 | Asura
++ 2023-09-19 2014H | v1.4.2 | Asura
 
 ### CHANGELOGS
 ```
@@ -260,3 +262,8 @@ release_date | version_number:
             + Makefile
             + distinstall (Installer)
     ```
+
+- 2023-09-19 2015H | v1.4.2
+    - Performed some simple cleaning up and restructuring to make it easier to navigate the repository, as well as cleaner
+    - Added tasks to TODO list that may have become relevant in the time I was busy from school work
+

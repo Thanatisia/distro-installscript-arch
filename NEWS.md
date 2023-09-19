@@ -5,7 +5,6 @@
 - Do message me with any comments or suggestions for improvements, all comments will be greatly appreciated!
 - Please star/follow this repository if you think this is useful!
 
-
 ## News
 ### 2022-03-04 1349H
 - The current status of the scripts is tested primarily for brand new installations
@@ -25,6 +24,7 @@
         + type-2 is operating as a source-config environment, theres a template config generated inside the script itself though, you can also just curl/download th template i have in my docs directory that I will push to githube
     + I am still considering which format is more configurable, once I have decided, I will rework the project filestructure and tidy up the repository.
     + I apologise for the messy structure at the moment.
+
 ### 2022-07-02 0019H
 - Stable release v1.0.0
     + First of all, thank you to everyone whom have provided feedback as to which type you prefer.
@@ -33,6 +33,7 @@
         + Thus, this makes the program more portable, configurable and customizable.
     + This means that this is what I would consider the first stable release
     + Other changes can be found in [Changelog](CHANGELOG.md)
+
 ### 2023-01-25 1311H
 - Implemented CLI Argument support and refactoring of documentations
     - New Features
@@ -41,5 +42,12 @@
         + Refactored installer to place initialized global variables into functions, allowing reusability, and readability as it is now cleaner
     + Tested multiple times, should be stable (please create issues if any are found, thank you!)
     + Please refer to the [CHANGELOGS](CHANGELOG.md) for all changes
+
+### 2023-09-19 2016H
+- It has been awhile since I last pushed anything, was busy with my school work the last few months
+    + and I just completed my examinations and now have some time to spare
+- Over the 9 months, I have had some new ideas on what could be done, as well as a generalized plan for this project that may be quite interesting
+    + Plans are still in order though, so I'll need to loop at the pipeline as well as designs
++ If you have been using this project/application/repository, thank you
 
 
