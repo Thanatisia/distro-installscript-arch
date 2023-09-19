@@ -19,20 +19,19 @@
     + linux-zen
 
 ### Motherboard Bootloader Firmware
-+ MSDOS  : The MSDOS motherboard firmware; To be replaced with the term 'BIOS'
-+ (U)EFI : The UEFI  motherboard firmware
++ bios   : A legacy motherboard firmware; Support Status: Unused
++ (u)efi : The Unified Extension Firmware Interface; a modern motherboard firmware used as replacement of the BIOS firmware; Support Status: Unused
 
-### Partition Table Format
-+ BIOS   : The BIOS/Master Boot Record (MBR) (To be replaced with the keyword 'MSDOS'/'MBR'; Legacy format used for disk with max size <= 2TB
-+ MSDOS  : WIP; To replace 'BIOS' with this and/or 'MBR'
-+ GPT    : The UEFI/GPT partition table format; Used for disks with max size > 2TB
+### Partition Table Label/Format
++ msdos  : aka Master Boot Record (MBR) partitioning; Legacy format used with the BIOS motherboard bootloader firmware for disk with max size <= 2TB; Support Status: Supported
++ gpt    : The UEFI/GPT partition table format; Used for disks with max size > 2TB; Support Status: to be tested
 
 ### Filesystem Type
 + ext4
 + btrfs : WIP - Currently not supported
 
 ### Filesystem Label
-+ /dev/sdX : For SATA HDD/SSD Drives; related to AHCI
++ /dev/sdX : For SATA HDD/SSD Drives; related to AHCI; Support Status: Supported
 + /dev/nvme[drive-number]p[partition-number] : For NVME Drives; WIP - Currently not supported)
 
 ### Bootloader Support

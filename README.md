@@ -38,7 +38,8 @@ and/or the tools required by the target distribution changed, thus, leading to t
     + change that line of code and that should do it, as some of the general steps are universal across the distro CLI-based installation steps
     + Thus, with the modular, containerized method, the modification of codes will be easier and customizable
 
- ### Files and Folders
+### Files and Folders
+- [SUPPORT.md](SUPPORT.md) : For a list of hardware/software support
 - [Source codes](src) : This is the root working directory containing the source files, configuration and scripts
     - [base-installation/](src/base-installation) : This is the Base Installation script. All files placed here have been tested from those found in dev (Development Folder). This is probably where you want to go first.
     - [post-installation/](src/post-installation) : This is the Post-Installation related scripts. All files placed here have been tested from those found in dev
