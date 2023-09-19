@@ -47,23 +47,6 @@ and/or the tools required by the target distribution changed, thus, leading to t
 - [documentations](docs) : This contains all documentations and guides for references
     + including detailed setup; usage
 
-### Support
-#### Architectures 
-- supported/tested
-    + i386-pc
-- testing
-    + amd64
-    + arm
-    + x86_64
-
-#### Kernel
-- supported/tested
-    + linux : The base/latest Linux kernel
-- testing
-    + linux-lts
-    + linux-zen
-
-
 ## Setup
 > This is a basic rundown of how to use the program, please refer to [Base Installation Manual](docs/manuals/distinstall.md) for a more detailed rundown
 ### Pre-Requisites
