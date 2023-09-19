@@ -19,4 +19,5 @@
 - [O] Add command line (CLI) argument (parameters/flag) support
     + [O] To fit the mission
 - [X] Refactor and rename variable 'devicePrams_Boot' in the configuration template structure as well as the installer
+- [] Reorganize CLI argument to be placeable in any position unless is behind an option/positional with additional arguments
 
