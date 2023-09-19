@@ -38,7 +38,8 @@ and/or the tools required by the target distribution changed, thus, leading to t
     + change that line of code and that should do it, as some of the general steps are universal across the distro CLI-based installation steps
     + Thus, with the modular, containerized method, the modification of codes will be easier and customizable
 
- ### Files and Folders
+### Files and Folders
+- [SUPPORT.md](SUPPORT.md) : For a list of hardware/software support
 - [Source codes](src) : This is the root working directory containing the source files, configuration and scripts
     - [base-installation/](src/base-installation) : This is the Base Installation script. All files placed here have been tested from those found in dev (Development Folder). This is probably where you want to go first.
     - [post-installation/](src/post-installation) : This is the Post-Installation related scripts. All files placed here have been tested from those found in dev
@@ -46,7 +47,7 @@ and/or the tools required by the target distribution changed, thus, leading to t
 - [development](dev) : This is the development directory. This directory is essentially the Nightly Build branch and to be considered as Testing or unsafe, just to be safe, please test the files found here in a Virtual Machine.
 - [documentations](docs) : This contains all documentations and guides for references
     + including detailed setup; usage
-    
+
 ## Setup
 > This is a basic rundown of how to use the program, please refer to [Base Installation Manual](docs/manuals/distinstall.md) for a more detailed rundown
 ### Pre-Requisites
@@ -225,15 +226,15 @@ and/or the tools required by the target distribution changed, thus, leading to t
     ```
 
 ## Wiki
-- Modes
-    + DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
-    + RELEASE : Performs the real RELEASE; must use with sudo
+### Modes
++ DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
++ RELEASE : Performs the real RELEASE; must use with sudo
 
-- Environment Variables
-	+ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
+### Environment Variables
++ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
 
-- Configuration guide
-    + Please refer to the [configuration guide](docs/installer%20configuration.md) for full information with regards to editing the configuration file
+### Configuration
++ Please refer to the [configuration guide](docs/installer%20configuration.md) for full information with regards to editing the configuration file
 
 ## FAQs
 
