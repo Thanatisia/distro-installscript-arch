@@ -26,6 +26,7 @@ help:
 	## Displays this help menu
 	@declare -A opts=( \
 		[help]="Displays this help menu" \
+		[display_snippets]="Display Sample Usages with both Makefile and bare metal" \
 		[init]="Initialize Environment Variables and System/Program Information" \
 		[download]="Download all files required: installer, config file" \
         [testinstall]="Run the install script's test suite and see the commands it will run before committing" \
@@ -36,6 +37,19 @@ help:
     for opt in "$${!opts[@]}"; do \
 		echo -e "$${opt} : $${opts[$${opt}]}"; \
 	done
+
+display_snippets:
+	## Display Sample Usages with both Makefile and bare metal
+	@echo -e "Sample Usages with:"
+	@echo -e ""
+	@echo -e "[Makefile]"
+	@echo -e "\t 1. make testinstall  : To display the commands in its entirety; Used to verify that the flow is what you want"
+	@echo -e "\t 2. sudo make install : Requires sudo; To begin the partition management and installation process"
+	@echo -e ""
+	@echo -e "[Bare Metal]"
+	@echo -e "\t 1. TARGET_DISK_NAME='target-disk-label (i.e. /dev/sdX)' ./distinstall            : To display the commands in its entirety; Used to verify that the flow is what you want"
+	@echo -e "\t 2. sudo TARGET_DISK_NAME='target-disk-label (i.e. /dev/sdX)' ./distinstall start : Requires sudo; To begin the partition management and installation process"
+	@echo -e ""
 
 init:
 	## Initialize Environment Variables and System/Program Information
