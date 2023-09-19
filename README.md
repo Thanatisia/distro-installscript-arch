@@ -46,7 +46,24 @@ and/or the tools required by the target distribution changed, thus, leading to t
 - [development](dev) : This is the development directory. This directory is essentially the Nightly Build branch and to be considered as Testing or unsafe, just to be safe, please test the files found here in a Virtual Machine.
 - [documentations](docs) : This contains all documentations and guides for references
     + including detailed setup; usage
-    
+
+### Support
+#### Architectures 
+- supported/tested
+    + i386-pc
+- testing
+    + amd64
+    + arm
+    + x86_64
+
+#### Kernel
+- supported/tested
+    + linux : The base/latest Linux kernel
+- testing
+    + linux-lts
+    + linux-zen
+
+
 ## Setup
 > This is a basic rundown of how to use the program, please refer to [Base Installation Manual](docs/manuals/distinstall.md) for a more detailed rundown
 ### Pre-Requisites
@@ -225,15 +242,15 @@ and/or the tools required by the target distribution changed, thus, leading to t
     ```
 
 ## Wiki
-- Modes
-    + DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
-    + RELEASE : Performs the real RELEASE; must use with sudo
+### Modes
++ DEBUG (Default) : Test install; Allows you to see all the commands that will be executed if you set the MODE to 'RELEASE'; set by default to prevent accidental reinstallation/overwriting
++ RELEASE : Performs the real RELEASE; must use with sudo
 
-- Environment Variables
-	+ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
+### Environment Variables
++ TARGET_DISK_NAME : This is used in the environment variable to specify the target disk you want to install with
 
-- Configuration guide
-    + Please refer to the [configuration guide](docs/installer%20configuration.md) for full information with regards to editing the configuration file
+### Configuration
++ Please refer to the [configuration guide](docs/installer%20configuration.md) for full information with regards to editing the configuration file
 
 ## FAQs
 
