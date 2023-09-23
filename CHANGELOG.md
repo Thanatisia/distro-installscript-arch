@@ -30,6 +30,9 @@ release_date | version_number | release_author
 + 2023-02-06 1518H | v1.4.0 | Asura
 + 2023-02-08 1641H | v1.4.1 | Asura
 + 2023-09-19 2014H | v1.4.2 | Asura
++ 2023-09-19 2312H | v1.4.3 | Asura
++ 2023-09-19 2252H | v1.4.4 | Asura
++ 2023-09-23 2254H | v1.4.5 | Asura
 
 ### CHANGELOGS
 ```
@@ -267,3 +270,28 @@ release_date | version_number:
     - Performed some simple cleaning up and restructuring to make it easier to navigate the repository, as well as cleaner
     - Added tasks to TODO list that may have become relevant in the time I was busy from school work
 
+- 2023-09-19 2312H | v1.4.3
+    - New
+        - Added 'SUPPORT.md' for all documentation of supported features/functions
+
+    - Updates
+        - added target 'display_snippets' to Makefile
+        - Updated features
+        - Updated README with supported information
+        - Migrated the support panel in README.md to SUPPORT.md
+        - Fixed technical terminology error in SUPPORT.md with accurate definitions, as well as tested several valid values/string inputs
+        - Added SUPPORT.md to README
+
+- 2023-09-19 2355H | v1.4.4
+    - Updates
+        - Fixed finalization steps - slight error during test install when copying scripts to users
+
+- 2023-09-23 2254H | v1.4.5
+    - Updates
+        - Began development of the port/re-implementation of the distribution installer in Python
+            - Goals to be achieved
+                + fix most of the technical terminological errors made (I know of afew) as well as to
+                + improve the configuration file handling by changing the configuration file from a linux shellscript parser to a proper Serializable data structure/object (i.e. YAML, TOML, JSON) where configuration files can be easier to edit, modify and/or use in general.
+                + improving the customizable, modifiable and portability of the project instead of using linux shellscripting (Bash) which, granted, is quite limiting
+                + Improve the readability
+                
