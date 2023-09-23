@@ -6,3 +6,6 @@
 # Ignore 'release' folder
 release/
 
+# Ignore python cache files
+__pycache__/
+
