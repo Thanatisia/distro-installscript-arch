@@ -9,6 +9,7 @@ import sys
 from lib.cli import CLIParser
 from lib.format import Text
 from lib.env import Environment
+import app.distributions as dist
 
 class Setup():
     """

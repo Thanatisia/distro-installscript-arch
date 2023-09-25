@@ -26,6 +26,7 @@ def generate_config(cfg_fname="config.yaml"):
         "device_Size" : "",
         "disk_Label" : "",
         "disk_filesystem_Label" : "",
+        "bootloader_firmware" 
 
     }
 	cfg = """
