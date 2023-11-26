@@ -2,6 +2,12 @@
 
 Linux Distribution Portable, Modular CLI/Terminal Base-Installation + Essential Scripts for ArchLinux
 
+## NOTE
++ This project has been migrated and rewrote into python in this [repository](https://github.com/Thanatisia/distinstall-python), with a consideration on potentially going to write it in golang for the ability to compile into a single binary (do tell me how you feel about this in terms of usability), please follow the attached repository for future updates! 
+- Thank you once again for following this project and feel free to dm me on any of my social media and/or create an Issue/pull request if you have any ideas on 
+    + what to add
+    + Bugs Encountered
+
 ## Table of Contents
 
 - [Information](#information)
